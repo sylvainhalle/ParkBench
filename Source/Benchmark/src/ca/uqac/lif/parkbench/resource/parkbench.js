@@ -89,6 +89,33 @@ function unselect_all_tests() {
 	$(".chk-test").prop("checked", false);
 };
 
+function select_category() {
+	if ($("#chktest-ready").prop("checked")) {
+		$("div.status-ready").each(function() {
+			var el_id = $(this).prop("id");
+			var id_parts = el_id.split("-");
+			var id = id_parts[2];
+			$("#chktest-" + id).prop("checked", true);
+		});
+	}
+	if ($("#chktest-running").prop("checked")) {
+		$("div.status-running").each(function() {
+			var el_id = $(this).prop("id");
+			var id_parts = el_id.split("-");
+			var id = id_parts[2];
+			$("#chktest-" + id).prop("checked", true);
+		});
+	}
+	if ($("#chktest-failed").prop("checked")) {
+		$("div.status-failed").each(function() {
+			var el_id = $(this).prop("id");
+			var id_parts = el_id.split("-");
+			var id = id_parts[2];
+			$("#chktest-" + id).prop("checked", true);
+		});
+	}
+};
+
 function get_time_string(status, starttime, endtime) {
   var duration = 0;
   var out_string = "";
@@ -233,6 +260,7 @@ $(document).ready(function() {
   $("#refresh-status").click(function() {refresh_test_list(true);});
   $("#check-all").click(select_all_tests);
   $("#uncheck-all").click(unselect_all_tests);
+  $("#check-category").click(select_category);
   $("#start-all").click(start_selected_tests);
   $("#save-benchmark").click(save_benchmark);
   show_benchmark_info();
