@@ -1,0 +1,33 @@
+.status-icon {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+
+.status-icon > span {
+  display: none;
+}
+
+.status-done {
+  background-color: blue;
+}
+
+.status-ready {
+  background-color: yellow;
+}
+
+.status-not-ready {
+  background-color: orange;
+}
+
+.status-failed {
+  background-color: red;
+}
+
+.status-queued {
+  background-color: grey;
+}
+
+.status-running {
+  background-color: green;
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="css/bootstrap.min.css" rel="stylesheet" media="screen" />
+<link rel="stylesheet" type="text/css" href="screen.css" />
+<style>
+  body {
+    padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+  }
+</style>
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet" />
+
+<!-- Inclusion of jQuery and Twitter Bootstrap -->
+ <script type="text/javascript" src="jquery-1.11.3.min.js"></script> 
+<script type="text/javascript" src="tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script> 
+<script type="text/javascript" src="parkbench.js"></script>
+
+<title>ParkBench Control Panel</title>
+</head>
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="brand" href="#">ParkBench</a>
+      <div class="nav-collapse collapse">
+        <ul class="nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+<div class="container">
+<h2>Benchmark info</h2>
+
+<table class="table table-condensed" id="benchmark-info">
+<tr><td>No info so far</td></td>
+</table>
+
+<h2>Tests in this benchmark</h2>
+
+<button class="btn" id="refresh-status">Refresh status</button>
+
+<h2>Status</h2>
+<table>
+<tr><td id="status-nb-not-ready">0</td><td><div class="status-icon status-not-ready"><span>Not ready</span></div></td><td>The test has not run and its prerequisites are not fulfilled</td></tr>
+<tr><td id="status-nb-ready">0</td><td><div class="status-icon status-ready"><span>Ready</span></div></td><td>The test has not run but is ready to run</td></tr>
+<tr><td id="status-nb-queued">0</td><td><div class="status-icon status-queued"><span>Queued</span></div></td><td>The test is in the queue, waiting to be started</td></tr>
+<tr><td id="status-nb-running">0</td><td><div class="status-icon status-running"><span>Running</span></div></td><td>The test is currently running</td></tr>
+<tr><td id="status-nb-done">0</td><td><div class="status-icon status-done"><span>Done</span></div></td><td>The test has completed successfully</td></tr>
+<tr><td id="status-nb-failed">0</td><td><div class="status-icon status-failed"><span>Failed</span></div></td><td>The execution of the test has failed or was manually cancelled</td></tr>
+</table>
+
+<p>
+<button class="btn btn-small" id="check-all">Select all</button>
+<button class="btn btn-small" id="uncheck-all">Unselect all</button>
+</p>
+
+<p>For selected tests:
+<button class="btn btn-small" id="start-all">Start all</button>
+</p>
+
+<p>Click on a column header to sort tests based on that column. Hold the Shift key
+to sort according to multiple columns.</p>
+
+<table id="test-list" class="table table-hover tablesorter">
+<tr><td>No test so far</td></tr>
+</table>
+
+</div> <!-- /container -->
+
+
+
+</body>
+</html>

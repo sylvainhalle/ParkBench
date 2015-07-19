@@ -1,0 +1,277 @@
+package ca.uqac.lif.parkbench;
+
+/**
+ * A test is a set of named parameters
+ * @author Sylvain
+ */
+public abstract class Test implements Runnable
+{
+	/**
+	 * The status of the test
+	 */
+	public static enum Status {DONE, FAILED, RUNNING, NOT_DONE, QUEUED};
+	
+	/**
+	 * Determines if the test is to be executed for real, or
+	 * just printed for debugging purposes.
+	 */
+	protected boolean m_dryRun;
+	
+	/**
+	 * A map from parameter names to their values, which can be
+	 * any Java object
+	 */
+	private Parameters m_parameters;
+	
+	/**
+	 * A counter for tests
+	 */
+	protected static int s_idCounter = 0;
+	
+	/**
+	 * A map from parameter names to values, to store the results
+	 * of the execution of the test
+	 */
+	private Parameters m_results;
+	
+	/**
+	 * Checks whether the test is done
+	 */
+	protected Status m_status;
+	
+	/**
+	 * Unique ID for this test. This number is meaningless and is
+	 * used only to interact with the GUI
+	 */
+	protected int m_id;
+	
+	public Test()
+	{
+		super();
+		m_id = s_idCounter++;
+		m_parameters = new Parameters();
+		m_results = new Parameters();
+		m_status = Status.NOT_DONE;
+		m_dryRun = false;
+	}
+
+	/**
+	 * Determines if the test is to be executed for real, or
+	 * just printed for debugging purposes.
+	 * @param b Set to true for a "dry run", false otherwise
+	 */
+	public final void setDryRun(boolean b)
+	{
+		m_dryRun = b;
+	}
+	
+	public final boolean getDryRun()
+	{
+		return m_dryRun;
+	}
+	
+	/**
+	 * Sets the value of some parameter
+	 * @param name The parameter name
+	 * @param value The parameter value
+	 */
+	public final void setParameter(String name, Object value)
+	{
+		m_parameters.put(name, value);
+	}
+	
+	/**
+	 * Get the value of some parameter
+	 * @param name The parameter name
+	 * @return The parameter value, or null if that parameter
+	 *   does not exist
+	 */
+	public final Object getParameter(String name)
+	{
+		if (!m_parameters.containsKey(name))
+		{
+			return null;
+		}
+		return m_parameters.get(name);
+	}
+	
+	protected final Parameters getParameters()
+	{
+		return m_parameters;
+	}
+	
+	/**
+	 * Get the integer value of some parameter
+	 * @param name The parameter name
+	 * @return The parameter value, cast as a number
+	 */
+	public final Number getParameterNumber(String name)
+	{
+		Object out = getParameter(name);
+		if (out instanceof Number)
+		{
+			return (Number) getParameter(name);
+		}
+		return 0;
+	}
+
+	/**
+	 * Get the integer value of some parameter
+	 * @param name The parameter name
+	 * @return The parameter value, cast as a string, or null
+	 *   if the parameter does not exist
+	 */
+	public final String getParameterString(String name)
+	{
+		Object out = getParameter(name);
+		if (out != null)
+		{
+			return getParameter(name).toString();
+		}
+		return null;
+	}
+	
+	/**
+	 * Checks if the test is done
+	 * @return True if the test is done, false otherwise
+	 */
+	public final Status getStatus()
+	{
+		return m_status;
+	}
+	
+	/**
+	 * Sets the tests's status
+	 * @param s The status
+	 */
+	public final void setStatus(Status s)
+	{
+		m_status = s;
+	}
+	
+	/**
+	 * Returns the test's unique ID
+	 * @return The id
+	 */
+	public final int getId()
+	{
+		return m_id;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return m_parameters.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o == null || !(o instanceof Test))
+		{
+			return false;
+		}
+		return equals((Test) o);
+	}
+	
+	protected boolean equals(Test t)
+	{
+		Parameters other_params = t.m_parameters;
+		boolean result = m_parameters.equals(other_params);
+		return result;
+	}
+	
+	/**
+	 * Checks if a test matches a set of parameters. This happens
+	 * when all parameters specified in the argument are also defined
+	 * in the test and have the same value. Note that the test may
+	 * have other parameters not specified in the argument; we don't
+	 * care about these.
+	 * @param parameters The map of parameters to look for
+	 * @return true if the test matches these parameters, false otherwise
+	 */
+	public boolean matches(Parameters parameters)
+	{
+		return m_parameters.match(parameters);
+	}
+	
+	/**
+	 * Checks whether the prerequisites for running this test (required
+	 * files, etc.) are fulfilled. Override this method if your test
+	 * has prerequisites.
+	 * @return true if the test is ready to run, false otherwise
+	 */
+	public boolean prerequisitesFulilled()
+	{
+		return true;
+	}
+	
+	/**
+	 * Fulfill the prerequisites for the test. This includes calling
+	 * any additional commands, generating any files, etc. that the
+	 * test will require when run.
+	 */
+	public void fulfillPrerequisites()
+	{
+		// Do nothing
+	}
+	
+	/**
+	 * Gets the test's results
+	 * @return The test's results
+	 */
+	public final Parameters getResults()
+	{
+		return m_results;
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder out = new StringBuilder();
+		out.append(m_parameters);
+		out.append(m_results);
+		return out.toString();
+	}
+
+	/**
+	 * Runs the test
+	 */
+	@Override
+	public abstract void run();
+
+	/**
+	 * Creates a new empty instance of the test
+	 * @return
+	 */
+	public abstract Test newTest();
+	
+	/**
+	 * Converts a test status into a string
+	 * @param s The test status
+	 * @return The string
+	 */
+	public static String statusToString(Status s)
+	{
+		String out = "";
+		switch (s)
+		{
+		case DONE:
+			out = "DONE";
+			break;
+		case FAILED:
+			out = "FAILED";
+			break;
+		case RUNNING:
+			out = "RUNNING";
+			break;
+		case NOT_DONE:
+			out = "NOT_DONE";
+			break;
+		case QUEUED:
+			out = "QUEUED";
+			break;
+		}
+		return out;
+	}
+}
