@@ -30,7 +30,7 @@ function refresh_test_list(incremental) {
       if (!incremental)
       {
 	      var out_list = "";
-	      out_list += "<thead><tr><th></th><th>Status</th>";
+	      out_list += "<thead><tr><th></th><th>Status</th><th>Duration</th><th>Name</th>";
 	      for (var j = 0; j < result["param-names"].length; j++) {
 	        var param_name = result["param-names"][j];
 	        out_list += "<th>" + param_name + "</th>";
@@ -65,10 +65,12 @@ function fill_table_line(test, param_names) {
     var out_list = "";
     out_list += "<td><input type=\"checkbox\" class=\"chk-test\" id=\"chktest-" + test.id + "\" /></td>\n";
     out_list += "<td>" + get_status_div(test.status, test.prerequisites, test.id) + "</td>\n";
+    out_list += "<td>" + get_time_string(test.status, test.starttime, test.endtime) + "</td>\n";
     //out_list += "<td>" + test.id + "</td>\n";
+    out_list += "<td>" + test.name + "</td>\n";
     for (var j = 0; j < param_names.length; j++) {
       var param_name = param_names[j];
-      out_list += "<td>" + test.params[param_name] + "</td>";
+      out_list += "<td>" + test.input[param_name] + "</td>";
     }
     out_list += "<td><button class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\">Start</button></td>\n";
     return out_list;  
@@ -80,6 +82,23 @@ function select_all_tests() {
 
 function unselect_all_tests() {
 	$(".chk-test").prop("checked", false);
+};
+
+function get_time_string(status, starttime, endtime) {
+  var duration = 0;
+  var out_string = "";
+  if (status !== "QUEUED" && status !== "NOT_DONE") {  
+	  if (status === "DONE" || status === "FAILED") {
+		  duration = endtime - starttime;
+	  }
+	  else if (status === "RUNNING") {
+		  var now = new Date();
+		  var now_sec = now.getTime() / 1000;
+		  duration = now_sec - starttime;
+	  }
+	  out_string = elapsed_time(duration);
+  }  
+  return out_string;
 };
 
 function get_status_div(status, prerequisites, id) {
@@ -150,6 +169,41 @@ function show_benchmark_info() {
       $("#benchmark-info").html(contents);
       }
   });
+};
+
+/* Found from: http://stackoverflow.com/a/13323160 */
+function elapsed_time(delta) // delta is the interval in *seconds*
+{
+    var ps, pm, ph, pd, min, hou, sec, days;
+    if(delta<=59)
+    {
+        ps = (delta>1) ? "s": "";
+        return Math.round(delta) + " second" + ps;
+    }
+    if(delta>=60 && delta<=3599)
+    {
+        min = Math.floor(delta/60);
+        sec = delta-(min*60);
+        pm = (min>1) ? "s": "";
+        ps = (sec>1) ? "s": "";
+        return min+" minute"+pm; //+" "+sec+" second"+ps;
+    }
+    if(delta>=3600 && delta<=86399)
+    {
+        hou = Math.floor(delta/3600);
+        min = Math.floor((delta-(hou*3600))/60);
+        ph = (hou>1) ? "s": "";
+        pm = (min>1) ? "s": "";
+        return hou+" hour"+ph; //+" "+min+" minute"+pm;
+    } 
+    if(delta>=86400)
+    {
+        days = Math.floor(delta/86400);
+        hou =  Math.floor((delta-(days*86400))/60/60);
+        pd = (days>1) ? "s": "";
+        ph = (hou>1) ? "s": "";
+        return days+" day"+pd; //+" "+hou+" hour"+ph;
+    }
 };
 
 $(document).ready(function() {

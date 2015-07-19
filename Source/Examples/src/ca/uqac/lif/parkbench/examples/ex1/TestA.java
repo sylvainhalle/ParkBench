@@ -13,8 +13,7 @@ public class TestA extends CommandTestRegex
 {
 	public TestA()
 	{
-		super("D:/Workspaces/ParkBench/Source/MyTestSuite/command-a.bat <n> <k>");
-		setParameter("name", "A");
+		super("A", "D:/Workspaces/ParkBench/Source/MyTestSuite/command-a.bat <n> <k>");
 	}
 	
 	@Override

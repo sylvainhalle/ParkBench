@@ -9,10 +9,6 @@ public class Main
 
 	public static void main(String[] args)
 	{
-        System.out.println(System.getenv("PROCESSOR_IDENTIFIER"));
-        System.out.println(System.getenv("PROCESSOR_ARCHITECTURE"));
-        System.out.println(System.getenv("PROCESSOR_ARCHITEW6432"));
-        System.out.println(System.getenv("NUMBER_OF_PROCESSORS"));
 		Cli cli = new Cli(args);
 		Benchmark b = setupBenchmark();
 		cli.start(b);

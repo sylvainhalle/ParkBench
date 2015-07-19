@@ -1,5 +1,7 @@
 package ca.uqac.lif.parkbench;
 
+import ca.uqac.lif.cornipickle.json.JsonMap;
+
 /**
  * A test is a set of named parameters
  * @author Sylvain
@@ -40,19 +42,64 @@ public abstract class Test implements Runnable
 	protected Status m_status;
 	
 	/**
+	 * Name for this family of tests
+	 */
+	protected final String m_name;
+	
+	/**
 	 * Unique ID for this test. This number is meaningless and is
 	 * used only to interact with the GUI
 	 */
 	protected int m_id;
 	
-	public Test()
+	/**
+	 * The test's latest start time. This value only has a meaning
+	 * if the test's status is not NOT_DONE or QUEUED.
+	 */
+	protected long m_startTime;
+	
+	/**
+	 * The test's latest stop time. This value only has a meaning
+	 * if the test's status is DONE or FAILED.
+	 */
+	protected long m_stopTime;
+	
+	public Test(String name)
 	{
 		super();
+		m_name = name;
 		m_id = s_idCounter++;
 		m_parameters = new Parameters();
 		m_results = new Parameters();
 		m_status = Status.NOT_DONE;
 		m_dryRun = false;
+		m_startTime = 0;
+		m_stopTime = 0;
+	}
+	
+	Test(String name, int test_id)
+	{
+		super();
+		m_name = name;
+		m_id = test_id;
+		s_idCounter = Math.max(s_idCounter, test_id + 1);
+		m_parameters = new Parameters();
+		m_results = new Parameters();
+		m_status = Status.NOT_DONE;
+		m_dryRun = false;
+		m_startTime = 0;
+		m_stopTime = 0;
+	}
+	
+	public abstract void runTest(final Parameters params, Parameters results);
+	
+	/**
+	 * Gets the test's name
+	 * @return The name
+	 */
+	public String getName()
+	{
+		return m_name;
 	}
 
 	/**
@@ -238,7 +285,12 @@ public abstract class Test implements Runnable
 	 * Runs the test
 	 */
 	@Override
-	public abstract void run();
+	public final void run()
+	{
+		m_startTime = System.currentTimeMillis() / 1000;
+		setStatus(Status.RUNNING);
+		runTest(m_parameters, m_results);
+	}
 
 	/**
 	 * Creates a new empty instance of the test
@@ -273,5 +325,52 @@ public abstract class Test implements Runnable
 			break;
 		}
 		return out;
+	}
+	
+	/**
+	 * Saves the test's current state into a JSON object
+	 * @return A JSON object with the test's state
+	 */
+	public JsonMap serializeState()
+	{
+		JsonMap out = new JsonMap();
+		out.put("name", m_name);
+		out.put("status", statusToString(m_status));
+		out.put("id", m_id);
+		out.put("starttime", m_startTime);
+		out.put("endtime", m_stopTime);
+		if (prerequisitesFulilled())
+		{
+			out.put("prerequisites", "true");
+		}
+		else
+		{
+			out.put("prerequisites", "false");
+		}
+		JsonMap in_params = new JsonMap();
+		for (String param_name : m_parameters.keySet())
+		{
+			Object value = m_parameters.get(param_name);
+			in_params.put(param_name, value);
+		}
+		out.put("input", in_params);
+		JsonMap out_params = new JsonMap();
+		for (String param_name : m_results.keySet())
+		{
+			Object value = m_results.get(param_name);
+			in_params.put(param_name, value);
+		}		
+		out.put("results", out_params);
+		return out;
+	}
+	
+	/**
+	 * Stops the tests and gives it a status
+	 * @param s The status of the test (normally FAILED or DONE)
+	 */
+	public void stopWithStatus(Status s)
+	{
+		m_stopTime = System.currentTimeMillis() / 1000;
+		setStatus(s);
 	}
 }

@@ -30,9 +30,9 @@ public abstract class CommandTestRegex extends CommandTest
 	 * Instantiates a command test
 	 * @param command_pattern The pattern to build a command
 	 */
-	public CommandTestRegex(String command_pattern)
+	public CommandTestRegex(String test_name, String command_pattern)
 	{
-		super();
+		super(test_name);
 		m_commandPattern = command_pattern;
 	}
 

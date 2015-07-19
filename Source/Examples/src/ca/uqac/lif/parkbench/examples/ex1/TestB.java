@@ -7,8 +7,7 @@ public class TestB extends Test
 {
 	public TestB()
 	{
-		super();
-		setParameter("name", "B");
+		super("B");
 	}
 	
 	@Override
@@ -18,16 +17,13 @@ public class TestB extends Test
 	}
 
 	@Override
-	public void run()
+	public void runTest(final Parameters params, Parameters results)
 	{
-		setStatus(Status.RUNNING);
 		// Get the value of test parameters "k" and "n"
-		Parameters params = getParameters();
 		Number n = params.getNumber("n");
 		Number k = params.getNumber("k");
 		// Multiply those values and put that as the result parameter "value"
 		Number out = n.floatValue() * k.floatValue();
-		Parameters results = getResults();
 		results.put("value", out);
 		// Sleep n * k seconds to simulate processing
 		try {
@@ -37,7 +33,7 @@ public class TestB extends Test
 			e.printStackTrace();
 		}
 		// Don't forget to set the status to DONE when finished
-		setStatus(Status.DONE);
+		stopWithStatus(Status.DONE);
 	}
 
 }

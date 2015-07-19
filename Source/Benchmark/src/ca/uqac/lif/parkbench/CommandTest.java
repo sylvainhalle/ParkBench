@@ -9,24 +9,23 @@ public abstract class CommandTest extends Test
 {
 	public String m_baseFolder;
 	
-	public CommandTest()
+	public CommandTest(String test_name)
 	{
-		this("");
+		this(test_name, "");
 	}
 	
-	public CommandTest(String base_folder)
+	public CommandTest(String test_name, String base_folder)
 	{
-		super();
+		super(test_name);
 		m_dryRun = false;
 		m_baseFolder = base_folder;
 	}
 
 	@Override
-	public void run()
+	public void runTest(Parameters params, Parameters results)
 	{
-		setStatus(Status.RUNNING);
 		List<String> command_list = new ArrayList<String>();
-		createCommandFromParameters(getParameters(), command_list);
+		createCommandFromParameters(params, command_list);
 		String command[] = new String[command_list.size()];
 		command = command_list.toArray(command);
 		try
@@ -34,17 +33,17 @@ public abstract class CommandTest extends Test
 			if (getDryRun() == false)
 			{
 				String output = CommandRunner.runCommand(command);
-				createResultsFromOutput(output, getResults());
+				createResultsFromOutput(output, results);
 			}
 			else
 			{
 				System.out.println("Dry run: would execute " + command_list);
 			}
-			setStatus(Status.DONE);
+			stopWithStatus(Status.DONE);
 		}
 		catch (IOException e)
 		{
-			setStatus(Status.FAILED);
+			stopWithStatus(Status.FAILED);
 		}
 	}
 	

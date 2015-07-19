@@ -18,8 +18,7 @@ public class TestC extends CommandTestRegex
 {
 	public TestC()
 	{
-		super("D:/Workspaces/ParkBench/Source/MyTestSuite/command-c.bat <filename>");
-		setParameter("name", "C");
+		super("C", "D:/Workspaces/ParkBench/Source/MyTestSuite/command-c.bat <filename>");
 	}
 	
 	@Override

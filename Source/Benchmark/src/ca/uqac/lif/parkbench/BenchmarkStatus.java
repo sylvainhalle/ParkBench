@@ -35,8 +35,7 @@ public class BenchmarkStatus extends BenchmarkCallback
 		Map<String,Integer> test_status = fillStatusMap();
 		for (Test test : tests)
 		{
-			JsonMap m = new JsonMap();
-			m.put("id", test.getId());
+			JsonMap m = test.serializeState();
 			String status = Test.statusToString(test.getStatus());
 			m.put("status", status);
 			if (!test_status.containsKey(status))
@@ -44,20 +43,6 @@ public class BenchmarkStatus extends BenchmarkCallback
 				test_status.put(status, 1);
 			}
 			putInStatusMap(test, test_status);
-			if (test.prerequisitesFulilled())
-			{
-				m.put("prerequisites", "true");
-			}
-			else
-			{
-				m.put("prerequisites", "false");
-			}
-			JsonMap map_params = new JsonMap();
-			for (String param_name : test_params)
-			{
-				map_params.put(param_name, test.getParameterString(param_name));
-			}
-			m.put("params", map_params);
 			list.add(m);
 		}
 		out.put("tests", list);
