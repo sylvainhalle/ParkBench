@@ -121,6 +121,22 @@ public class JsonMap extends JsonElement implements Map<String,JsonElement>
   {
     return m_map.get(arg0);
   }
+  
+  public String getString(Object arg0)
+  {
+	  Object o = m_map.get(arg0);
+	  if (o == null)
+		  return null;
+	  return ((JsonString) o).stringValue();
+  }
+  
+  public Number getNumber(Object arg0)
+  {
+	  Object o = m_map.get(arg0);
+	  if (o == null || !(o instanceof JsonNumber))
+		  return null;
+	  return ((JsonNumber) o).numberValue();
+  }
 
   @Override
   public boolean isEmpty()

@@ -201,10 +201,10 @@ public class Server implements HttpHandler
   	HttpExchange t = cbr.getExchange();
     Headers h = t.getResponseHeaders();
     h.add("User-agent", m_userAgent);
-    String content_type = cbr.getContentType();
-    if (!content_type.isEmpty())
+    Map<String,String> headers = cbr.getHeaders();
+    for (String name : headers.keySet())
     {
-    	h.add("Content-Type", content_type);
+    	h.add(name, headers.get(name));
     }
     byte[] contents = cbr.getContents();
     int response_code = cbr.getCode();

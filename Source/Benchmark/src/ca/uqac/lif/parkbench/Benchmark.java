@@ -1,9 +1,15 @@
 package ca.uqac.lif.parkbench;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+
+import ca.uqac.lif.cornipickle.json.JsonElement;
+import ca.uqac.lif.cornipickle.json.JsonList;
+import ca.uqac.lif.cornipickle.json.JsonMap;
 
 /**
  * A benchmark controls the execution of a set of tests
@@ -243,5 +249,127 @@ public class Benchmark
 			out.append(t);
 		}
 		return out.toString();
+	}
+
+	/**
+	 * Sets the state of the benchmark to the contents of a JSON structure
+	 * @param state The JSON structure
+	 */
+	public void deserializeState(JsonMap state)
+	{
+		Set<Test> new_tests = new HashSet<Test>();
+		m_name = state.getString("name");
+		JsonList test_list = (JsonList) state.get("tests");
+		for (JsonElement el : test_list)
+		{
+			JsonMap el_test = (JsonMap) el;
+			String test_name = el_test.getString("name");
+			int test_id = el_test.getNumber("id").intValue();
+			Test test_instance = findTestWithName(test_name);
+			if (test_instance != null)
+			{
+				Test new_test = test_instance.newTest(test_id);
+				new_test.deserializeState(el_test);
+				new_tests.add(new_test);
+			}
+		}
+		// Replaces the old set of tests with the one created from the JSON
+		m_tests = new_tests;
+	}
+	
+	/**
+	 * Serializes the status of the benchmark into a JSON structure
+	 * @return The JSON structure
+	 */
+	public JsonMap serializeState()
+	{
+		JsonMap out = new JsonMap();
+		out.put("name", m_name);
+		JsonList list = new JsonList();
+		Set<String> test_params = getTestParameterNames();
+		JsonList param_list = new JsonList();
+		for (String param_name : test_params)
+		{
+			param_list.add(param_name);
+		}
+		out.put("param-names", param_list);
+		Map<String,Integer> test_status = fillStatusMap();
+		for (Test test : m_tests)
+		{
+			JsonMap m = test.serializeState();
+			String status = Test.statusToString(test.getStatus());
+			m.put("status", status);
+			putInStatusMap(test, test_status);
+			list.add(m);
+		}
+		out.put("tests", list);
+		JsonMap status_map = new JsonMap();
+		for (String status : test_status.keySet())
+		{
+			status_map.put(status, test_status.get(status));
+		}
+		out.put("status", status_map);
+		return out;
+	}
+	
+	/**
+	 * In the set of current tests, finds a test with the same name as
+	 * the parameter
+	 * @param name The test's name
+	 * @return A test instance with the same name, null if none found
+	 */
+	protected Test findTestWithName(String name)
+	{
+		for (Test t : m_tests)
+		{
+			if (name.compareTo(t.getName()) == 0)
+			{
+				return t;
+			}
+		}
+		return null;
+	}
+	
+	static Map<String,Integer> fillStatusMap()
+	{
+		Map<String,Integer> out = new HashMap<String,Integer>();
+		out.put("status-done", 0);
+		out.put("status-failed", 0);
+		out.put("status-ready", 0);
+		out.put("status-not-ready", 0);
+		out.put("status-queued", 0);
+		out.put("status-running", 0);
+		return out;
+	}
+	
+	static void putInStatusMap(Test t, Map<String,Integer> map)
+	{
+		switch (t.getStatus())
+		{
+		case DONE:
+			map.put("status-done", map.get("status-done") + 1);
+			break;
+		case FAILED:
+			map.put("status-failed", map.get("status-failed") + 1);
+			break;
+		case NOT_DONE:
+			if (t.prerequisitesFulilled())
+			{
+				map.put("status-ready", map.get("status-ready") + 1);
+			}
+			else
+			{
+				map.put("status-not-ready", map.get("status-not-ready") + 1);
+			}
+			break;
+		case RUNNING:
+			map.put("status-running", map.get("status-running") + 1);
+			break;
+		case QUEUED:
+			map.put("status-queued", map.get("status-queued") + 1);
+			break;
+		default:
+			break;
+		}
 	}
 }

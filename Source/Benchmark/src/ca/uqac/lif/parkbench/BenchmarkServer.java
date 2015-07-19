@@ -12,5 +12,6 @@ public class BenchmarkServer extends InnerFileServer
 		registerCallback(0, new BenchmarkStatus(b));
 		registerCallback(0, new SystemInfo(b));
 		registerCallback(0, new RunTest(b));
+		registerCallback(0, new SaveBenchmark(b));
 	}
 }

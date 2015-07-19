@@ -1,6 +1,8 @@
 package ca.uqac.lif.parkbench;
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -9,7 +11,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
+import ca.uqac.lif.cornipickle.json.JsonFastParser;
+import ca.uqac.lif.cornipickle.json.JsonMap;
+import ca.uqac.lif.cornipickle.json.JsonParser;
+import ca.uqac.lif.cornipickle.json.JsonParser.JsonParseException;
 import ca.uqac.lif.cornipickle.util.AnsiPrinter;
+import ca.uqac.lif.util.FileReadWrite;
 
 public class Cli
 {
@@ -65,6 +72,7 @@ public class Cli
 			@Override
 			public void run()
 			{
+				stderr.println("Stopping server");
 				stderr.close();
 				stdout.close();
 			}
@@ -108,15 +116,35 @@ public class Cli
 			interactive_mode = true;
 		}
 		
-		// The remaining arguments are the Cornipickle files to read
+		// The remaining arguments are configuration files to read
+		List<String> remaining_args = c_line.getArgList();
+		JsonParser parser = new JsonFastParser();
+		for (String filename : remaining_args)
+		{
+			stdout.setForegroundColor(AnsiPrinter.Color.BROWN);
+			println(stdout, "Reading benchmark state " + filename, 1);
+			String file_contents;
+			try
+			{
+				file_contents = FileReadWrite.readFile(filename);
+				JsonMap state = (JsonMap) parser.parse(file_contents);
+				benchmark.deserializeState(state);
+			}
+			catch (IOException e) 
+			{
+				stderr.println("Error reading file " + filename);
+			}
+			catch (JsonParseException e) 
+			{
+				stderr.println("Error parsing contents of file " + filename);
+			}
+		}
 		if (interactive_mode)
 		{
 			BenchmarkServer server = new BenchmarkServer(server_name, server_port, benchmark);
 			server.startServer();
 			println(stdout, "Server started on " + server_name + ":" + server_port, 1);
 		}
-
-
 	}
 	
 	/**
@@ -161,7 +189,7 @@ public class Cli
 	private static void showUsage(Options options)
 	{
 		HelpFormatter hf = new HelpFormatter();
-		hf.printHelp("java -jar Barkbench.jar [options]", options);
+		hf.printHelp("java -jar Barkbench.jar [options] [filename]", options);
 	}
 	
 	/**

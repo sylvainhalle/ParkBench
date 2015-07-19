@@ -1,6 +1,9 @@
 package ca.uqac.lif.parkbench;
 
+import ca.uqac.lif.cornipickle.json.JsonElement;
 import ca.uqac.lif.cornipickle.json.JsonMap;
+import ca.uqac.lif.cornipickle.json.JsonNumber;
+import ca.uqac.lif.cornipickle.json.JsonString;
 
 /**
  * A test is a set of named parameters
@@ -115,6 +118,15 @@ public abstract class Test implements Runnable
 	public final boolean getDryRun()
 	{
 		return m_dryRun;
+	}
+	
+	/**
+	 * Sets the test's ID
+	 * @param test_id The ID
+	 */
+	private void setId(int test_id)
+	{
+		m_id = test_id;
 	}
 	
 	/**
@@ -299,6 +311,18 @@ public abstract class Test implements Runnable
 	public abstract Test newTest();
 	
 	/**
+	 * Creates a new empty instance of the test
+	 * @return
+	 */
+	public Test newTest(int test_id)
+	{
+		Test t = newTest();
+		t.setId(test_id);
+		s_idCounter = Math.max(s_idCounter, test_id + 1);
+		return t;
+	}
+	
+	/**
 	 * Converts a test status into a string
 	 * @param s The test status
 	 * @return The string
@@ -325,6 +349,37 @@ public abstract class Test implements Runnable
 			break;
 		}
 		return out;
+	}
+	
+	/**
+	 * Converts a string into a test status
+	 * @param s The string
+	 * @return The status
+	 */
+	public static Status stringToStatus(String s)
+	{
+		s = s.trim();
+		if (s.compareToIgnoreCase("DONE") == 0)
+		{
+			return Status.DONE;
+		}
+		else if (s.compareToIgnoreCase("FAILED") == 0)
+		{
+			return Status.FAILED;
+		}
+		else if (s.compareToIgnoreCase("RUNNING") == 0)
+		{
+			return Status.RUNNING;
+		}
+		else if (s.compareToIgnoreCase("NOT_DONE") == 0)
+		{
+			return Status.NOT_DONE;
+		}		
+		else if (s.compareToIgnoreCase("QUEUED") == 0)
+		{
+			return Status.QUEUED;
+		}
+		return Status.NOT_DONE;
 	}
 	
 	/**
@@ -358,11 +413,40 @@ public abstract class Test implements Runnable
 		for (String param_name : m_results.keySet())
 		{
 			Object value = m_results.get(param_name);
-			in_params.put(param_name, value);
+			out_params.put(param_name, value);
 		}		
 		out.put("results", out_params);
 		return out;
 	}
+	
+	/**
+	 * Sets the state of the test to the contents of a JSON structure
+	 * @param state The JSON structure
+	 */
+	public void deserializeState(JsonMap state)
+	{
+		JsonMap in_params = (JsonMap) state.get("input");
+		m_startTime = state.getNumber("starttime").intValue();
+		m_stopTime = state.getNumber("endtime").intValue();
+		m_status = stringToStatus(state.getString("status"));
+		for (String param_name : in_params.keySet())
+		{
+			JsonElement param_value = in_params.get(param_name);
+			if (param_value instanceof JsonNumber)
+			{
+				m_parameters.put(param_name, ((JsonNumber) param_value).numberValue());
+			}
+			else if (param_value instanceof JsonString)
+			{
+				m_parameters.put(param_name, ((JsonString) param_value).stringValue());
+			}
+			else
+			{
+				m_parameters.put(param_name, param_value);
+			}
+		}
+	}
+
 	
 	/**
 	 * Stops the tests and gives it a status

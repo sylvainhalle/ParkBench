@@ -1,3 +1,8 @@
+/**
+ *  The interval for refreshing the list of tests (in ms)
+ */
+var REFRESH_INTERVAL = 1000;
+
 function refresh_test_list(incremental) {
   $.ajax({
     url         : "/status",
@@ -151,8 +156,8 @@ function start_selected_tests() {
 
 function periodical_refresh() {
   refresh_test_list(true);
-  // Refresh the test list every 2 seconds
-  setTimeout(periodical_refresh, 1000);
+  // Refresh the test list
+  setTimeout(periodical_refresh, REFRESH_INTERVAL);
 };
 
 function show_benchmark_info() {
@@ -170,6 +175,24 @@ function show_benchmark_info() {
       }
   });
 };
+
+function save_benchmark() {
+  $.ajax({
+    url         : "/save",
+    contentType : "application/json",
+    /*success     : function(result) {
+      var contents = "";
+      contents += "<tr><th>OS name</th><td>" + result.osname + "</td></tr>\n";
+      contents += "<tr><th>Version</th><td>" + result.osversion + "</td></tr>\n";
+      contents += "<tr><th>Architecture</th><td>" + result.osarch + "</td></tr>\n";
+      contents += "<tr><th>CPUs</th><td>" + result.numcpu + "</td></tr>\n";
+      contents += "<tr><th>Threads allocated</th><td>" + result.threads + "</td></tr>\n";
+      $("#benchmark-info").html(contents);
+      }
+    */
+  });
+};
+
 
 /* Found from: http://stackoverflow.com/a/13323160 */
 function elapsed_time(delta) // delta is the interval in *seconds*
@@ -211,6 +234,7 @@ $(document).ready(function() {
   $("#check-all").click(select_all_tests);
   $("#uncheck-all").click(unselect_all_tests);
   $("#start-all").click(start_selected_tests);
+  $("#save-benchmark").click(save_benchmark);
   show_benchmark_info();
   refresh_test_list(false);
   periodical_refresh();
