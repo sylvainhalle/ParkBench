@@ -146,7 +146,7 @@ public class Benchmark
 			Test t = it.next();
 			if (override || !t.prerequisitesFulilled())
 			{
-				t.fulfillPrerequisites();
+				t.fulfillPrerequisites(t.getParameters());
 			}
 		}
 	}
@@ -345,6 +345,7 @@ public class Benchmark
 		Map<String,Integer> out = new HashMap<String,Integer>();
 		out.put("status-done", 0);
 		out.put("status-failed", 0);
+		out.put("status-prerequisites", 0);
 		out.put("status-ready", 0);
 		out.put("status-not-ready", 0);
 		out.put("status-queued", 0);
@@ -377,6 +378,9 @@ public class Benchmark
 			break;
 		case QUEUED:
 			map.put("status-queued", map.get("status-queued") + 1);
+			break;
+		case PREREQUISITES:
+			map.put("status-prerequisites", map.get("status-prerequisites") + 1);
 			break;
 		default:
 			break;

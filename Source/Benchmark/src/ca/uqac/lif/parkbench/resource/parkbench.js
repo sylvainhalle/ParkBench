@@ -16,6 +16,10 @@ function refresh_test_list(incremental) {
         $("#status-nb-not-ready").html(result.status["status-not-ready"]);
       else
         $("#status-nb-not-ready").html("0");
+      if (result.status["status-prerequisites"])
+          $("#status-nb-prerequisites").html(result.status["status-prerequisites"]);
+        else
+          $("#status-nb-prerequisites").html("0");
       if (result.status["status-ready"])
         $("#status-nb-ready").html(result.status["status-ready"]);
       else
@@ -127,7 +131,7 @@ function get_time_string(status, starttime, endtime) {
 	  if (status === "DONE" || status === "FAILED") {
 		  duration = endtime - starttime;
 	  }
-	  else if (status === "RUNNING") {
+	  else if (status === "RUNNING" || status === "PREREQUISITES") {
 		  var now = new Date();
 		  var now_sec = now.getTime() / 1000;
 		  duration = now_sec - starttime;
@@ -144,6 +148,8 @@ function get_status_div(status, prerequisites, id) {
     return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-failed\"><span>Failed</span></div>";
   else if (status === "RUNNING")
     return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-running\"><span>Running</span></div>";
+  else if (status === "PREREQUISITES")
+	    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-prerequisites\"><span>Prerequisites</span></div>";
   else if (status === "QUEUED")
     return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-queued\"><span>Queued</span></div>";
   else if (status === "NOT_DONE")

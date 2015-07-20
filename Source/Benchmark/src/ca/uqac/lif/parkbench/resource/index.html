@@ -62,6 +62,7 @@
 <tr><td id="status-nb-not-ready">0</td><td><div class="status-icon status-not-ready"><span>Not ready</span></div></td><td>The test has not run and its prerequisites are not fulfilled</td></tr>
 <tr><td id="status-nb-ready">0</td><td><div class="status-icon status-ready"><span>Ready</span></div></td><td>The test has not run but is ready to run</td></tr>
 <tr><td id="status-nb-queued">0</td><td><div class="status-icon status-queued"><span>Queued</span></div></td><td>The test is in the queue, waiting to be started</td></tr>
+<tr><td id="status-nb-prerequisites">0</td><td><div class="status-icon status-prerequisites"><span>Prerequisites</span></div></td><td>The test is currently generating its prerequisites</td></tr>
 <tr><td id="status-nb-running">0</td><td><div class="status-icon status-running"><span>Running</span></div></td><td>The test is currently running</td></tr>
 <tr><td id="status-nb-done">0</td><td><div class="status-icon status-done"><span>Done</span></div></td><td>The test has completed successfully</td></tr>
 <tr><td id="status-nb-failed">0</td><td><div class="status-icon status-failed"><span>Failed</span></div></td><td>The execution of the test has failed or was manually cancelled</td></tr>
@@ -75,6 +76,7 @@
 
 <p><button class="btn btn-small" id="check-category">Select&hellip;</button>
 <ul id="test-selection">
+<li class="status-prerequisites"><input type="checkbox" id="chktest-prerequisites" />&nbsp;Prerequisites</li>
 <li class="status-running"><input type="checkbox" id="chktest-running" />&nbsp;Running</li>
 <li class="status-ready"><input type="checkbox" id="chktest-ready" />&nbsp;Ready</li>
 <li class="status-failed"><input type="checkbox" id="chktest-failed" />&nbsp;Failed</li> 

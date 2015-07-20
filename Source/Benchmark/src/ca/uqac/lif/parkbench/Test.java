@@ -12,9 +12,20 @@ import ca.uqac.lif.cornipickle.json.JsonString;
 public abstract class Test implements Runnable
 {
 	/**
-	 * The status of the test
+	 * The status of the test. The meaning of each value is:
+	 * <ul>
+	 * <li><tt>NOT_DONE</tt>: the test has not started yet</li>
+	 * <li><tt>QUEUED</tt>: the test is in the waiting queue</li>
+	 * <li><tt>PREREQUISITES</tt>: the test has prerequisites that are in
+	 *   the process of being generated</li>
+	 * <li><tt>RUNNING</tt>: the test is currently running</li>
+	 * <li><tt>DONE</tt>: the execution of the test has finished without error</li>
+	 * <li><tt>FAILED</tt>: the execution of the test has failed, or was
+	 *   manually cancelled</li>
+	 * </ul>
 	 */
-	public static enum Status {DONE, FAILED, RUNNING, NOT_DONE, QUEUED};
+	public static enum Status {DONE, FAILED, RUNNING, NOT_DONE,
+		QUEUED, PREREQUISITES};
 	
 	/**
 	 * Determines if the test is to be executed for real, or
@@ -31,7 +42,7 @@ public abstract class Test implements Runnable
 	/**
 	 * A counter for tests
 	 */
-	protected static int s_idCounter = 0;
+	private static int s_idCounter = 0;
 	
 	/**
 	 * A map from parameter names to values, to store the results
@@ -42,30 +53,30 @@ public abstract class Test implements Runnable
 	/**
 	 * Checks whether the test is done
 	 */
-	protected Status m_status;
+	private Status m_status;
 	
 	/**
 	 * Name for this family of tests
 	 */
-	protected final String m_name;
+	private final String m_name;
 	
 	/**
 	 * Unique ID for this test. This number is meaningless and is
 	 * used only to interact with the GUI
 	 */
-	protected int m_id;
+	private int m_id;
 	
 	/**
 	 * The test's latest start time. This value only has a meaning
 	 * if the test's status is not NOT_DONE or QUEUED.
 	 */
-	protected long m_startTime;
+	private long m_startTime;
 	
 	/**
 	 * The test's latest stop time. This value only has a meaning
 	 * if the test's status is DONE or FAILED.
 	 */
-	protected long m_stopTime;
+	private long m_stopTime;
 	
 	public Test(String name)
 	{
@@ -220,7 +231,7 @@ public abstract class Test implements Runnable
 	@Override
 	public int hashCode()
 	{
-		return m_parameters.hashCode();
+		return m_parameters.hashCode() + m_name.hashCode();
 	}
 	
 	@Override
@@ -235,6 +246,10 @@ public abstract class Test implements Runnable
 	
 	protected boolean equals(Test t)
 	{
+		if (t.getName().compareTo(m_name) != 0)
+		{
+			return false;
+		}
 		Parameters other_params = t.m_parameters;
 		boolean result = m_parameters.equals(other_params);
 		return result;
@@ -269,8 +284,9 @@ public abstract class Test implements Runnable
 	 * Fulfill the prerequisites for the test. This includes calling
 	 * any additional commands, generating any files, etc. that the
 	 * test will require when run.
+	 * @param params The test's parameters
 	 */
-	public void fulfillPrerequisites()
+	public void fulfillPrerequisites(Parameters params)
 	{
 		// Do nothing
 	}
@@ -300,6 +316,12 @@ public abstract class Test implements Runnable
 	public final void run()
 	{
 		m_startTime = System.currentTimeMillis() / 1000;
+		if (!prerequisitesFulilled())
+		{
+			// Before running, generate the prerequisites
+			setStatus(Status.PREREQUISITES);
+			fulfillPrerequisites(m_parameters);
+		}
 		setStatus(Status.RUNNING);
 		runTest(m_parameters, m_results);
 	}
@@ -337,6 +359,9 @@ public abstract class Test implements Runnable
 			break;
 		case FAILED:
 			out = "FAILED";
+			break;
+		case PREREQUISITES:
+			out = "PREREQUISITES";
 			break;
 		case RUNNING:
 			out = "RUNNING";
@@ -378,6 +403,10 @@ public abstract class Test implements Runnable
 		else if (s.compareToIgnoreCase("QUEUED") == 0)
 		{
 			return Status.QUEUED;
+		}
+		else if (s.compareToIgnoreCase("PREREQUISITES") == 0)
+		{
+			return Status.PREREQUISITES;
 		}
 		return Status.NOT_DONE;
 	}

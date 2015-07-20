@@ -18,12 +18,12 @@ public class Main
 	{
 		Benchmark benchmark = new Benchmark(3);
 		Test[] tests_to_create = {
-				//new TestA(),
+				new TestA(),
 				new TestB()
 		};
-		for (int k = 1; k < 4; k++)
+		for (int k = 1; k < 3; k++)
 		{
-			for (int n = 1; n < 5; n++)
+			for (int n = 1; n < 4; n++)
 			{
 				for (Test t : tests_to_create)
 				{

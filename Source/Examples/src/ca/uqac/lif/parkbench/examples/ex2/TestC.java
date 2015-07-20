@@ -29,7 +29,7 @@ public class TestC extends CommandTestRegex
 	}
 	
 	@Override
-	public void fulfillPrerequisites()
+	public void fulfillPrerequisites(Parameters params)
 	{
 		String filename = getPrerequisitesFilename();
 		String file_contents = fillFile();

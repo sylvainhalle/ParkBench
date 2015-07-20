@@ -21,16 +21,20 @@
   background-color: orange;
 }
 
+.status-prerequisites {
+  background-color: lightgreen;
+}
+
 .status-failed {
   background-color: red;
 }
 
 .status-queued {
-  background-color: grey;
+  background-color: lightgrey;
 }
 
 .status-running {
-  background-color: lightgreen;
+  background-color: green;
 }
 
 #test-selection > li {
