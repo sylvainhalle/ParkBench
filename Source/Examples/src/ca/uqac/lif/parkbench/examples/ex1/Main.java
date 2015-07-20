@@ -21,9 +21,9 @@ public class Main
 				//new TestA(),
 				new TestB()
 		};
-		for (int k = 1; k < 3; k++)
+		for (int k = 1; k < 4; k++)
 		{
-			for (int n = 1; n < 4; n++)
+			for (int n = 1; n < 5; n++)
 			{
 				for (Test t : tests_to_create)
 				{

@@ -26,11 +26,15 @@ public class TestB extends Test
 		Number out = n.floatValue() * k.floatValue();
 		results.put("value", out);
 		// Sleep n * k seconds to simulate processing
-		try {
+		try
+		{
 			Thread.sleep(1000 * n.intValue() * k.intValue());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}
+		catch (InterruptedException e) 
+		{
+			// This happens if the user cancels the test manually
+			stopWithStatus(Status.FAILED);
+			return;
 		}
 		// Don't forget to set the status to DONE when finished
 		stopWithStatus(Status.DONE);

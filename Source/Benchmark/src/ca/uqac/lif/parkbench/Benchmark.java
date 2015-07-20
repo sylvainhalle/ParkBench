@@ -225,7 +225,17 @@ public class Benchmark
 		}
 		return false;		
 	}
-
+	
+	/**
+	 * Stops a test
+	 * @param test_id The ID of the test to stop
+	 * @return true if the test exits (whether or not it needed stopping),
+	 *   false otherwise
+	 */
+	public boolean stopTest(int test_id)
+	{
+		return m_dispatcher.cancel(test_id);		
+	}
 	
 	/**
 	 * Sets the dry run status of every test in the benchmark.

@@ -34,6 +34,7 @@ function refresh_test_list(incremental) {
         $("#status-nb-queued").html("0");
       if (!incremental)
       {
+    	  $("#benchmark-name").html(result.name);
 	      var out_list = "";
 	      out_list += "<thead><tr><th></th><th>Status</th><th>Duration</th><th>Name</th>";
 	      for (var j = 0; j < result["param-names"].length; j++) {
@@ -77,7 +78,10 @@ function fill_table_line(test, param_names) {
       var param_name = param_names[j];
       out_list += "<td>" + test.input[param_name] + "</td>";
     }
-    out_list += "<td><button class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\">Start</button></td>\n";
+    out_list += "<td>";
+    out_list += "<button class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\">Start</button>";
+    out_list += "<button class=\"btn btn-mini\" onclick=\"stop_test(" + test.id + ");\">Stop</button>";
+    out_list += "</td>\n";
     return out_list;  
 };
 
@@ -151,10 +155,30 @@ function get_status_div(status, prerequisites, id) {
   }
 };
 
+/**
+ * Starts the execution of one or more tests (or rather, puts them into
+ * the waiting queue)
+ * @param test_id A comma-separated list of test IDs
+ */
 function start_test(test_id) {
   $("#status-icon-" + test_id).removeClass("status-ready").addClass("status-queued").html("<span>Queued</span>");
   $.ajax({
     url         : "/run?id=" + test_id,
+    contentType : "application/json",
+    success     : function(result) {
+      setTimeout(function() {refresh_test_list(true);}, 1000);
+      }
+  });
+};
+
+/**
+ * Stops the execution of one or more tests
+ * @param test_id A comma-separated list of test IDs
+ */
+function stop_test(test_id) {
+  $("#status-icon-" + test_id).removeClass("status-running").addClass("status-failed").html("<span>Failed</span>");
+  $.ajax({
+    url         : "/stop?id=" + test_id,
     contentType : "application/json",
     success     : function(result) {
       setTimeout(function() {refresh_test_list(true);}, 1000);
@@ -180,6 +204,25 @@ function start_selected_tests() {
       }
   });
 };
+
+function stop_selected_tests() {
+	  // Get list of test IDs that are selected
+	  var id_list = "";
+	  $(".chk-test:checked").each(function() {
+	    var eid = $(this).prop("id");
+	    var parts = eid.split("-");
+	    var id = parts[1];
+	    id_list += id + ",";
+	  });
+	  // Sends these IDs in the run request
+	  $.ajax({
+	    url         : "/stop?id=" + id_list,
+	    contentType : "application/json",
+	    success     : function(result) {
+	      setTimeout(function() {refresh_test_list(true);}, 1000);
+	      }
+	  });
+	};
 
 function periodical_refresh() {
   refresh_test_list(true);
@@ -262,6 +305,7 @@ $(document).ready(function() {
   $("#uncheck-all").click(unselect_all_tests);
   $("#check-category").click(select_category);
   $("#start-all").click(start_selected_tests);
+  $("#stop-all").click(stop_selected_tests);
   $("#save-benchmark").click(save_benchmark);
   show_benchmark_info();
   refresh_test_list(false);

@@ -6,6 +6,7 @@
 
 .status-icon > span {
   display: none;
+  border-radius: 4px;
 }
 
 .status-done {
@@ -29,5 +30,13 @@
 }
 
 .status-running {
-  background-color: green;
+  background-color: lightgreen;
+}
+
+#test-selection > li {
+  list-style-type: none;
+  display: inline-block;
+  margin-right: 1em;
+  padding: 0.3em;
+  border-radius: 4px;
 }

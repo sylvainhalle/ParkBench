@@ -59,6 +59,11 @@ public class Server implements HttpHandler
    * The underlying Java HTTP server
    */
   HttpServer m_server;
+  
+  /**
+   * The debug mode provides additional verbosity
+   */
+  protected boolean m_debugMode;
 
   /**
    * Instantiates an empty server
@@ -67,6 +72,16 @@ public class Server implements HttpHandler
   {
     super();
     m_callbacks = new Vector<RequestCallback>();
+    m_debugMode = false;
+  }
+  
+  /**
+   * Sets the debug mode for the server
+   * @param b Set to true to activate debug mode, false otherwise
+   */
+  public void setDebugMode(boolean b)
+  {
+	  m_debugMode = b;
   }
 
   /**
@@ -177,8 +192,9 @@ public class Server implements HttpHandler
       	cbr = cb.process(t);
         if (cbr != null)
         {
-          System.out.println(t.getRequestURI().getPath());
-          break;
+        	if (m_debugMode)
+        		System.out.println(t.getRequestURI().getPath());
+        	break;
         }
       }
     }
@@ -192,8 +208,6 @@ public class Server implements HttpHandler
     	cbr = new CallbackResponse(t, CallbackResponse.HTTP_BAD_REQUEST, "", "");
       sendResponse(cbr);
     }
-    
-    
   }
   
   public void sendResponse(CallbackResponse cbr)
@@ -261,12 +275,12 @@ public class Server implements HttpHandler
     if (query == null)
       return out;
     String[] pairs = query.split("&");
-    /*if (pairs.length == 1)
+    if (pairs.length == 1 && pairs[0].indexOf("=") < 0)
     {
       // No params; likely a POST request with payload
       out.put("", pairs[0]);
-    }*/
-    //else
+    }
+    else
     {
       // List of attribute/value pairs
       for (String pair : pairs)
