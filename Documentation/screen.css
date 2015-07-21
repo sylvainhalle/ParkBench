@@ -1,0 +1,42 @@
+code, tt {
+	font-family: Consolas, monospace;
+}
+
+.status-icon {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+
+.status-icon > span {
+  display: none;
+  border-radius: 4px;
+}
+
+.status-done {
+  background-color: blue;
+}
+
+.status-ready {
+  background-color: yellow;
+}
+
+.status-not-ready {
+  background-color: orange;
+}
+
+.status-prerequisites {
+  background-color: lightgreen;
+}
+
+.status-failed {
+  background-color: red;
+}
+
+.status-queued {
+  background-color: lightgrey;
+}
+
+.status-running {
+  background-color: green;
+}

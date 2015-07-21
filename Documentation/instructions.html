@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="screen.css" />
+<link rel="stylesheet" href="styles/default.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<title>A 10-Minute Introduction to ParkBench</title>
+</head>
+<body>
+
+<h1>A 10-Minute Introduction to ParkBench</h1>
+
+<p>ParkBench is an environment for running *benchmarks*. A benchmark is a set of
+tests, &hellip;</p>
+
+<h2>Quick Links</h2>
+
+<ul id="quick-links">
+<li><a href="#test">Creating a test class</a></li>
+<li><a href="#suite">Creating a test suite</a></li>
+<li><a href="#run">Compiling and running</a></li>
+<li><a href="#web">Using the web interface</a></li>
+<li><a href="#sofar">What you've got so far</a></li>
+</ul>
+
+<p>Once you've finished reading this quick tutorial, you can have a look at some
+of the slightly more <a href="advanced.html">advanced features</a> of
+ParkBench.</p>
+
+<a name="test"></a><h2>Creating a test class</h2>
+
+<p>Suppose you have a procedure called Procedure A, which takes as input two
+numerical parameters, <i>x</i> and <i>y</i>, and
+produces as an output a single numerical value (let us call it <i>z</i>).
+You would like to run it and compute its output value <i>z</i>
+for various combinations of input parameters.</p>
+
+
+<p>You start by creating an empty class <code>ProcedureA</code> that extends the
+<code>Test</code> class, as follows:</p>
+
+<pre><code>import ca.uqac.lif.parkbench.*;
+
+class ProcedureA extends Test {
+
+  public ProcedureA() {
+    super("Procedure A");
+  }
+  
+  public Test newTest() {
+    return new ProcedureA();
+  }
+  
+  public void runTest(Parameters input, Parameters output) {
+  }
+}
+</code></pre>
+
+<p>The first two methods (constructor and <code>newTest()</code>) are boilerplate
+methods that you can simply copy-paste by replacing them with whathever name you
+use for your class. (The string within the call to <code>super()</code> can be
+anything you like, as long as it uniquely identifies all tests of type
+<code>ProcedureA</code>.) The processing of the test happens in the method
+<code>runTest()</code>. It receives two objects of type <code>Parameters</code>, which
+are <code>Map</code>s from <code>String</code>s (parameter names) to any Java
+<code>Object</code>. The first contains the test's input parameters (you <em>read</em> from
+them), and the second is where you <em>write</em> the tests's output once it has
+finished.</p>
+
+<p>Suppose Procedure A simply computes as its output parameter <i>z</i> the
+sum of input parameters <i>x</i> and <i>y</i>. This can be written as
+follows:</p>
+
+<pre><code>  public void runTest(Parameters input, Parameters output) {
+    int x = input.getNumber("x").intValue();
+    int y = input.getNumber("y").intValue();
+    int result = x + y;
+    output.put("z", result);
+    stopWithStatus(Status.DONE);
+  }
+</code></pre>
+
+<p>The first two lines get the values of parameters <i>x</i> and <i>y</i>.
+Since we know they are numbers, we can call the <code>getNumber()</code> method
+that readily casts them as <code>Number</code>s (recall that otherwise, what you
+receive using simply <code>get()</code> is an <code>Object</code>. Line 3 computes the
+sum, and line 4 puts that result in the output <code>Parameters</code> object,
+giving it the name <i>z</i>. Finally, the last line is used to indicate that the
+test has finished with success (anoher value can be used to indicate failure, as
+we shall see later).</p>
+
+<a name="suite"></a><h2>Creating a test suite</h2>
+
+<p>Our procedure is now ready to be tested with multiple values. To do so,
+we create a <code>TestSuite</code>. A test suite contains a <code>Benchmark</code>,
+which coordinates the execution
+of multiple instances of <code>Test</code> objects. An empty test suite looks
+like this:</p>
+
+<pre><code>import ca.uqac.lif.parkbench.*;
+
+class MyTestSuite extends TestSuite {
+
+  public static void main(String[] args) {
+    initialize(args, new MyTestSuite());
+  }
+  
+  public void setup(Benchmark b) {
+  }
+}
+</code></pre>
+
+<p>The <code>main()</code> method is again composed of a single line; just make
+sure the second argument to <code>initialize()</code> matches the name of your
+test suite. The setup of your benchmark occurs in the <code>setup()</code>
+method. This method receives as an argument an empty benchmark you are about to
+configure and fill with tests. The simplest thing you can do is add a single
+instance of Procedure A, say with <i>x</i>=2 and <i>y</i>=3:</p>
+
+<pre><code>  public void setup(Benchmark b) {
+    ProcedureA my_test = new ProcedureA();
+    my_test.setParameter("x", 2).setParameter("y", 3);
+    b.addTest(my_test);
+  }
+</code></pre>
+
+<p>Of course, you can write some more code to add multiple tests to the
+benchmark. For example, you can create all tests where <i>x</i> ranges between
+1 and 4, and <i>y</i> ranges between 1 and 2, as follows (no big deal
+here):</p>
+
+<pre><code>  public void setup(Benchmark b) {
+    for (int x = 1; x &lt;= 4; x++)
+      for (int y = 1; y &lt;= 2; y++) {
+        ProcedureA my_test = new ProcedureA();
+        my_test.setParameter("x", x).setParameter("y", y);
+        b.addTest(my_test);
+      }
+  }
+</code></pre>
+
+<p>Note that a single benchmark does not need to contain tests of the same class.
+As a matter of fact, you could create <code>ProcedureB</code>, and add instances
+of these tests to the same benchmark. This is useful, for example, for comparing
+the results of various methods on the same inputs.</p>
+
+<a name="run"></a><h2>Compiling and running</h2>
+
+<p>You can run you test suite directly from the files or from the IDE of your
+choice. However, if Ant is intalled on your computer, you can simply type
+<code>ant</code> on the command line, and you will get a stand-alone, runnable
+JAR file (called <code>TestSuite.jar</code> using the defaults) that you can
+move around and run as you wish.</p>
+
+<p>Run the test suite as follows:</p>
+
+<pre><code>java -jar MyTestSuite.jar
+</code></pre>
+
+<p>You should see an output like this:</p>
+
+<pre><code>ParkBench, a versatile benchmark environment
+Running Untitled test suite in batch mode, using 2 threads
+Saving results in Untitled.json
+Queued  Prereq  Running Done   Failed Time
+    10       0        2      1      0 2 s
+</code></pre>
+
+<p>As you can see, the test suite starts and runs all the tests added to the
+benchmark one by one. Well, not exactly one by one. You can see that the test
+suite is actually using two threads, meaning that there are always two tests
+running at the same time. (We shall see later that the number of threads can be
+configured.)</p>
+
+<p>Moreover, the results of the benchmark are saved to a file; in this case,
+this file is called <code>Untitled.json</code> (this is because we haven't given
+a name to our benchmark, in which case it uses the default "Untitled"). Once the
+test suite is over (which should be almost instantaneous), you can open that
+file and see that its contents look roughly like this:</p>
+
+<pre><code>{
+  "name"  : "Untitled",
+  "tests" : [
+    {
+      "name"   : "Procedure A",
+      "id"     : 4,
+      "input"  : {
+        "x" : 3,
+        "y" : 2
+      },
+      "output" : {
+        "z" : 6,
+      }
+    }
+    &hellip;
+  ]
+}
+</code></pre>
+
+<p>This file uses the JSON notation to structure its data; it should be fairly
+intuitive. For each test in the benchmark, there exists one structure in the
+element <code>tests</code> that gives all the information about that particular
+test instance: its ID (whose value is only relevant to ParkBench), its name
+(<code>"Procedure A"</code>), as well as all its input and output
+parameters. If you look at the actual file, you will see that it contains much more data,
+such as each test's start and end time, information about its status, etc. More
+on that later. Still, from that point on, you can use that file to do whatever
+you like: parse it back and process it to generate graphs, etc. Yet more on that 
+later.</p>
+
+<p>It shall be noted that the execution of your test suite provides another
+benefit, as it is "crash resistant". That is, information about all running
+tests is periodically saved to <code>Untitled.json</code>, so that if you
+computer shuts down, or you hit Ctrl+C, whatever results were in at that point
+will be in the JSON file. We shall see later that you can resume the execution
+of a benchmark from where it stopped, using that file.</p>
+
+<a name="web"></a><h2>Using the web interface</h2>
+
+<p>The benefits of using ParkBench extend beyond the multi-threaded execution
+of the tests in your test suite. ParkBench also provides a user-friendly
+interface to monitor and control the execution of the tests through a web
+browser. Simply type:</p>
+
+<pre><code>java -jar MyTestSuite.jar --interactive
+</code></pre>
+
+<p>You will see this output:</p>
+
+<pre><code>ParkBench, a versatile benchmark environment
+Listening requests on port 21212
+</code></pre>
+
+<p>This time, you test suite does not execute any test. However, if you open the
+web browser of your choice and enter the URL
+<tt>http://localhost:21212/index.html</tt>, you shall see a window that allows
+you to interact with all the tests in your test suite.</p>
+
+<h3>The test list</h3>
+
+<p>The main part of the page is the list of tests. Each test of the test suite
+is one line of the table. For each test, you get information about all of its
+input parameters, buttons to start/interrupt each test individually.
+If the test is running or has finished, real-time information
+about its execution time is displayed in the column "Duration".
+You can sort tests according to a parameter by clicking on its column header;
+hold Shift to sort according to multiple parameters.</p>
+
+<table class="table table-hover tablesorter">
+<tr><th></th><th>Status</th><th>Duration</th><th>Name</th><th>x</th><th>y</th><th></th></tr>
+<tr>
+ <td><input type="checkbox" /></td>
+ <td><div class="status-icon status-ready"></div></td>
+ <td></td>
+ <td>Procedure A</td>
+ <td>1</td>
+ <td>1</td>
+ <td><button class="btn btn-small">Start</button><button class="btn btn-small">Stop</button></td>
+</tr>
+<tr>
+ <td><input type="checkbox" /></td>
+ <td><div class="status-icon status-ready"></div></td>
+ <td></td>
+ <td>Procedure A</td>
+ <td>1</td>
+ <td>2</td>
+ <td><button class="btn btn-small">Start</button><button class="btn btn-small">Stop</button></td>
+</tr>
+<tr>
+ <td><input type="checkbox" /></td>
+ <td><div class="status-icon status-ready"></div></td>
+ <td></td>
+ <td>Procedure A</td>
+ <td>2</td>
+ <td>1</td>
+ <td><button class="btn btn-small">Start</button><button class="btn btn-small">Stop</button></td>
+</tr>
+<tr>
+ <td><input type="checkbox" /></td>
+ <td><div class="status-icon status-ready"></div></td>
+ <td></td>
+ <td>Procedure A</td>
+ <td>1</td>
+ <td>2</td>
+ <td><button class="btn btn-small">Start</button><button class="btn btn-small">Stop</button></td>
+</tr>
+</table>
+
+<p>The "Status" column shows a small square whose colour is explained in the
+key just above the list of tests.</p>
+
+<ul>
+<li><div class="status-icon status-not-ready"><span>Not ready</span></div>The test has not run and its prerequisites are not fulfilled</li>
+<li><div class="status-icon status-ready"><span>Ready</span></div>The test has not run but is ready to run</li>
+<li><div class="status-icon status-queued"><span>Queued</span></div>The test is in the queue, waiting to be started</li>
+<li><div class="status-icon status-prerequisites"><span>Prerequisites</span></div>The test is currently generating its prerequisites</li>
+<li><div class="status-icon status-running"><span>Running</span></div>The test is currently running</li>
+<li><div class="status-icon status-done"><span>Done</span></div>The test has completed successfully</li>
+<li><div class="status-icon status-failed"><span>Failed</span></div>The execution of the test has failed or was manually cancelled</li>
+</ul>
+
+<p>Try it. Select a few or all of the tests (options above the list allow you
+to select all tests, or only those with a specific status), and start/stop them
+using the buttons.</p>
+
+<p>Since Procedure A does not do much, its execution is almost instantaneous. To
+simulate the execution of a test that does more work (and takes more time), add
+the following line in the method <tt>runTest()</tt> of <tt>ProcedureA</tt>, just
+before the last line:</p>
+
+<pre><code class="java">waitFor(5);
+</code></pre>
+
+<p>This will suspend the execution of the test for five seconds before moving
+on to the last instruction, where the test indicates that it has finished. Now
+restart your test suite and refresh your browser. If you select all tests and
+run them at once, you should see how the benchmark manages their execution:
+tests are first put in the waiting queue (<span class="status-icon status-queued"><span>Queued</span></span>),
+eventually get to the "running" state (<span class="status-icon status-running"><span>Running</span></span>),
+and after a few seconds end up in the "finished" state (<span class="status-icon status-done"><span>Done</span></span>).
+You can also see that two tests are always running in parallel, as the benchmark
+uses two threads.</p>
+
+<h3>Remote control</h3>
+
+<p>Since your test suite is also a web server, you can access it from a
+different computer, so that the tests run on a computer, but are controlled from
+<em>another</em> computer. Suppose 10.10.10.1 is the IP address of the computer
+where <code>MyTestSuite.jar</code> is currently running. You can open a web
+browser in another computer, and type
+<tt>http://10.10.10.1:21212/index.html</tt> to open the web interface.
+Voil&agrave;! No need to SSH into the machine to start/stop test scripts.</p>
+
+<p>Through the web interface, you can also download the <tt>Untitled.json</tt>
+file that contains all the tests results. Simply click on the "Download" button
+above the test list and you will receive a copy of the test suite's current
+state. No need to FTP into the machine to download test results.</p>
+
+<a name="sofar"></a><h2>What you've got so far</h2>
+
+<p>So far, we've written 25 lines of code (including boilerplate code we can
+simply copy-paste). Here's what we got in exchange:</p>
+
+<ul>
+<li>Queuing and multi-threaded execution of all tests in your test suite from the command line</li>
+<li>Automated saving of all test information (input and results) into a
+JSON file you can reuse to create graphs, etc.</li>
+<li>A nice web interface to control and monitor the execution of your tests
+from any computer</li>
+</ul>
+
+<p>Ready for some more <a href="advanced.html">advanced features</a>?</p>
+
+</body>
+</html>
