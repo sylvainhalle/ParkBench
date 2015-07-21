@@ -149,9 +149,10 @@ public class Benchmark
 		while (it.hasNext())
 		{
 			Test t = it.next();
-			if (override || !t.prerequisitesFulilled())
+			Parameters input = t.getParameters();
+			if (override || !t.prerequisitesFulilled(input))
 			{
-				t.fulfillPrerequisites(t.getParameters());
+				t.fulfillPrerequisites(input);
 			}
 		}
 	}
@@ -427,7 +428,7 @@ public class Benchmark
 			map.put("status-failed", map.get("status-failed") + 1);
 			break;
 		case NOT_DONE:
-			if (t.prerequisitesFulilled())
+			if (t.prerequisitesFulilled(t.getParameters()))
 			{
 				map.put("status-ready", map.get("status-ready") + 1);
 			}

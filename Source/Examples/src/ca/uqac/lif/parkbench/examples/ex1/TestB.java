@@ -29,7 +29,7 @@ public class TestB extends Test
 	}
 	
 	@Override
-	public boolean prerequisitesFulilled()
+	public boolean prerequisitesFulilled(final Parameters input)
 	{
 		return false;
 	}

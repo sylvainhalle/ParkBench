@@ -277,9 +277,10 @@ public abstract class Test implements Runnable
 	 * Checks whether the prerequisites for running this test (required
 	 * files, etc.) are fulfilled. Override this method if your test
 	 * has prerequisites.
+	 * @param input The test's parameters
 	 * @return true if the test is ready to run, false otherwise
 	 */
-	public boolean prerequisitesFulilled()
+	public boolean prerequisitesFulilled(final Parameters input)
 	{
 		return true;
 	}
@@ -288,9 +289,9 @@ public abstract class Test implements Runnable
 	 * Fulfill the prerequisites for the test. This includes calling
 	 * any additional commands, generating any files, etc. that the
 	 * test will require when run.
-	 * @param params The test's parameters
+	 * @param input The test's parameters
 	 */
-	public void fulfillPrerequisites(Parameters params)
+	public void fulfillPrerequisites(final Parameters input)
 	{
 		// Do nothing
 	}
@@ -320,7 +321,7 @@ public abstract class Test implements Runnable
 	public final void run()
 	{
 		m_startTime = System.currentTimeMillis() / 1000;
-		if (!prerequisitesFulilled())
+		if (!prerequisitesFulilled(m_parameters))
 		{
 			// Before running, generate the prerequisites
 			setStatus(Status.PREREQUISITES);
@@ -427,7 +428,7 @@ public abstract class Test implements Runnable
 		out.put("id", m_id);
 		out.put("starttime", m_startTime);
 		out.put("endtime", m_stopTime);
-		if (prerequisitesFulilled())
+		if (prerequisitesFulilled(m_parameters))
 		{
 			out.put("prerequisites", "true");
 		}
