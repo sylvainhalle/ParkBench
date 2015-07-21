@@ -44,6 +44,16 @@ public class Cli
 	protected int m_verbosity = 1;
 	
 	/**
+	 * The number of refresh loops between two saves of the benchmark's status
+	 */
+	protected static final int s_saveInterval = 10;
+	
+	/**
+	 * The number of threads used by default
+	 */
+	protected static final int s_defaultNumThreads = 2;
+	
+	/**
 	 * Command-line arguments
 	 */
 	protected String[] m_args;
@@ -59,11 +69,12 @@ public class Cli
 		String server_name = m_defaultServerName;
 		int server_port = m_defaultPort;
 		boolean interactive_mode = false;
+		int num_threads = s_defaultNumThreads;
 		
 		final AnsiPrinter stderr = new AnsiPrinter(System.err);
 		final AnsiPrinter stdout = new AnsiPrinter(System.out);
-		stdout.setForegroundColor(AnsiPrinter.Color.BLACK);
-		stderr.setForegroundColor(AnsiPrinter.Color.BLACK);
+		//stdout.setForegroundColor(AnsiPrinter.Color.BLACK);
+		//stderr.setForegroundColor(AnsiPrinter.Color.BLACK);
 
 		// Propertly close print streams when closing the program
 		// https://www.securecoding.cert.org/confluence/display/java/FIO14-J.+Perform+proper+cleanup+at+program+termination
@@ -72,7 +83,8 @@ public class Cli
 			@Override
 			public void run()
 			{
-				stderr.println("Stopping server");
+				stderr.println("\nStopping server");
+				benchmark.stop();
 				stderr.close();
 				stdout.close();
 			}
@@ -115,6 +127,11 @@ public class Cli
 		{
 			interactive_mode = true;
 		}
+		if (c_line.hasOption("t"))
+		{
+			num_threads = Integer.parseInt(c_line.getOptionValue("p"));
+		}
+		benchmark.setThreads(num_threads);
 		
 		// The remaining arguments are configuration files to read
 		List<String> remaining_args = c_line.getArgList();
@@ -144,6 +161,67 @@ public class Cli
 			BenchmarkServer server = new BenchmarkServer(server_name, server_port, benchmark);
 			server.startServer();
 			println(stdout, "Server started on " + server_name + ":" + server_port, 1);
+		}
+		else
+		{
+			// Run all tests
+			int loop_count = 1;
+			String save_filename = benchmark.getName() + ".json";
+			println(stdout, "Running " + benchmark.getName() 
+					+ " test suite in batch mode, using " 
+					+ benchmark.threadCount() + " threads", 1000);
+			println(stdout, "Saving results in " + save_filename, 1000);
+			long start_time = System.currentTimeMillis() / 1000;
+			benchmark.queueAllTests();
+			println(stdout, "Queued  Prereq  Running Done   Failed Time", 1000);
+			while (!benchmark.isFinished())
+			{
+				long current_time = System.currentTimeMillis() / 1000;
+				JsonMap state = benchmark.serializeState();
+				JsonMap status_map = (JsonMap) state.get("status");
+				String line = String.format("%6d  %6d  %7d %6d %6d %d s", 
+						status_map.getNumber("status-queued").intValue(),
+						status_map.getNumber("status-prerequisites").intValue(),
+						status_map.getNumber("status-running").intValue(),
+						status_map.getNumber("status-done").intValue(),
+						status_map.getNumber("status-failed").intValue(),
+						current_time - start_time);
+				print(stdout, line + "\r", 1000);
+				try
+				{
+					// Wait one second
+					Thread.sleep(1000);
+				}
+				catch (InterruptedException e) 
+				{
+					// Do nothing
+				}
+				loop_count = (loop_count + 1) % s_saveInterval;
+				if (loop_count == 0)
+				{
+					// Periodical save of the benchmark
+					try
+					{
+						FileReadWrite.writeToFile(save_filename, state.toString());
+					}
+					catch (IOException e) 
+					{
+						println(stderr, "Error writing to file " + save_filename, 2);
+					}
+				}
+			}
+			try
+			{
+				// We are done; save benchmark status one last time
+				JsonMap state = benchmark.serializeState();
+				FileReadWrite.writeToFile(save_filename, state.toString());
+			}
+			catch (IOException e) 
+			{
+				println(stderr, "Error writing to file " + save_filename, 2);
+			}
+			println(stdout, "\nDone", 1000);
+			benchmark.stop();
 		}
 	}
 	
@@ -177,6 +255,13 @@ public class Cli
 				.argName("x")
 				.hasArg()
 				.desc("Listen on port x (default: " + m_defaultPort + ")")
+				.build();
+		options.addOption(opt);
+		opt = Option.builder("t")
+				.longOpt("threads")
+				.argName("x")
+				.hasArg()
+				.desc("Use x threads (default: " + s_defaultNumThreads + ")")
 				.build();
 		options.addOption(opt);
 		return options;
@@ -229,6 +314,14 @@ public class Cli
 		if (verbosity_level >= m_verbosity)
 		{
 			out.println(message);
+		}
+	}
+	
+	protected void print(PrintStream out, String message, int verbosity_level)
+	{
+		if (verbosity_level >= m_verbosity)
+		{
+			out.print(message);
 		}
 	}
 

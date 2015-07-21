@@ -1,7 +1,6 @@
 package ca.uqac.lif.parkbench;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Runs a test by running a command, created from a regular expression
@@ -37,7 +36,7 @@ public abstract class CommandTestRegex extends CommandTest
 	}
 
 	@Override
-	protected void createCommandFromParameters(Map<String, Object> parameters,
+	protected void createCommand(Parameters parameters,
 			List<String> command)
 	{
 		String[] parts = m_commandPattern.split(" ");

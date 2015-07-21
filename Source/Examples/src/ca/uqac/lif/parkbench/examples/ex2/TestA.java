@@ -1,8 +1,7 @@
 package ca.uqac.lif.parkbench.examples.ex2;
 
-import java.util.Map;
-
 import ca.uqac.lif.parkbench.CommandTestRegex;
+import ca.uqac.lif.parkbench.Parameters;
 import ca.uqac.lif.parkbench.Test;
 
 /**
@@ -17,7 +16,7 @@ public class TestA extends CommandTestRegex
 	}
 	
 	@Override
-	protected void createResultsFromOutput(String output, Map<String,Object> results)
+	protected void readOutput(String output, Parameters results)
 	{
 		results.put("value", output.trim());
 	}

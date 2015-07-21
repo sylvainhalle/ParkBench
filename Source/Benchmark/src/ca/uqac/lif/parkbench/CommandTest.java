@@ -3,7 +3,6 @@ package ca.uqac.lif.parkbench;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class CommandTest extends Test
 {
@@ -22,10 +21,10 @@ public abstract class CommandTest extends Test
 	}
 
 	@Override
-	public void runTest(Parameters params, Parameters results)
+	public final void runTest(Parameters params, Parameters results)
 	{
 		List<String> command_list = new ArrayList<String>();
-		createCommandFromParameters(params, command_list);
+		createCommand(params, command_list);
 		String command[] = new String[command_list.size()];
 		command = command_list.toArray(command);
 		try
@@ -33,7 +32,7 @@ public abstract class CommandTest extends Test
 			if (getDryRun() == false)
 			{
 				String output = CommandRunner.runCommand(command);
-				createResultsFromOutput(output, results);
+				readOutput(output, results);
 			}
 			else
 			{
@@ -52,7 +51,7 @@ public abstract class CommandTest extends Test
 	 * @param parameters The test's parameters
 	 * @param command The command to execute
 	 */
-	protected abstract void createCommandFromParameters(Map<String,Object> parameters, List<String> command);
+	protected abstract void createCommand(Parameters parameters, List<String> command);
 	
 	/**
 	 * Processes the output of the command and creates a set of
@@ -60,5 +59,5 @@ public abstract class CommandTest extends Test
 	 * @param output The output of the command
 	 * @param results The set of result parameters
 	 */
-	protected abstract void createResultsFromOutput(String output, Map<String,Object> results);
+	protected abstract void readOutput(String output, Parameters results);
 }

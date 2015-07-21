@@ -33,6 +33,11 @@ public class Benchmark
 	 */
 	protected ThreadDispatcher m_dispatcher;
 	
+	/**
+	 * The thread running the dispatcher
+	 */
+	protected Thread m_dispatcherThread;
+	
 	
 	/**
 	 * Create an empty benchmark 
@@ -52,8 +57,8 @@ public class Benchmark
 		m_tests = new HashSet<Test>();
 		m_name = "Untitled Benchmark";
 		m_dispatcher = new ThreadDispatcher(num_threads);
-		Thread th = new Thread(m_dispatcher);
-		th.start();
+		m_dispatcherThread = new Thread(m_dispatcher);
+		m_dispatcherThread.start();
 	}
 	
 	/**
@@ -192,6 +197,20 @@ public class Benchmark
 	}
 	
 	/**
+	 * Queues all the tests in the benchmark
+	 */
+	public void queueAllTests()
+	{
+		Iterator<Test> it = m_tests.iterator();
+		
+		while (it.hasNext())
+		{
+			Test t = it.next();
+			m_dispatcher.putInQueue(t);
+		}
+	}
+	
+	/**
 	 * Runs a test in the benchmark
 	 * @param test_id The id of the test to run
 	 * @return true if a test with that ID exists, false otherwise
@@ -211,6 +230,11 @@ public class Benchmark
 		return false;
 	}
 	
+	/**
+	 * Places a test in the waiting queue to be executed
+	 * @param test_id The id of the test to run
+	 * @return true if a test with that ID exists, false otherwise
+	 */
 	public boolean queueTest(int test_id)
 	{
 		Iterator<Test> it = m_tests.iterator();
@@ -238,16 +262,46 @@ public class Benchmark
 	}
 	
 	/**
+	 * Checks if all the tests in the benchmark are done
+	 * (either finished or interrupted)
+	 * @return true if all tests are finished, false otherwise
+	 */
+	public boolean isFinished()
+	{
+		return m_dispatcher.allDone();
+	}
+	
+	/**
 	 * Sets the dry run status of every test in the benchmark.
 	 * See {@link Test#setDryRun(boolean)}.
 	 * @param b The dry run status
+	 * @return An instance of this benchmark
 	 */
-	public void setDryRun(boolean b)
+	public Benchmark setDryRun(boolean b)
 	{
 		for (Test t : m_tests)
 		{
 			t.setDryRun(b);
 		}
+		return this;
+	}
+	
+	/**
+	 * Sets the number of threads to be used with this benchmark.
+	 * <b>NOTE:</b> this will stop and <b>wipe out</b> the current
+	 * {@link ThreadDispatcher}, leaving dangling any tasks that were running
+	 * in it. It is not recommended to call this method while tests are
+	 * running.
+	 * @param num_threads The number of threads this benchmark should use
+	 * @return An instance of this benchmark
+	 */
+	public Benchmark setThreads(int num_threads)
+	{
+		m_dispatcherThread.interrupt();
+		m_dispatcher = new ThreadDispatcher(num_threads);
+		m_dispatcherThread = new Thread(m_dispatcher);
+		m_dispatcherThread.start();
+		return this;
 	}
 	
 	@Override
@@ -338,6 +392,15 @@ public class Benchmark
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Stops the benchmark
+	 */
+	public void stop()
+	{
+		m_dispatcher.stopAll();
+		m_dispatcherThread.interrupt();
 	}
 	
 	static Map<String,Integer> fillStatusMap()

@@ -63,9 +63,24 @@ public class ThreadDispatcher implements Runnable
 	 */
 	synchronized public void putInQueue(Test t)
 	{
-		System.out.println("Test added with ID " + t.getId());
+		//System.out.println("Test added with ID " + t.getId());
 		t.setStatus(Test.Status.QUEUED);
 		m_testQueue.add(t);
+	}
+	
+	/**
+	 * Interrupts all running threads
+	 */
+	synchronized public void stopAll()
+	{
+		for (int i = 0; i < m_threads.length; i++)
+		{
+			TestThread th = m_threads[i];
+			if (th != null)
+			{
+				th.interrupt();
+			}
+		}
 	}
 	
 	/**
@@ -88,7 +103,7 @@ public class ThreadDispatcher implements Runnable
 			Test test = m_testQueue.poll();
 			if (test != null)
 			{
-				System.out.println("Test ID " + test.getId() + " assigned to thread #" + i);
+				//System.out.println("Test ID " + test.getId() + " assigned to thread #" + i);
 				TestThread th_new = new TestThread(test);
 				th_new.start();
 				m_threads[i] = th_new;
@@ -169,6 +184,29 @@ public class ThreadDispatcher implements Runnable
 		}
 		// No success!
 		return false;
+	}
+	
+	/**
+	 * Checks if the dispatcher is done. This is the case when the input
+	 * queue is empty and all tests in the threads are finished or
+	 * interrupted. 
+	 * @return true if all done, false otherwise
+	 */
+	public boolean allDone()
+	{
+		if (!m_testQueue.isEmpty())
+		{
+			return false;
+		}
+		for (int i = 0; i < m_threads.length; i++)
+		{
+			Thread th = m_threads[i];
+			if (th != null && th.isAlive())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

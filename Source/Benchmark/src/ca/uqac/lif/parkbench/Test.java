@@ -144,10 +144,14 @@ public abstract class Test implements Runnable
 	 * Sets the value of some parameter
 	 * @param name The parameter name
 	 * @param value The parameter value
+	 * @return A reference to the test itself. This return value can be
+	 *   ignored; it is there so that one can chain calls to setParameter in
+	 *   the same line (e.g.: <tt>test.setParameter(...).setParameter(...)</tt>
 	 */
-	public final void setParameter(String name, Object value)
+	public final Test setParameter(String name, Object value)
 	{
 		m_parameters.put(name, value);
+		return this;
 	}
 	
 	/**
@@ -485,5 +489,26 @@ public abstract class Test implements Runnable
 	{
 		m_stopTime = System.currentTimeMillis() / 1000;
 		setStatus(s);
+	}
+	
+	/**
+	 * Waits for a number of seconds, doing nothing. If the test
+	 * gets interrupted while waiting, it ends with the status
+	 * <tt>FAILED</tt>.
+	 * @param seconds The number of seconds to wait
+	 */
+	public void waitFor(float seconds)
+	{
+		try
+		{
+			Thread.sleep((long)(1000 * seconds));
+		}
+		catch (InterruptedException e) 
+		{
+			// This happens if the user cancels the test manually
+			stopWithStatus(Status.FAILED);
+			return;
+		}
+
 	}
 }

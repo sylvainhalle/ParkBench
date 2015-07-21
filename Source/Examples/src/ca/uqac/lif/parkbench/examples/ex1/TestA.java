@@ -28,22 +28,13 @@ public class TestA extends Test
 	public void runTest(final Parameters params, Parameters results)
 	{
 		// Get the value of test parameters "k" and "n"
-		Number n = params.getNumber("n");
-		Number k = params.getNumber("k");
+		int n = params.getNumber("n").intValue();
+		int k = params.getNumber("k").intValue();
 		// Multiply those values and put that as the result parameter "value"
-		Number out = n.floatValue() * k.floatValue();
+		int out = n * k;
 		results.put("value", out);
 		// Sleep n * k seconds to simulate processing
-		try
-		{
-			Thread.sleep(1000 * n.intValue() * k.intValue());
-		}
-		catch (InterruptedException e) 
-		{
-			// This happens if the user cancels the test manually
-			stopWithStatus(Status.FAILED);
-			return;
-		}
+		waitFor(out);
 		// Don't forget to set the status to DONE when finished
 		stopWithStatus(Status.DONE);
 	}

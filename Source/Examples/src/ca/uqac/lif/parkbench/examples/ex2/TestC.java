@@ -1,7 +1,6 @@
 package ca.uqac.lif.parkbench.examples.ex2;
 
 import java.io.IOException;
-import java.util.Map;
 
 import ca.uqac.lif.parkbench.CommandRunner;
 import ca.uqac.lif.parkbench.CommandTestRegex;
@@ -44,7 +43,7 @@ public class TestC extends CommandTestRegex
 	}
 	
 	@Override
-	protected void createResultsFromOutput(String output, Map<String,Object> results)
+	protected void readOutput(String output, Parameters results)
 	{
 		results.put("value", output.trim());
 	}

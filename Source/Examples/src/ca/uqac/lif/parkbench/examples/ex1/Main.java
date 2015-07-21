@@ -1,22 +1,18 @@
 package ca.uqac.lif.parkbench.examples.ex1;
 
 import ca.uqac.lif.parkbench.Benchmark;
-import ca.uqac.lif.parkbench.Cli;
 import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.TestSuite;
 
-public class Main
+public class Main extends TestSuite
 {
-
 	public static void main(String[] args)
 	{
-		Cli cli = new Cli(args);
-		Benchmark b = setupBenchmark();
-		cli.start(b);
+		initialize(args, new Main());
 	}
 	
-	protected static Benchmark setupBenchmark()
+	public void setup(Benchmark b)
 	{
-		Benchmark benchmark = new Benchmark(3);
 		Test[] tests_to_create = {
 				new TestA(),
 				new TestB()
@@ -30,10 +26,9 @@ public class Main
 					Test new_t = t.newTest();
 					new_t.setParameter("n", n);
 					new_t.setParameter("k", k);
-					benchmark.addTest(new_t);
+					b.addTest(new_t);
 				}
 			}
 		}
-		return benchmark;
 	}
 }
