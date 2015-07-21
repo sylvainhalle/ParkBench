@@ -169,7 +169,7 @@ public abstract class Test implements Runnable
 		return m_parameters.get(name);
 	}
 	
-	protected final Parameters getParameters()
+	public final Parameters getParameters()
 	{
 		return m_parameters;
 	}
@@ -460,6 +460,7 @@ public abstract class Test implements Runnable
 	public void deserializeState(JsonMap state)
 	{
 		JsonMap in_params = (JsonMap) state.get("input");
+		JsonMap out_params = (JsonMap) state.get("results");
 		m_startTime = state.getNumber("starttime").intValue();
 		m_stopTime = state.getNumber("endtime").intValue();
 		m_status = stringToStatus(state.getString("status"));
@@ -479,8 +480,23 @@ public abstract class Test implements Runnable
 				m_parameters.put(param_name, param_value);
 			}
 		}
+		for (String param_name : out_params.keySet())
+		{
+			JsonElement param_value = out_params.get(param_name);
+			if (param_value instanceof JsonNumber)
+			{
+				m_results.put(param_name, ((JsonNumber) param_value).numberValue());
+			}
+			else if (param_value instanceof JsonString)
+			{
+				m_results.put(param_name, ((JsonString) param_value).stringValue());
+			}
+			else
+			{
+				m_results.put(param_name, param_value);
+			}
+		}
 	}
-
 	
 	/**
 	 * Stops the tests and gives it a status

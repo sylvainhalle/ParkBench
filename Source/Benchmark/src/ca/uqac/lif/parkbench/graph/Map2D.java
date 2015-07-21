@@ -1,10 +1,12 @@
-package ca.uqac.lif.parkbench;
+package ca.uqac.lif.parkbench.graph;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
+import ca.uqac.lif.parkbench.DataFormatter;
 
 public class Map2D<T,U,V>
 {
@@ -144,6 +146,10 @@ public class Map2D<T,U,V>
 		@Override
 		public String format(Number x)
 		{
+			if (x == null)
+			{
+				return "-";
+			}
 			return x.toString();
 		}
 		

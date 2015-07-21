@@ -13,7 +13,7 @@
 <link href="css/bootstrap-responsive.min.css" rel="stylesheet" />
 
 <!-- Inclusion of jQuery and Twitter Bootstrap -->
- <script type="text/javascript" src="jquery-1.11.3.min.js"></script> 
+<script type="text/javascript" src="jquery-1.11.3.min.js"></script> 
 <script type="text/javascript" src="tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script> 
 <script type="text/javascript" src="parkbench.js"></script>
@@ -56,6 +56,9 @@
 <a href="/save"><button class="btn" id="save-benchmark">Save benchmark</button></a>
 </div>
 
+<button class="btn btn-small" id="refresh-plot">Refresh plot</button>
+<img src="plot" alt="Plot" id="plot" />
+
 <div class="well">
 <h3>Status</h2>
 <table>
@@ -89,7 +92,8 @@
 </p>
 
 <p>Click on a column header to sort tests based on that column. Hold the Shift key
-to sort according to multiple columns.</p>
+to sort according to multiple columns. The list auto-refreshes every
+<span id="refresh-interval">1</span> s.</p>
 
 <table id="test-list" class="table table-hover tablesorter">
 <tr><td>No test so far</td></tr>

@@ -1,13 +1,17 @@
 /**
  *  The interval for refreshing the list of tests (in ms)
  */
-var REFRESH_INTERVAL = 1000;
+var REFRESH_INTERVAL = 2000;
 
 function refresh_test_list(incremental) {
   $.ajax({
     url         : "/status",
     contentType : "application/json",
     success     : function(result) {
+      // Slow down refresh interval according to size of server response
+      // The problem is not the server, it's the browser that can't keep up
+      REFRESH_INTERVAL = Math.max(1000, result.tests.length * 10);
+      $("#refresh-interval").html(Math.round(REFRESH_INTERVAL / 1000));
       if (result.status["status-done"])
         $("#status-nb-done").html(result.status["status-done"]);
       else
@@ -305,6 +309,12 @@ function elapsed_time(delta) // delta is the interval in *seconds*
     }
 };
 
+function refresh_plot()
+{
+    // Refresh plot
+    $("#plot").attr("src", "/plot?ts=" + new Date().getTime());
+};
+
 $(document).ready(function() {
   $("#refresh-status").click(function() {refresh_test_list(true);});
   $("#check-all").click(select_all_tests);
@@ -313,6 +323,7 @@ $(document).ready(function() {
   $("#start-all").click(start_selected_tests);
   $("#stop-all").click(stop_selected_tests);
   $("#save-benchmark").click(save_benchmark);
+  $("#refresh-plot").click(refresh_plot);
   show_benchmark_info();
   refresh_test_list(false);
   periodical_refresh();

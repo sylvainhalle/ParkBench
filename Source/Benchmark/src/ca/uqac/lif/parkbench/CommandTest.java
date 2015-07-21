@@ -31,7 +31,7 @@ public abstract class CommandTest extends Test
 		{
 			if (getDryRun() == false)
 			{
-				String output = CommandRunner.runCommand(command);
+				String output = CommandRunner.runCommandString(command);
 				readOutput(output, results);
 			}
 			else

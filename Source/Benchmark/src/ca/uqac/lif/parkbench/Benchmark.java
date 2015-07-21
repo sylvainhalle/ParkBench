@@ -10,6 +10,7 @@ import java.util.Set;
 import ca.uqac.lif.cornipickle.json.JsonElement;
 import ca.uqac.lif.cornipickle.json.JsonList;
 import ca.uqac.lif.cornipickle.json.JsonMap;
+import ca.uqac.lif.parkbench.graph.GnuPlot;
 
 /**
  * A benchmark controls the execution of a set of tests
@@ -34,9 +35,16 @@ public class Benchmark
 	protected ThreadDispatcher m_dispatcher;
 	
 	/**
+	 * A counter for plot IDs
+	 */
+	protected int s_plotCounter = 0;
+	
+	/**
 	 * The thread running the dispatcher
 	 */
 	protected Thread m_dispatcherThread;
+	
+	protected Map<Integer,GnuPlot> m_plots;
 	
 	
 	/**
@@ -59,6 +67,7 @@ public class Benchmark
 		m_dispatcher = new ThreadDispatcher(num_threads);
 		m_dispatcherThread = new Thread(m_dispatcher);
 		m_dispatcherThread.start();
+		m_plots = new HashMap<Integer,GnuPlot>();
 	}
 	
 	/**
@@ -340,6 +349,12 @@ public class Benchmark
 		}
 		// Replaces the old set of tests with the one created from the JSON
 		m_tests = new_tests;
+		// Don't forget to re-associate any plots to the new tests
+		for (int key : m_plots.keySet())
+		{
+			GnuPlot plot = m_plots.get(key);
+			plot.clear().addTests(this);
+		}
 	}
 	
 	/**
@@ -415,6 +430,18 @@ public class Benchmark
 		out.put("status-queued", 0);
 		out.put("status-running", 0);
 		return out;
+	}
+	
+	public Benchmark addPlot(GnuPlot plot)
+	{
+		plot.addTests(this);
+		m_plots.put(s_plotCounter++, plot);
+		return this;
+	}
+	
+	public GnuPlot getPlot(int plot_id)
+	{
+		return m_plots.get(plot_id);
 	}
 	
 	static void putInStatusMap(Test t, Map<String,Integer> map)

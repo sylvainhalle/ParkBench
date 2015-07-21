@@ -1,8 +1,13 @@
-package ca.uqac.lif.parkbench;
+package ca.uqac.lif.parkbench.graph;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import ca.uqac.lif.parkbench.Benchmark;
+import ca.uqac.lif.parkbench.CommandRunner;
+import ca.uqac.lif.parkbench.Test;
 
 public abstract class GnuPlot
 {
@@ -20,6 +25,11 @@ public abstract class GnuPlot
 	 * The set of tests associated to that plot
 	 */
 	protected Set<Test> m_tests;
+	
+	/**
+	 * The path to launch GnuPlot
+	 */
+	protected static String s_path = "gnuplot";
 	
 	/**
 	 * The plot's title
@@ -81,4 +91,46 @@ public abstract class GnuPlot
 	 *   generate this plot
 	 */
 	public abstract String toGnuPlot(Terminal term);
+	
+	/**
+	 * Sets the path to run the GnuPlot executable
+	 * @param path The path
+	 * @return An instance of this GnuPlot object
+	 */
+	public GnuPlot setPath(String path)
+	{
+		s_path = path;
+		return this;
+	}
+	
+	/**
+	 * Runs GnuPlot on a file and returns the resulting graph
+	 * @return The (binary) contents of the image produced by Gnuplot
+	 */
+	public final byte[] getImage()
+	{
+		String instructions = toGnuPlot();
+		byte[] image = null;
+		String[] command = {s_path};
+		try 
+		{
+			image = CommandRunner.runCommandBytes(command, instructions);
+		}
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return image;
+	}
+	
+	/**
+	 * Clears the plot
+	 * @return
+	 */
+	public GnuPlot clear()
+	{
+		m_tests.clear();
+		return this;
+	}
 }
