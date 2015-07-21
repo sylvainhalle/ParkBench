@@ -133,4 +133,29 @@ public abstract class GnuPlot
 		m_tests.clear();
 		return this;
 	}
+	
+	/**
+	 * Returns the terminal string associated to this plot 
+	 * @param term The terminal
+	 * @return A string understood by Gnuplot for the terminal's name
+	 */
+	protected static String getTerminalString(Terminal term)
+	{
+		String out = "";
+		switch (term)
+		{
+		case GIF:
+			out = "gif";
+			break;
+		case PDF:
+			out = "pdf";
+			break;
+		case PNG:
+			out = "png";
+			break;
+		default:
+			break;
+		}
+		return out;
+	}
 }

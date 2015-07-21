@@ -12,6 +12,9 @@ function refresh_test_list(incremental) {
       // The problem is not the server, it's the browser that can't keep up
       REFRESH_INTERVAL = Math.max(1000, result.tests.length * 10);
       $("#refresh-interval").html(Math.round(REFRESH_INTERVAL / 1000));
+      // Refresh the plot
+      refresh_plot();
+      // Refresh the summary table
       if (result.status["status-done"])
         $("#status-nb-done").html(result.status["status-done"]);
       else

@@ -1,7 +1,10 @@
 package ca.uqac.lif.parkbench.graph;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -71,11 +74,13 @@ public class Map2D<T,U,V>
 
 	/**
 	 * The columns, in the order they have been arranged the last time
-	 * the plot was asked for
+	 * the plot was asked for.
 	 * @return A vector of columns
 	 */
 	public Vector<U> getColumns()
 	{
+		// The columns are computed by orderColumns, so we call it
+		m_columns = orderColumns();
 		return m_columns;
 	}
 	

@@ -21,7 +21,7 @@ public class TestC extends CommandTestRegex
 	}
 	
 	@Override
-	public boolean prerequisitesFulilled()
+	public boolean prerequisitesFulilled(Parameters input)
 	{
 		String filename = getPrerequisitesFilename();
 		return CommandRunner.fileExists(filename);
