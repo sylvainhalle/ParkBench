@@ -32,12 +32,12 @@ public class Map2D<T,U,V>
 	/**
 	 * The data formatter for the x values
 	 */
-	protected DataFormatter<Number> m_formatterX;
+	protected DataFormatter<T> m_formatterX;
 	
 	/**
 	 * The data formatter for the y values
 	 */
-	protected DataFormatter<Number> m_formatterY;
+	protected DataFormatter<V> m_formatterY;
 	
 	/**
 	 * The columns, in the order they have been arranged the last time
@@ -50,7 +50,7 @@ public class Map2D<T,U,V>
 		this(null, null);
 	}
 	
-	public Map2D(DataFormatter<Number> formatter_x, DataFormatter<Number> formatter_y)
+	public Map2D(DataFormatter<T> formatter_x, DataFormatter<V> formatter_y)
 	{
 		super();
 		m_contents = new HashMap<T,Map<U,V>>();
@@ -61,7 +61,7 @@ public class Map2D<T,U,V>
 		}
 		else
 		{
-			m_formatterX = new PassthroughFormatter();
+			m_formatterX = new PassthroughFormatter<T>();
 		}
 		if (formatter_y != null)
 		{
@@ -69,7 +69,7 @@ public class Map2D<T,U,V>
 		}
 		else
 		{
-			m_formatterY = new PassthroughFormatter();
+			m_formatterY = new PassthroughFormatter<V>();
 		}		
 	}
 	
@@ -110,7 +110,7 @@ public class Map2D<T,U,V>
 		Set<T> keys = m_contents.keySet();
 		for (T key : keys)
 		{
-			out.append(keyFormat(key));
+			out.append(m_formatterX.format(key));
 			Map<U,V> values = m_contents.get(key);
 			for (U col_name : columns)
 			{
@@ -118,7 +118,7 @@ public class Map2D<T,U,V>
 				if (values.containsKey(col_name))
 				{
 					V value = values.get(col_name);
-					out.append(valueFormat(value));
+					out.append(m_formatterY.format(value));
 				}
 			}
 			out.append("\n");
@@ -149,17 +149,7 @@ public class Map2D<T,U,V>
 		return out;
 	}
 	
-	public T keyFormat(T k)
-	{
-		return k;
-	}
-	
-	public V valueFormat(V v)
-	{
-		return v;
-	}
-	
-	protected static class PassthroughFormatter implements DataFormatter<Number>
+	protected static class PassthroughFormatter<X> implements DataFormatter<X>
 	{
 		public PassthroughFormatter()
 		{
@@ -167,11 +157,11 @@ public class Map2D<T,U,V>
 		}
 		
 		@Override
-		public String format(Number x)
+		public String format(X x)
 		{
 			if (x == null)
 			{
-				return "-";
+				return "";
 			}
 			return x.toString();
 		}

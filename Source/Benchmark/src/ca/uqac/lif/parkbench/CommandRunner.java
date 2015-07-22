@@ -102,8 +102,10 @@ public class CommandRunner
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		error_gobbler.interrupt();
-		output_gobbler.interrupt();
+		do
+		{
+			// Wait for both gobblers to finish
+		} while (error_gobbler.isAlive() || output_gobbler.isAlive());
 		return output_gobbler.getBytes();
 	}
 
@@ -133,31 +135,37 @@ public class CommandRunner
 			{
 				//InputStreamReader isr = new InputStreamReader(is);
 				byte[] buffer = new byte[8192];
-				int len = 1;
+				int len = -1;
 				while ((len = m_is.read(buffer)) > 0)
-				{   
-					for (int i = 0; i < len; i++)
+				{
+					//System.err.println(m_name + " Gobbled " + len);
+					synchronized (this)
 					{
-						m_contents.add(buffer[i]);
+						for (int i = 0; i < len; i++)
+						{
+							m_contents.add(buffer[i]);
+						}
 					}
-					if (m_is.available() == 0)
+					if (m_name.compareTo("ERR") == 0)
 					{
-						break;
+						String s = new String(getBytes());
+						System.err.println(s);
 					}
 				}
+				//System.out.println(m_name + " DONE");
 				m_is.close();
 			}
 			catch (IOException ioe) 
 			{
 				ioe.printStackTrace();
-			}
+			} 
 		}
 
 		/**
 		 * Returns the contents captured by the gobbler as an array of bytes
 		 * @return The contents
 		 */
-		public byte[] getBytes()
+		public synchronized byte[] getBytes()
 		{
 			int size = m_contents.size();
 			byte[] out = new byte[size];
@@ -222,8 +230,10 @@ public class CommandRunner
 	public static void main(String[] args) throws IOException
 	{
 		//String[] command = {"D:/Workspaces/ParkBench/testA.bat"};
-		String[] command = {"C:/Program Files/gnuplot/binary/gnuplot.exe"};
-		String gpfile = FileReadWrite.readFile("D:/Workspaces/ParkBench/test.gp");
+		//String[] command = {"C:/Program Files/gnuplot/binary/gnuplot.exe"};
+		String[] command = {"gnuplot"};
+		String gpfile = FileReadWrite.readFile("/home/sylvain/test.gp");
+		//String gpfile = FileReadWrite.readFile("D:/Workspaces/ParkBench/test.gp");
 		byte[] out = CommandRunner.runCommandBytes(command, gpfile);
 		System.out.println(out.length);
 	}

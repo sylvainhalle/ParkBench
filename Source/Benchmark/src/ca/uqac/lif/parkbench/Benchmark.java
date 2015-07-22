@@ -80,7 +80,7 @@ public class Benchmark
 	{
 		super();
 		m_tests = new HashSet<Test>();
-		m_name = "Untitled Benchmark";
+		m_name = "Untitled";
 		m_dispatcher = new ThreadDispatcher(num_threads);
 		m_dispatcherThread = new Thread(m_dispatcher);
 		m_dispatcherThread.start();

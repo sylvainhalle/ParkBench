@@ -39,7 +39,8 @@ public class SystemInfo extends BenchmarkCallback
 		out.put("osname", System.getProperty("os.name"));
 		out.put("osarch", System.getProperty("os.arch"));
 		out.put("osversion", System.getProperty("os.version"));
-		out.put("numcpu", System.getenv("NUMBER_OF_PROCESSORS"));
+		//out.put("numcpu", System.getenv("NUMBER_OF_PROCESSORS")); // Windows only
+		out.put("numcpu", Runtime.getRuntime().availableProcessors());
 		CallbackResponse response = new CallbackResponse(t);
 		response.setContents(out.toString("", true));
 		response.setContentType(CallbackResponse.ContentType.JSON);

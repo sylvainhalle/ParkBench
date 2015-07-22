@@ -35,7 +35,7 @@ public class SortTestSuite extends TestSuite
 				new QuickSortTest(),
 				new BubbleSortTest()
 		};
-		for (int length = 5000; length <= 100000; length += 5000)
+		for (int length = 5000; length <= 50000; length += 5000)
 		{
 			for (Test t : tests_to_create)
 			{
@@ -46,10 +46,8 @@ public class SortTestSuite extends TestSuite
 		}
 		// Prepare plot
 		Scatterplot plot = new Scatterplot("Sorting time");
-		plot.setPath("C:/Program Files/gnuplot/binary/gnuplot");
 		plot.setParameterX("size");
 		plot.setParameterY("time");
 		b.addPlot(plot);		
 	}
-
 }

@@ -46,7 +46,7 @@ public abstract class GnuPlot
 	/**
 	 * The path to launch GnuPlot
 	 */
-	protected static String s_path = "gnuplot";
+	protected static String s_path = new GnuPlotCommand().grab();
 	
 	/**
 	 * The plot's title
