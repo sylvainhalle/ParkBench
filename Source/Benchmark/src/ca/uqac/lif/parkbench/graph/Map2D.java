@@ -1,10 +1,7 @@
 package ca.uqac.lif.parkbench.graph;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -67,7 +64,11 @@ public class Map2D<T,U,V>
 	 */
 	public void put(T key, U column, V value)
 	{
-		Map<U,V> values = m_contents.getOrDefault(key, new HashMap<U,V>());
+		if (!m_contents.containsKey(key))
+		{
+			m_contents.put(key, new HashMap<U,V>());
+		}
+		Map<U,V> values = m_contents.get(key);
 		values.put(column, value);
 		m_contents.put(key, values);
 	}
