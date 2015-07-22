@@ -169,21 +169,21 @@ function get_time_string(status, starttime, endtime) {
 
 function get_status_div(status, prerequisites, id) {
   if (status === "DONE")
-    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-done\"><span>Done</span></div>";
+    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-done\"><span class=\"text-only\">Done</span></div>";
   else if (status === "FAILED")
-    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-failed\"><span>Failed</span></div>";
+    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-failed\"><span class=\"text-only\">Failed</span></div>";
   else if (status === "RUNNING")
-    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-running\"><span>Running</span></div>";
+    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-running\"><span class=\"text-only\">Running</span></div>";
   else if (status === "PREREQUISITES")
-	    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-prerequisites\"><span>Prerequisites</span></div>";
+	    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-prerequisites\"><span class=\"text-only\">Prerequisites</span></div>";
   else if (status === "QUEUED")
-    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-queued\"><span>Queued</span></div>";
+    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-queued\"><span class=\"text-only\">Queued</span></div>";
   else if (status === "NOT_DONE")
   {
     if (prerequisites === "true")
-      return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-ready\"><span>Ready</span></div>";
+      return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-ready\"><span class=\"text-only\">Ready</span></div>";
     else
-      return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-not-ready\"><span>Not ready</span></div>";
+      return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-not-ready\"><span class=\"text-only\">Not ready</span></div>";
   }
 };
 
@@ -193,7 +193,7 @@ function get_status_div(status, prerequisites, id) {
  * @param test_id A comma-separated list of test IDs
  */
 function start_test(test_id) {
-  $("#status-icon-" + test_id).removeClass("status-ready").addClass("status-queued").html("<span>Queued</span>");
+  $("#status-icon-" + test_id).removeClass("status-ready").addClass("status-queued").html("<span class=\"text-only\">Queued</span>");
   $.ajax({
     url         : "/run?id=" + test_id,
     contentType : "application/json",
@@ -208,7 +208,7 @@ function start_test(test_id) {
  * @param test_id A comma-separated list of test IDs
  */
 function reset_test(test_id) {
-  //$("#status-icon-" + test_id).removeClass("status-ready").addClass("status-queued").html("<span>Queued</span>");
+  //$("#status-icon-" + test_id).removeClass("status-ready").addClass("status-queued").html("<span class=\"text-only\">Queued</span>");
   $.ajax({
     url         : "/reset?id=" + test_id,
     contentType : "application/json",
@@ -223,7 +223,7 @@ function reset_test(test_id) {
  * @param test_id A comma-separated list of test IDs
  */
 function stop_test(test_id) {
-  $("#status-icon-" + test_id).removeClass("status-running").addClass("status-failed").html("<span>Failed</span>");
+  $("#status-icon-" + test_id).removeClass("status-running").addClass("status-failed").html("<span class=\"text-only\">Failed</span>");
   $.ajax({
     url         : "/stop?id=" + test_id,
     contentType : "application/json",

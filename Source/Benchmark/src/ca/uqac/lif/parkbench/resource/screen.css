@@ -2,11 +2,11 @@
   display: inline-block;
   width: 10px;
   height: 10px;
+  border-radius: 4px;
 }
 
-.status-icon > span {
+span.text-only {
   display: none;
-  border-radius: 4px;
 }
 
 .status-done {

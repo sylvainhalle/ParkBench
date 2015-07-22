@@ -36,7 +36,7 @@ public abstract class GnuPlot
 	/**
 	 * The default terminal to use if none is specified
 	 */
-	protected static final Terminal s_defaultTerminal = Terminal.PNG;
+	public static final Terminal DEFAULT_TERMINAL = Terminal.PNG;
 	
 	/**
 	 * The set of tests associated to that plot
@@ -98,7 +98,7 @@ public abstract class GnuPlot
 	 */
 	public String toGnuPlot()
 	{
-		return toGnuPlot(s_defaultTerminal);
+		return toGnuPlot(DEFAULT_TERMINAL);
 	}
 
 	/**
@@ -120,13 +120,18 @@ public abstract class GnuPlot
 		return this;
 	}
 	
+	public final byte[] getImage()
+	{
+		return getImage(DEFAULT_TERMINAL);
+	}
+	
 	/**
 	 * Runs GnuPlot on a file and returns the resulting graph
 	 * @return The (binary) contents of the image produced by Gnuplot
 	 */
-	public final byte[] getImage()
+	public final byte[] getImage(Terminal term)
 	{
-		String instructions = toGnuPlot();
+		String instructions = toGnuPlot(term);
 		byte[] image = null;
 		String[] command = {s_path};
 		try 
@@ -156,7 +161,7 @@ public abstract class GnuPlot
 	 * @param term The terminal
 	 * @return A string understood by Gnuplot for the terminal's name
 	 */
-	protected static String getTerminalString(Terminal term)
+	public static String getTerminalString(Terminal term)
 	{
 		String out = "";
 		switch (term)
@@ -180,5 +185,31 @@ public abstract class GnuPlot
 			break;
 		}
 		return out;
+	}
+	
+	public static Terminal stringToTerminal(String s)
+	{
+		s = s.trim();
+		if (s.compareToIgnoreCase("png") == 0)
+		{
+			return Terminal.PNG;
+		}
+		if (s.compareToIgnoreCase("gif") == 0)
+		{
+			return Terminal.GIF;
+		}
+		if (s.compareToIgnoreCase("pdf") == 0)
+		{
+			return Terminal.PDF;
+		}
+		if (s.compareToIgnoreCase("svg") == 0)
+		{
+			return Terminal.SVG;
+		}
+		if (s.compareToIgnoreCase("jpg") == 0)
+		{
+			return Terminal.JPEG;
+		}
+		return DEFAULT_TERMINAL;
 	}
 }

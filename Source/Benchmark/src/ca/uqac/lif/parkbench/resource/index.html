@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="css/bootstrap.min.css" rel="stylesheet" media="screen" />
+<link href="css/bootstrap-glyphicons.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="screen.css" />
 <style>
   body {
@@ -53,22 +54,23 @@
 
 <div>
 <button class="btn" id="refresh-status">Refresh status</button>
-<a href="/save"><button class="btn" id="save-benchmark">Save benchmark</button></a>
+<a href="/save"><button class="btn" id="save-benchmark"><span class="glyphicon glyphicon-save"></span> Save benchmark</button></a>
 </div>
 
-<button class="btn btn-small" id="refresh-plot">Refresh plot</button>
+<button class="btn btn-small" id="refresh-plot" title="Refresh plot"><span class="glyphicon glyphicon-refresh"></span><span class="text-only">Refresh plot</span></button>
+<a href="plot?terminal=pdf&amp;download=true"><button class="btn btn-small" id="save-plot" title="Save plot"><span class="glyphicon glyphicon-save"></span><span class="text-only">Save plot</span></button></a>
 <img src="plot" alt="Plot" id="plot" width="250" />
 
 <div class="well">
 <h3>Status</h2>
 <table>
-<tr><td id="status-nb-not-ready">0</td><td><div class="status-icon status-not-ready"><span>Not ready</span></div></td><td>The test has not run and its prerequisites are not fulfilled</td></tr>
-<tr><td id="status-nb-ready">0</td><td><div class="status-icon status-ready"><span>Ready</span></div></td><td>The test has not run but is ready to run</td></tr>
-<tr><td id="status-nb-queued">0</td><td><div class="status-icon status-queued"><span>Queued</span></div></td><td>The test is in the queue, waiting to be started</td></tr>
-<tr><td id="status-nb-prerequisites">0</td><td><div class="status-icon status-prerequisites"><span>Prerequisites</span></div></td><td>The test is currently generating its prerequisites</td></tr>
-<tr><td id="status-nb-running">0</td><td><div class="status-icon status-running"><span>Running</span></div></td><td>The test is currently running</td></tr>
-<tr><td id="status-nb-done">0</td><td><div class="status-icon status-done"><span>Done</span></div></td><td>The test has completed successfully</td></tr>
-<tr><td id="status-nb-failed">0</td><td><div class="status-icon status-failed"><span>Failed</span></div></td><td>The execution of the test has failed or was manually cancelled</td></tr>
+<tr><td id="status-nb-not-ready">0</td><td><div class="status-icon status-not-ready"><span class="text-only">Not ready</span></div></td><td>The test has not run and its prerequisites are not fulfilled</td></tr>
+<tr><td id="status-nb-ready">0</td><td><div class="status-icon status-ready"><span class="text-only">Ready</span></div></td><td>The test has not run but is ready to run</td></tr>
+<tr><td id="status-nb-queued">0</td><td><div class="status-icon status-queued"><span class="text-only">Queued</span></div></td><td>The test is in the queue, waiting to be started</td></tr>
+<tr><td id="status-nb-prerequisites">0</td><td><div class="status-icon status-prerequisites"><span class="text-only">Prerequisites</span></div></td><td>The test is currently generating its prerequisites</td></tr>
+<tr><td id="status-nb-running">0</td><td><div class="status-icon status-running"><span class="text-only">Running</span></div></td><td>The test is currently running</td></tr>
+<tr><td id="status-nb-done">0</td><td><div class="status-icon status-done"><span class="text-only">Done</span></div></td><td>The test has completed successfully</td></tr>
+<tr><td id="status-nb-failed">0</td><td><div class="status-icon status-failed"><span class="text-only">Failed</span></div></td><td>The execution of the test has failed or was manually cancelled</td></tr>
 </table>
 </div>
 

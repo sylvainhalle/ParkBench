@@ -17,6 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */package ca.uqac.lif.parkbench;
 
+import java.util.Map;
+
 import ca.uqac.lif.httpserver.CallbackResponse;
 import ca.uqac.lif.httpserver.RequestCallback;
 import ca.uqac.lif.parkbench.graph.GnuPlot;
@@ -33,12 +35,22 @@ public class GetPlot extends BenchmarkCallback
 	@Override
 	public CallbackResponse process(HttpExchange t)
 	{
-		GnuPlot plot = m_benchmark.getPlot(0);
-		byte[] image = plot.getImage();
 		CallbackResponse response = new CallbackResponse(t);
+		GnuPlot plot = m_benchmark.getPlot(0);
+		Map<String,String> params = getParameters(t);
+		String terminal = GnuPlot.getTerminalString(GnuPlot.DEFAULT_TERMINAL);
+		if (params.containsKey("terminal"))
+		{
+			terminal = params.get("terminal");
+		}
+		if (params.containsKey("download") && params.get("download").compareToIgnoreCase("true") == 0)
+		{
+			// Download image
+			response.setHeader("Content-Disposition", "attachment; filename=graph." + terminal);
+		}
+		byte[] image = plot.getImage(GnuPlot.stringToTerminal(terminal));
 		response.setContents(image);
-		response.setContentType(CallbackResponse.ContentType.PNG);
+		//response.setContentType(CallbackResponse.ContentType.PNG);
 		return response;
 	}
-
 }
