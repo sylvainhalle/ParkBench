@@ -342,7 +342,14 @@ function elapsed_time(delta) // delta is the interval in *seconds*
 function refresh_plot()
 {
     // Refresh plot
-    $("#plot").attr("src", "/plot?ts=" + new Date().getTime());
+	var img_src = "/plot?ts=" + new Date().getTime();
+	(new Image()).src = img_src;
+	for (var i = 0; i < 100000; i++) {
+		// Wait a bit (unelegant)
+	}
+	// Now set the visible image with the same src; it should
+	// be preloaded and not blink
+    $("#plot").attr("src", img_src);
 };
 
 $(document).ready(function() {
