@@ -499,6 +499,40 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
+	 * Cleans a test. This means removing any prerequisites the test may have.
+	 * It is the responsibility of the test writer to make sure that {@link #clean()}
+	 * undoes the work done in {@link #fulfillPrerequisites(Parameters)}.
+	 * <p>
+	 * <b>NOTE:</b> it is probably not well advised to call this method while
+	 * the test is running, but no check is done to that effect. <i>Caveat
+	 * emptor</i>!
+	 * <p>
+	 * Other note: if other tests in your test suite have the <em>same</em>
+	 * prerequisites, they will be affected by this cleaning too. Again,
+	 * beware!
+	 * @param input The test's input parameters
+	 */
+	public void clean(Parameters input)
+	{
+		// Do nothing
+	}
+	
+	/**
+	 * Resets the test's state. This means:
+	 * <ul>
+	 * <li>Putting the test back to the <tt>NOT_DONE</tt> state</li>
+	 * <li>Cleaning any prerequisites (through {@link #clean()})</li>
+	 * <li>Clearing any results the test has generated</li> 
+	 * </ul>
+	 */
+	public final void reset()
+	{
+		setStatus(Status.NOT_DONE);
+		clean(m_parameters);
+		m_results.clear();
+	}
+	
+	/**
 	 * Stops the tests and gives it a status
 	 * @param s The status of the test (normally FAILED or DONE)
 	 */

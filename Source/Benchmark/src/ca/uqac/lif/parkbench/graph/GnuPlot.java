@@ -14,7 +14,7 @@ public abstract class GnuPlot
 	/**
 	 * The terminal used for the plot's output
 	 */
-	public static enum Terminal {PDF, PNG, GIF};
+	public static enum Terminal {PDF, PNG, GIF, SVG, JPEG};
 	
 	/**
 	 * The default terminal to use if none is specified
@@ -152,6 +152,12 @@ public abstract class GnuPlot
 			break;
 		case PNG:
 			out = "png";
+			break;
+		case SVG:
+			out = "svg";
+			break;
+		case JPEG:
+			out = "jpg";
 			break;
 		default:
 			break;

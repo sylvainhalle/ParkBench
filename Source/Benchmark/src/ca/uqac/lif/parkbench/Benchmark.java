@@ -227,15 +227,11 @@ public class Benchmark
 	 */
 	public boolean runTest(int test_id)
 	{
-		Iterator<Test> it = m_tests.iterator();
-		while (it.hasNext())
+		Test t = getTest(test_id);
+		if (t != null)
 		{
-			Test t = it.next();
-			if (t.getId() == test_id)
-			{
-				t.run();
-				return true;
-			}
+			t.run();
+			return true;
 		}
 		return false;
 	}
@@ -247,17 +243,13 @@ public class Benchmark
 	 */
 	public boolean queueTest(int test_id)
 	{
-		Iterator<Test> it = m_tests.iterator();
-		while (it.hasNext())
+		Test t = getTest(test_id);
+		if (t != null)
 		{
-			Test t = it.next();
-			if (t.getId() == test_id)
-			{
-				m_dispatcher.putInQueue(t);
-				return true;
-			}
+			m_dispatcher.putInQueue(t);
+			return true;
 		}
-		return false;		
+		return false;
 	}
 	
 	/**
@@ -355,6 +347,58 @@ public class Benchmark
 			GnuPlot plot = m_plots.get(key);
 			plot.clear().addTests(this);
 		}
+	}
+	
+	/**
+	 * Retrieves a test with given ID
+	 * @param test_id The test ID to look for
+	 * @return The test instance, null if no test exists with
+	 *   such ID
+	 */
+	protected Test getTest(int test_id)
+	{
+		Iterator<Test> it = m_tests.iterator();
+		while (it.hasNext())
+		{
+			Test t = it.next();
+			if (t.getId() == test_id)
+			{
+				return t;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Cleans a test
+	 * @param test_id The test ID to clean
+	 * @return true if the test was found, false otherwise
+	 */
+	boolean cleanTest(int test_id)
+	{
+		Test t = getTest(test_id);
+		if (t != null)
+		{
+			t.clean(t.getParameters());
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Resets a test
+	 * @param test_id The test ID to reset
+	 * @return true if the test was found, false otherwise
+	 */
+	public boolean resetTest(int test_id)
+	{
+		Test t = getTest(test_id);
+		if (t != null)
+		{
+			t.reset();
+			return true;
+		}
+		return false;
 	}
 	
 	/**

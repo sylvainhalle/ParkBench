@@ -90,8 +90,9 @@ function fill_table_line(test, param_names) {
       out_list += "<td>" + test.input[param_name] + "</td>";
     }
     out_list += "<td>";
-    out_list += "<button class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\">Start</button>";
-    out_list += "<button class=\"btn btn-mini\" onclick=\"stop_test(" + test.id + ");\">Stop</button>";
+    out_list += "<button class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\">Start</button> ";
+    out_list += "<button class=\"btn btn-mini\" onclick=\"stop_test(" + test.id + ");\">Stop</button> ";
+    out_list += "<button class=\"btn btn-mini\" onclick=\"reset_test(" + test.id + ");\">Reset</button> ";
     out_list += "</td>\n";
     return out_list;  
 };
@@ -185,6 +186,21 @@ function start_test(test_id) {
 };
 
 /**
+ * Resets one or more tests
+ * @param test_id A comma-separated list of test IDs
+ */
+function reset_test(test_id) {
+  //$("#status-icon-" + test_id).removeClass("status-ready").addClass("status-queued").html("<span>Queued</span>");
+  $.ajax({
+    url         : "/reset?id=" + test_id,
+    contentType : "application/json",
+    success     : function(result) {
+      setTimeout(function() {refresh_test_list(true);}, 1000);
+      }
+  });
+};
+
+/**
  * Stops the execution of one or more tests
  * @param test_id A comma-separated list of test IDs
  */
@@ -200,14 +216,7 @@ function stop_test(test_id) {
 };
 
 function start_selected_tests() {
-  // Get list of test IDs that are selected
-  var id_list = "";
-  $(".chk-test:checked").each(function() {
-    var eid = $(this).prop("id");
-    var parts = eid.split("-");
-    var id = parts[1];
-    id_list += id + ",";
-  });
+  var id_list = get_selected_tests();
   // Sends these IDs in the run request
   $.ajax({
     url         : "/run?id=" + id_list,
@@ -219,6 +228,30 @@ function start_selected_tests() {
 };
 
 function stop_selected_tests() {
+	var id_list = get_selected_tests();
+	// Sends these IDs in the run request
+	$.ajax({
+	    url         : "/stop?id=" + id_list,
+	    contentType : "application/json",
+	    success     : function(result) {
+	      setTimeout(function() {refresh_test_list(true);}, 1000);
+	      }
+	  });
+	};
+	
+function reset_selected_tests() {
+  var id_list = get_selected_tests();
+  // Sends these IDs in the run request
+  $.ajax({
+    url         : "/reset?id=" + id_list,
+    contentType : "application/json",
+    success     : function(result) {
+      setTimeout(function() {refresh_test_list(true);}, 1000);
+      }
+  });
+};
+
+function get_selected_tests() {
 	  // Get list of test IDs that are selected
 	  var id_list = "";
 	  $(".chk-test:checked").each(function() {
@@ -227,15 +260,9 @@ function stop_selected_tests() {
 	    var id = parts[1];
 	    id_list += id + ",";
 	  });
-	  // Sends these IDs in the run request
-	  $.ajax({
-	    url         : "/stop?id=" + id_list,
-	    contentType : "application/json",
-	    success     : function(result) {
-	      setTimeout(function() {refresh_test_list(true);}, 1000);
-	      }
-	  });
-	};
+	  return id_list;
+};
+
 
 function periodical_refresh() {
   refresh_test_list(true);
@@ -325,6 +352,7 @@ $(document).ready(function() {
   $("#check-category").click(select_category);
   $("#start-all").click(start_selected_tests);
   $("#stop-all").click(stop_selected_tests);
+  $("#reset-all").click(reset_selected_tests);
   $("#save-benchmark").click(save_benchmark);
   $("#refresh-plot").click(refresh_plot);
   show_benchmark_info();

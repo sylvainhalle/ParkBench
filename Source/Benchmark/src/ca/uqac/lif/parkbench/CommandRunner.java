@@ -190,6 +190,17 @@ public class CommandRunner
 			return filename;
 		return filename.substring(0, position);
 	}
+	
+	/**
+	 * Deletes a file
+	 * @param filename The filename
+	 * @return true if the file could be deleted, false otherwise
+	 */
+	public static boolean deleteFile(String filename)
+	{
+		File f = new File(filename);
+		return f.delete();
+	}
 
 	public static void main(String[] args) throws IOException
 	{
