@@ -44,3 +44,14 @@ span.text-only {
   padding: 0.3em;
   border-radius: 4px;
 }
+
+div.plot {
+  border: solid 1px lightgrey;
+  border-radius: 6px;
+  padding: 1em;
+  display: inline-block;
+}
+
+div.plot img {
+  margin-bottom: 1em;
+}

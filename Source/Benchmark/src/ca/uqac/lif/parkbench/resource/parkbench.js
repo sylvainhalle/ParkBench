@@ -17,9 +17,26 @@
  */
 
 /**
+ *  The minimum interval for refreshing the list of tests (in ms)
+ */
+var MIN_REFRESH_INTERVAL = 1000;
+
+/**
  *  The interval for refreshing the list of tests (in ms)
  */
 var REFRESH_INTERVAL = 2000;
+
+/**
+ *  The interval for refreshing the graphs (in multiples
+ *  of the test refresh interval)
+ */
+var PLOT_REFRESH_MULTIPLIER = 2;
+
+/**
+ *  The number of times the list of test has been refreshed 
+ */
+var REFRESH_COUNT = 0;
+
 
 function refresh_test_list(incremental) {
   $.ajax({
@@ -28,10 +45,9 @@ function refresh_test_list(incremental) {
     success     : function(result) {
       // Slow down refresh interval according to size of server response
       // The problem is not the server, it's the browser that can't keep up
-      REFRESH_INTERVAL = Math.max(1000, result.tests.length * 10);
+      REFRESH_INTERVAL = Math.max(MIN_REFRESH_INTERVAL, result.tests.length * 10);
+      REFRESH_COUNT++;
       $("#refresh-interval").html(Math.round(REFRESH_INTERVAL / 1000));
-      // Refresh the plot
-      //refresh_plot();
       // Refresh the summary table
       if (result.status["status-done"])
         $("#status-nb-done").html(result.status["status-done"]);
@@ -63,6 +79,7 @@ function refresh_test_list(incremental) {
         $("#status-nb-queued").html("0");
       if (!incremental)
       {
+    	  // Create table contents
     	  $("#benchmark-name").html(result.name);
 	      var out_list = "";
 	      out_list += "<thead><tr><th></th><th>Status</th><th>Duration</th><th>Name</th>";
@@ -81,6 +98,8 @@ function refresh_test_list(incremental) {
 	      out_list += "</tbody>\n";
 	      $("#test-list").html(out_list);
 	      $("#test-list").tablesorter();
+	      // Create plot contents
+	      create_plots(result["plots"]);
 	  }
 	  else
 	  {
@@ -91,6 +110,13 @@ function refresh_test_list(incremental) {
           element.html(fill_table_line(test, result["param-names"]));
           if (checked)
           	$("#chktest-" + test.id).prop("checked", true);
+	    }
+        // Refresh plot contents
+	    if (REFRESH_COUNT % PLOT_REFRESH_MULTIPLIER === 0) {
+	    	for (var i = 0; i < result["plots"].length; i++) {
+	    		var plot_id = result["plots"][i];
+	    		refresh_plot(plot_id);
+	    	}
 	    }
 	  }
   }});
@@ -357,17 +383,37 @@ function elapsed_time(delta) // delta is the interval in *seconds*
     }
 };
 
-function refresh_plot()
+function create_plots(plot_list) {
+  var out = "";
+  for (var i = 0; i < plot_list.length; i++) {
+	  var plot_id = plot_list[i];
+	  out += "<div class=\"plot\">\n";
+	  out += "<img id=\"plot-" + plot_id + "\" width=\"400\" />\n";
+	  out += "<div>\n";
+	  out += "<button class=\"btn btn-small\" title=\"Refresh plot\" onclick=\"refresh_plot(" + plot_id + "\"><span class=\"glyphicon glyphicon-refresh\"></span><span class=\"text-only\">Refresh plot</span></button> ";
+	  out += "<a href=\"/plot?id=" + plot_id + "&amp;terminal=pdf&amp;download=true\"><button class=\"btn btn-small\" title=\"Download plot\"><span class=\"glyphicon glyphicon-download\"></span> PDF<span class=\"text-only\">Download plot</span></button> ";
+	  out += "<a href=\"/plot?id=" + plot_id + "&amp;terminal=pdf&amp;download=true&amp;raw=true\"><button class=\"btn btn-small\" title=\"Download plot instructions\"><span class=\"glyphicon glyphicon-download\"></span> GP<span class=\"text-only\">Download plot instructions</span></button>";
+	  out += "</div></div>\n";
+  }
+  $("#plots").html(out);
+};
+
+function refresh_plot(plot_id)
 {
     // Refresh plot
-	var img_src = "/plot?ts=" + new Date().getTime();
+	var img_src = "/plot?id=" + plot_id + "&amp;ts=" + new Date().getTime();
 	(new Image()).src = img_src;
 	for (var i = 0; i < 100000; i++) {
 		// Wait a bit (unelegant)
 	}
 	// Now set the visible image with the same src; it should
 	// be preloaded and not blink
-    $("#plot").attr("src", img_src);
+    $("#plot-" + plot_id).attr("src", img_src);
+};
+
+function toggle_section(divname) {
+	$(".div-section").hide();
+	$("#section-" + divname).show();
 };
 
 $(document).ready(function() {

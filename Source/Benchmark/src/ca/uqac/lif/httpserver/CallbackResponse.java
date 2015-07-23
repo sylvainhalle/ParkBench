@@ -37,7 +37,7 @@ public class CallbackResponse
   /**
    * The content type of the response
    */
-  public static enum ContentType {JSON, TEXT, XML, PNG, JS, HTML};
+  public static enum ContentType {JSON, TEXT, XML, PNG, JS, HTML, JPEG};
   
   /**
    * The HTTP exchange containing the response headers
@@ -174,6 +174,15 @@ public class CallbackResponse
   }
   
   /**
+   * Sets the response as an attachment to be downloaded
+   * @param filename The filename
+   */
+  public void setAttachment(String filename)
+  {
+	  setHeader("Content-Disposition", "attachment; filename=" + filename);
+  }
+  
+  /**
    * Sets a response header
    * @param name The parameter name
    * @param value The parameter value
@@ -225,6 +234,9 @@ public class CallbackResponse
   		break;
   	case PNG:
   		out = "image/png";
+  		break;
+  	case JPEG:
+  		out = "image/jpeg";
   		break;
   	case JS:
   		out = "application/javascript";

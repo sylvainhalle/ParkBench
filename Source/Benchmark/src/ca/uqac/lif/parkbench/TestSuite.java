@@ -33,7 +33,10 @@ public abstract class TestSuite
 			c_arg[0] = Benchmark.class;
 			m = reference_class.getDeclaredMethod("setup", c_arg);
 			m.invoke(reference, b);
-		} catch (NoSuchMethodException | SecurityException e) {
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {

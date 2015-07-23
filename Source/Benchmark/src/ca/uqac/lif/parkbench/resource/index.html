@@ -34,9 +34,9 @@
       <a class="brand" href="#">ParkBench</a>
       <div class="nav-collapse collapse">
         <ul class="nav">
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
+          <li class="active"><a href="#" onclick="toggle_section('info');">Home</a></li>
+          <li><a href="#" onclick="toggle_section('tests');">Tests</a></li>
+          <li><a href="#" onclick="toggle_section('plots');">Plots</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
@@ -44,22 +44,28 @@
 </div>
 
 <div class="container">
+
+<div class="div-section" id="section-info">
 <h2 id="benchmark-name">Benchmark info</h2>
 
 <table class="table table-condensed" id="benchmark-info">
 <tr><td>No info so far</td></td>
 </table>
+</div> <!-- /#section-info -->
 
+<div class="div-section" id="section-plots" style="display:none">
+<h2>Plots</h2>
+<div id="plots">
+</div>
+</div> <!-- /#section-plots -->
+
+<div class="div-section" id="section-tests" style="display:none">
 <h2>Tests in this benchmark</h2>
 
 <div>
 <button class="btn" id="refresh-status">Refresh status</button>
 <a href="/save"><button class="btn" id="save-benchmark"><span class="glyphicon glyphicon-save"></span> Save benchmark</button></a>
 </div>
-
-<button class="btn btn-small" id="refresh-plot" title="Refresh plot"><span class="glyphicon glyphicon-refresh"></span><span class="text-only">Refresh plot</span></button>
-<a href="plot?terminal=pdf&amp;download=true"><button class="btn btn-small" id="save-plot" title="Save plot"><span class="glyphicon glyphicon-save"></span><span class="text-only">Save plot</span></button></a>
-<img src="plot" alt="Plot" id="plot" width="250" />
 
 <div class="well">
 <h3>Status</h2>
@@ -101,6 +107,8 @@ to sort according to multiple columns. The list auto-refreshes every
 <table id="test-list" class="table table-hover tablesorter">
 <tr><td>No test so far</td></tr>
 </table>
+
+</div> <!-- /#section-tests -->
 
 <hr />
 <p>&copy; 2015 Sylvain Hall&eacute;. Laboratoire d'informatique formelle,

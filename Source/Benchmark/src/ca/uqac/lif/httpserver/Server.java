@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -338,5 +340,27 @@ public class Server implements HttpHandler
       }
     }
     return sb.toString();
-  } 
+  }
+  
+  /**
+   * Encodes a string in an URL-encoded form. This is a wrapper method around
+   * Java's {@link URLEncoder.encode()} method, which deals with the encoding
+   * and possible exception.
+   * @param s The input string
+   * @return The encoded string
+   */
+  public static String urlEncode(String s)
+  {
+	  String out = s;
+		try 
+		{
+			out = URLEncoder.encode(s, "UTF-8");
+		} 
+		catch (UnsupportedEncodingException e) 
+		{
+			// Do nothing
+			// Should never occur anyway
+		}
+		return out;
+  }
 }

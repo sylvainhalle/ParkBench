@@ -434,6 +434,12 @@ public class Benchmark
 			param_list.add(param_name);
 		}
 		out.put("param-names", param_list);
+		JsonList plot_list = new JsonList();
+		for (Integer k : m_plots.keySet())
+		{
+			plot_list.add(k);
+		}
+		out.put("plots", plot_list);
 		Map<String,Integer> test_status = fillStatusMap();
 		for (Test test : m_tests)
 		{

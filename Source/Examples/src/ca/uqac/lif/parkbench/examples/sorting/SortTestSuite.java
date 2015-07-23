@@ -20,7 +20,8 @@ package ca.uqac.lif.parkbench.examples.sorting;
 import ca.uqac.lif.parkbench.Benchmark;
 import ca.uqac.lif.parkbench.Test;
 import ca.uqac.lif.parkbench.TestSuite;
-import ca.uqac.lif.parkbench.graph.Scatterplot;
+import ca.uqac.lif.parkbench.graph.PlanarPlot;
+import ca.uqac.lif.parkbench.graph.ScatterPlot;
 
 public class SortTestSuite extends TestSuite
 {
@@ -31,6 +32,10 @@ public class SortTestSuite extends TestSuite
 
 	public void setup(Benchmark b)
 	{
+		// Give a name to the benchmark
+		b.setName("Sorting Algorithms");
+
+		// Initialize tests
 		Test[] tests_to_create = {
 				new QuickSortTest(),
 				new BubbleSortTest()
@@ -39,15 +44,15 @@ public class SortTestSuite extends TestSuite
 		{
 			for (Test t : tests_to_create)
 			{
-				Test new_t = t.newTest();
-				new_t.setParameter("size", length);
-				b.addTest(new_t);
+				b.addTest(t.newTest().setParameter("size", length));
 			}
 		}
-		// Prepare plot
-		Scatterplot plot = new Scatterplot("Sorting time");
-		plot.setParameterX("size");
-		plot.setParameterY("time");
+
+		// Add a plot
+		PlanarPlot plot = new ScatterPlot("Sorting time")
+			.withLines()
+			.setParameterX("size", "List size")
+			.setParameterY("time", "Time (ms)");
 		b.addPlot(plot);		
 	}
 }

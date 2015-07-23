@@ -18,6 +18,7 @@
 package ca.uqac.lif.parkbench;
 
 import ca.uqac.lif.httpserver.CallbackResponse;
+import ca.uqac.lif.httpserver.Server;
 
 import com.sun.net.httpserver.HttpExchange;
 
@@ -33,8 +34,8 @@ public class SaveBenchmark extends BenchmarkStatus
 	{
 		CallbackResponse response = super.process(t);
 		// Tell the browser to download the document rather than display it
-		String filename = m_benchmark.getName();
-		response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".json");
+		String filename = Server.urlEncode(m_benchmark.getName()) + ".json";
+		response.setAttachment(filename);
 		return response;
 	}	
 }

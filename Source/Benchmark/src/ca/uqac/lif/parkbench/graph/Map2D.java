@@ -17,6 +17,8 @@
  */
 package ca.uqac.lif.parkbench.graph;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,7 +27,7 @@ import java.util.Vector;
 
 import ca.uqac.lif.parkbench.DataFormatter;
 
-public class Map2D<T,U,V>
+public class Map2D<T extends Comparable<? super T>,U,V>
 {
 	Map<T,Map<U,V>> m_contents;
 	
@@ -107,8 +109,10 @@ public class Map2D<T,U,V>
 		StringBuilder out = new StringBuilder();
 		Vector<U> columns = orderColumns();
 		m_columns = columns;
-		Set<T> keys = m_contents.keySet();
-		for (T key : keys)
+		ArrayList<T> sorted_keys = new ArrayList<T>();
+		sorted_keys.addAll(m_contents.keySet());
+		Collections.sort(sorted_keys);
+		for (T key : sorted_keys)
 		{
 			out.append(m_formatterX.format(key));
 			Map<U,V> values = m_contents.get(key);

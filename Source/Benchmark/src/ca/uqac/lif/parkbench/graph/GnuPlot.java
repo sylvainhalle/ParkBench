@@ -54,6 +54,12 @@ public abstract class GnuPlot
 	protected String m_title;
 	
 	/**
+	 * The plot's name. This is different from the plot's <em>title</em>, which
+	 * is displayed in the graph
+	 */
+	protected String m_name;
+	
+	/**
 	 * Creates an empty plot
 	 * @param title The plot's title
 	 */
@@ -62,6 +68,31 @@ public abstract class GnuPlot
 		super();
 		m_title = title;
 		m_tests = new HashSet<Test>();
+		m_name = "";
+	}
+	
+	/**
+	 * Sets the plot's name
+	 * @param name The name
+	 * @return A pointer to this plot
+	 */
+	public GnuPlot setName(String name)
+	{
+		m_name = name;
+		return this;
+	}
+	
+	/**
+	 * Gets the plot's name.
+	 * @return The name. If the name is empty, will return the plot's title.
+	 */
+	public String getName()
+	{
+		if (m_name.isEmpty())
+		{
+			return m_title;
+		}
+		return m_name;
 	}
 	
 	/**

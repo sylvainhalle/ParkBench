@@ -20,7 +20,9 @@
 import java.util.Map;
 
 import ca.uqac.lif.httpserver.CallbackResponse;
+import ca.uqac.lif.httpserver.CallbackResponse.ContentType;
 import ca.uqac.lif.httpserver.RequestCallback;
+import ca.uqac.lif.httpserver.Server;
 import ca.uqac.lif.parkbench.graph.GnuPlot;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -36,21 +38,53 @@ public class GetPlot extends BenchmarkCallback
 	public CallbackResponse process(HttpExchange t)
 	{
 		CallbackResponse response = new CallbackResponse(t);
-		GnuPlot plot = m_benchmark.getPlot(0);
 		Map<String,String> params = getParameters(t);
 		String terminal = GnuPlot.getTerminalString(GnuPlot.DEFAULT_TERMINAL);
+		if (!params.containsKey("id"))
+		{
+			// Bad request: should always contain an ID
+			response.setCode(CallbackResponse.HTTP_BAD_REQUEST);
+			return response;
+		}
+		int plot_id = Integer.parseInt(params.get("id"));
+		GnuPlot plot = m_benchmark.getPlot(plot_id);
 		if (params.containsKey("terminal"))
 		{
 			terminal = params.get("terminal");
 		}
-		if (params.containsKey("download") && params.get("download").compareToIgnoreCase("true") == 0)
+		if (params.containsKey("raw"))
 		{
-			// Download image
-			response.setHeader("Content-Disposition", "attachment; filename=graph." + terminal);
+			// Send Gnuplot data
+			String filename = Server.urlEncode(plot.getName()) + ".gp";
+			response.setAttachment(filename);
+			response.setContents(plot.toGnuPlot(GnuPlot.stringToTerminal(terminal)));
 		}
-		byte[] image = plot.getImage(GnuPlot.stringToTerminal(terminal));
-		response.setContents(image);
-		//response.setContentType(CallbackResponse.ContentType.PNG);
+		else
+		{
+			// Produce image
+			if (params.containsKey("download") && params.get("download").compareToIgnoreCase("true") == 0)
+			{
+				String filename = Server.urlEncode(plot.getName()) + "." + terminal;
+				response.setAttachment(filename);
+			}
+			byte[] image = plot.getImage(GnuPlot.stringToTerminal(terminal));
+			response.setContentType(terminalToContentType(terminal));
+			response.setContents(image);
+		}			
 		return response;
+	}
+	
+	/**
+	 * Returns the appropriate MIME content type based on the Gnuplot terminal
+	 * @param terminal The terminal
+	 * @return The content type
+	 */
+	protected static ContentType terminalToContentType(String terminal)
+	{
+		if (terminal.compareToIgnoreCase("jpg") == 0)
+		{
+			return ContentType.JPEG;
+		}
+		return ContentType.PNG;
 	}
 }
