@@ -133,12 +133,10 @@ public class CommandRunner
 		{
 			try
 			{
-				//InputStreamReader isr = new InputStreamReader(is);
 				byte[] buffer = new byte[8192];
 				int len = -1;
 				while ((len = m_is.read(buffer)) > 0)
 				{
-					//System.err.println(m_name + " Gobbled " + len);
 					synchronized (this)
 					{
 						for (int i = 0; i < len; i++)
@@ -146,13 +144,7 @@ public class CommandRunner
 							m_contents.add(buffer[i]);
 						}
 					}
-					if (m_name.compareTo("ERR") == 0)
-					{
-						String s = new String(getBytes());
-						System.err.println(s);
-					}
 				}
-				//System.out.println(m_name + " DONE");
 				m_is.close();
 			}
 			catch (IOException ioe) 

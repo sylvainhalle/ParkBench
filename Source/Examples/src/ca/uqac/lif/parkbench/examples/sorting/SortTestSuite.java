@@ -38,9 +38,11 @@ public class SortTestSuite extends TestSuite
 		// Initialize tests
 		Test[] tests_to_create = {
 				new QuickSortTest(),
-				new BubbleSortTest()
+				new ShellSortTest(),
+				new BubbleSortTest(),
+				new GnomeSortTest()
 		};
-		for (int length = 5000; length <= 50000; length += 5000)
+		for (int length = 5000; length <= 40000; length += 5000)
 		{
 			for (Test t : tests_to_create)
 			{
@@ -52,7 +54,8 @@ public class SortTestSuite extends TestSuite
 		PlanarPlot plot = new ScatterPlot("Sorting time")
 			.withLines()
 			.setParameterX("size", "List size")
-			.setParameterY("time", "Time (ms)");
+			.setParameterY("time", "Time (ms)")
+			.setLogscaleY();
 		b.addPlot(plot);		
 	}
 }

@@ -44,7 +44,12 @@ public class RunTest extends BenchmarkCallback
 			if (!test_id_string.isEmpty())
 			{
 				int test_id = Integer.parseInt(test_id_string);
-				outcome &= m_benchmark.queueTest(test_id);
+				boolean test_outcome = m_benchmark.queueTest(test_id);
+				if (!test_outcome)
+				{
+					System.err.println("Test not found " + test_id);
+				}
+				outcome &= test_outcome;
 			}
 		}
 		CallbackResponse response = new CallbackResponse(t);
