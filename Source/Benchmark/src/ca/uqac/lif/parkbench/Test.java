@@ -531,6 +531,12 @@ public abstract class Test implements Runnable
 		m_startTime = state.getNumber("starttime").intValue();
 		m_stopTime = state.getNumber("endtime").intValue();
 		m_status = stringToStatus(state.getString("status"));
+		if (m_status == Status.QUEUED || m_status == Status.RUNNING ||
+				m_status == Status.PREREQUISITES)
+		{
+			// The test was running; put it back to "not-done"
+			m_status = Status.NOT_DONE;
+		}
 		m_failureMessage = state.getString("failure-message");
 		for (String param_name : in_params.keySet())
 		{

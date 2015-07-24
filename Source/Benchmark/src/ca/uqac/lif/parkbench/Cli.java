@@ -87,6 +87,7 @@ public class Cli
 		int server_port = m_defaultPort;
 		boolean interactive_mode = false;
 		int num_threads = s_defaultNumThreads;
+		boolean merge = false;
 		
 		final AnsiPrinter stderr = new AnsiPrinter(System.err);
 		final AnsiPrinter stdout = new AnsiPrinter(System.out);
@@ -144,6 +145,10 @@ public class Cli
 		{
 			interactive_mode = true;
 		}
+		if (c_line.hasOption("i"))
+		{
+			merge = true;
+		}
 		if (c_line.hasOption("t"))
 		{
 			num_threads = Integer.parseInt(c_line.getOptionValue("p"));
@@ -162,7 +167,7 @@ public class Cli
 			{
 				file_contents = FileReadWrite.readFile(filename);
 				JsonMap state = (JsonMap) parser.parse(file_contents);
-				benchmark.deserializeState(state);
+				benchmark.deserializeState(state, merge);
 			}
 			catch (IOException e) 
 			{
@@ -173,17 +178,46 @@ public class Cli
 				stderr.println("Error parsing contents of file " + filename);
 			}
 		}
+		String save_filename = benchmark.getName() + ".json";
+		
 		if (interactive_mode)
 		{
 			BenchmarkServer server = new BenchmarkServer(server_name, server_port, benchmark);
 			server.startServer();
 			println(stdout, "Server started on " + server_name + ":" + server_port, 1);
+			int loop_count = 1;
+			while (!benchmark.isFinished())
+			{
+				try
+				{
+					// Wait one second
+					Thread.sleep(1000);
+				}
+				catch (InterruptedException e) 
+				{
+					// Do nothing
+				}
+				loop_count = (loop_count + 1) % s_saveInterval;
+				if (loop_count == 0)
+				{
+					// Periodical save of the benchmark
+					try
+					{
+						JsonMap state = benchmark.serializeState();
+						FileReadWrite.writeToFile(save_filename, state.toString());
+					}
+					catch (IOException e) 
+					{
+						println(stderr, "Error writing to file " + save_filename, 2);
+					}
+				}
+			}
 		}
 		else
 		{
 			// Run all tests
 			int loop_count = 1;
-			String save_filename = benchmark.getName() + ".json";
+			
 			println(stdout, "Running " + benchmark.getName() 
 					+ " test suite in batch mode, using " 
 					+ benchmark.threadCount() + " threads", 1000);
@@ -258,6 +292,11 @@ public class Cli
 		opt = Option.builder("i")
 				.longOpt("interactive")
 				.desc("Use interactive mode")
+				.build();
+		options.addOption(opt);
+		opt = Option.builder("m")
+				.longOpt("merge")
+				.desc("Merge JSON file with existing test suite")
 				.build();
 		options.addOption(opt);
 		opt = Option.builder("s")

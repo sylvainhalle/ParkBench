@@ -342,12 +342,17 @@ public class Benchmark
 		}
 		return out.toString();
 	}
+	
+	public void deserializeState(JsonMap state)
+	{
+		deserializeState(state, false);
+	}
 
 	/**
 	 * Sets the state of the benchmark to the contents of a JSON structure
 	 * @param state The JSON structure
 	 */
-	public void deserializeState(JsonMap state)
+	public void deserializeState(JsonMap state, boolean merge)
 	{
 		Set<Test> new_tests = new HashSet<Test>();
 		m_name = state.getString("name");
@@ -362,11 +367,25 @@ public class Benchmark
 			{
 				Test new_test = test_instance.newTest(test_id);
 				new_test.deserializeState(el_test);
-				new_tests.add(new_test);
+				if (merge)
+				{
+					// The following two lines will have the effect of
+					// removing any test with the same input parameters
+					// (1st line) and putting the new test (2nd line)
+					m_tests.remove(new_test);
+					m_tests.add(new_test);
+				}
+				else
+				{
+					new_tests.add(new_test);
+				}
 			}
 		}
-		// Replaces the old set of tests with the one created from the JSON
-		m_tests = new_tests;
+		if (!merge)
+		{
+			// Replaces the old set of tests with the one created from the JSON
+			m_tests = new_tests;
+		}
 		// Don't forget to re-associate any plots to the new tests
 		for (int key : m_plots.keySet())
 		{
