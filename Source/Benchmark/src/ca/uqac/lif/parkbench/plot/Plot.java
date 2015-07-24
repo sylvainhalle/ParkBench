@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.uqac.lif.parkbench.graph;
+package ca.uqac.lif.parkbench.plot;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import ca.uqac.lif.parkbench.Benchmark;
 import ca.uqac.lif.parkbench.CommandRunner;
 import ca.uqac.lif.parkbench.Test;
 
-public abstract class GnuPlot
+public abstract class Plot
 {
 	/**
 	 * The terminal used for the plot's output
@@ -63,7 +63,7 @@ public abstract class GnuPlot
 	 * Creates an empty plot
 	 * @param title The plot's title
 	 */
-	public GnuPlot(String title)
+	public Plot(String title)
 	{
 		super();
 		m_title = title;
@@ -76,7 +76,7 @@ public abstract class GnuPlot
 	 * @param name The name
 	 * @return A pointer to this plot
 	 */
-	public GnuPlot setName(String name)
+	public Plot setName(String name)
 	{
 		m_name = name;
 		return this;
@@ -145,7 +145,7 @@ public abstract class GnuPlot
 	 * @param path The path
 	 * @return An instance of this GnuPlot object
 	 */
-	public GnuPlot setPath(String path)
+	public Plot setPath(String path)
 	{
 		s_path = path;
 		return this;
@@ -181,7 +181,7 @@ public abstract class GnuPlot
 	 * Clears the plot
 	 * @return
 	 */
-	public GnuPlot clear()
+	public Plot clear()
 	{
 		m_tests.clear();
 		return this;

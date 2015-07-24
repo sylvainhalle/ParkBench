@@ -1,10 +1,10 @@
-package ca.uqac.lif.parkbench.graph;
+package ca.uqac.lif.parkbench.plot;
 
 /**
  * General class for all two-dimensional plots with an "x" axis and a
  * "y" axis
  */
-public abstract class PlanarPlot extends GnuPlot
+public abstract class PlanarPlot extends Plot
 {
 	/**
 	 * Creates an empty plot with title

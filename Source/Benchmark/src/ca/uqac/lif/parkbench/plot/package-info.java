@@ -22,4 +22,4 @@
  * @author Sylvain
  *
  */
-package ca.uqac.lif.parkbench.graph;
+package ca.uqac.lif.parkbench.plot;

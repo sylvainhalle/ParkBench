@@ -23,7 +23,7 @@ import ca.uqac.lif.httpserver.CallbackResponse;
 import ca.uqac.lif.httpserver.CallbackResponse.ContentType;
 import ca.uqac.lif.httpserver.RequestCallback;
 import ca.uqac.lif.httpserver.Server;
-import ca.uqac.lif.parkbench.graph.GnuPlot;
+import ca.uqac.lif.parkbench.plot.Plot;
 
 import com.sun.net.httpserver.HttpExchange;
 
@@ -39,7 +39,7 @@ public class GetPlot extends BenchmarkCallback
 	{
 		CallbackResponse response = new CallbackResponse(t);
 		Map<String,String> params = getParameters(t);
-		String terminal = GnuPlot.getTerminalString(GnuPlot.DEFAULT_TERMINAL);
+		String terminal = Plot.getTerminalString(Plot.DEFAULT_TERMINAL);
 		if (!params.containsKey("id"))
 		{
 			// Bad request: should always contain an ID
@@ -47,7 +47,7 @@ public class GetPlot extends BenchmarkCallback
 			return response;
 		}
 		int plot_id = Integer.parseInt(params.get("id"));
-		GnuPlot plot = m_benchmark.getPlot(plot_id);
+		Plot plot = m_benchmark.getPlot(plot_id);
 		if (params.containsKey("terminal"))
 		{
 			terminal = params.get("terminal");
@@ -57,7 +57,7 @@ public class GetPlot extends BenchmarkCallback
 			// Send Gnuplot data
 			String filename = Server.urlEncode(plot.getName()) + ".gp";
 			response.setAttachment(filename);
-			response.setContents(plot.toGnuPlot(GnuPlot.stringToTerminal(terminal)));
+			response.setContents(plot.toGnuPlot(Plot.stringToTerminal(terminal)));
 		}
 		else
 		{
@@ -67,7 +67,7 @@ public class GetPlot extends BenchmarkCallback
 				String filename = Server.urlEncode(plot.getName()) + "." + terminal;
 				response.setAttachment(filename);
 			}
-			byte[] image = plot.getImage(GnuPlot.stringToTerminal(terminal));
+			byte[] image = plot.getImage(Plot.stringToTerminal(terminal));
 			response.setContentType(terminalToContentType(terminal));
 			response.setContents(image);
 		}			

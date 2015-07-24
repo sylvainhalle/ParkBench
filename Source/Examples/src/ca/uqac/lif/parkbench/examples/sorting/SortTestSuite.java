@@ -20,8 +20,8 @@ package ca.uqac.lif.parkbench.examples.sorting;
 import ca.uqac.lif.parkbench.Benchmark;
 import ca.uqac.lif.parkbench.Test;
 import ca.uqac.lif.parkbench.TestSuite;
-import ca.uqac.lif.parkbench.graph.PlanarPlot;
-import ca.uqac.lif.parkbench.graph.ScatterPlot;
+import ca.uqac.lif.parkbench.plot.PlanarPlot;
+import ca.uqac.lif.parkbench.plot.ScatterPlot;
 
 public class SortTestSuite extends TestSuite
 {

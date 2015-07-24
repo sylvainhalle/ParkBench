@@ -20,6 +20,7 @@ to ParkBench</a>?</p>
 <li><a href="#external">Calling external commands</a></li>
 <li><a href="#prerequisites">Test prerequisites</a></li>
 <li><a href="#resuming">Resuming an interrupted test suite</a></li>
+<li><a href="#plots">Creating plots</a></li>
 </ul>
 
 <a name="test"></a><h2>Calling external commands</h2>
@@ -134,9 +135,9 @@ output something like this:</p>
 parse such a string. Method <code>readOutput()</code> could look like:</p>
 
 <pre><code>  public void readOutput(String output, Parameters results) {
-    Pattern p = new Pattern("The output value of this program is (\\d+)");
-    Matcher m = p.matcher();
-    if (m.matches(output)) {
+    Pattern p = Pattern.compile("The output value of this program is (\\d+)");
+    Matcher m = p.matcher(output);
+    if (m.find()) {
       results.put("z", Integer.parseInt(m.group(1)));
     }
   }
@@ -268,6 +269,51 @@ as a command-line parameter to the test suite; for example:</p>
 JSON file define tests with different parameters, as long as they contain tests
 of the same classes. ParkBench will overwrite whatever tests instances the
 <code>TestSuite</code> contains with those defined in the file.</p>
+
+<a name="plots"></a><h2>Creating plots</h2>
+
+<p>ParkBench can also auto-create (and auto-update) plots created from test
+results. For example, you may want to create a two-dimensional, x-y plot where
+each dot represents a value of the <i>x</i> input parameter and a value of the
+<i>z</i> input parameter. The simplest way to do so is to add the following
+lines at the end of the <code>setup()</code> method of your test suite:</p>
+
+<pre><code>  Plot plot = new ScatterPlot("The plot's title")
+    .withLines()
+    .setParameterX("x").setCaptionX("Value of x")
+    .setParameterY("z").setCaptionY("Value of z");
+    b.addPlotToAll(plot);
+  }
+</code></pre>
+
+<p>Methods <code>setParameterX()</code> and <code>setParameterY()</code> tell
+the plot what values in each test to pick for the <i>x</i> and <i>y</i>
+coordinates (in this case, we use x and z). Methods <code>setCaptionX()</code>
+and <code>setCaptionY()</code> provide the caption for the x and y axis in the
+plot (they are optional).</p>
+
+<p>Restart your test suite in interactive mode and re-run the tests. This time,
+in the graphical interface, you can select the "Plots" sub-menu at the top of
+the page, which will lead you to a display of all plots associated with your
+test suite. You will also notice that the plots auto-update periodically (every
+few seconds), so that you can see the trends in the results as the data from
+the tests progressively comes in. Buttons for each plot also allow you to
+manually refresh a graph, download the graph locally in PDF format, and download
+a stand-alone <a href="http://gnuplot.info">GnuPlot</a> file that generates that
+graph. (As a matter of fact, ParkBench uses GnuPlot in the background to
+produce the images.)</p>
+
+<p>As the plot above is two-dimensional, ParkBench will create one data series
+with every combination of test parameters that remains. For example, in our
+case, <code>ProcedureA</code> has <em>two</em> input parameters: <i>x</i> and
+<i>y</i>. Parameter <i>x</i> is used for the x-axis, but parameter <i>y</i> is
+not used. Therefore, ParkBench will treat all tests with <i>y</i>=1 as one data
+series, using the values of <i>x</i> and <i>z</i> to plot a line of a given
+colour. Similarly, all tests with <i>y</i>=2 will be another data series, which
+ParkBench will plot as another line of a different colour, etc. Moreover, the
+name of the test also counts as a parameter, so tests of
+<code>ProcedureA</code> with <i>y</i>=0 will be in a different data series as
+the tests of <code>ProcedureB</code> with <i>y</i>=0.</p>
 
 </body>
 </html>

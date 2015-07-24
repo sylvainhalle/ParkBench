@@ -579,4 +579,9 @@ public abstract class Test implements Runnable
 		}
 
 	}
+
+	public void clean() {
+		// TODO Auto-generated method stub
+		
+	}
 }

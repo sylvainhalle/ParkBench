@@ -27,7 +27,7 @@ import java.util.Set;
 import ca.uqac.lif.cornipickle.json.JsonElement;
 import ca.uqac.lif.cornipickle.json.JsonList;
 import ca.uqac.lif.cornipickle.json.JsonMap;
-import ca.uqac.lif.parkbench.graph.GnuPlot;
+import ca.uqac.lif.parkbench.plot.Plot;
 
 /**
  * A benchmark controls the execution of a set of tests
@@ -61,7 +61,7 @@ public class Benchmark
 	 */
 	protected Thread m_dispatcherThread;
 	
-	protected Map<Integer,GnuPlot> m_plots;
+	protected Map<Integer,Plot> m_plots;
 	
 	
 	/**
@@ -84,7 +84,7 @@ public class Benchmark
 		m_dispatcher = new ThreadDispatcher(num_threads);
 		m_dispatcherThread = new Thread(m_dispatcher);
 		m_dispatcherThread.start();
-		m_plots = new HashMap<Integer,GnuPlot>();
+		m_plots = new HashMap<Integer,Plot>();
 	}
 	
 	/**
@@ -361,7 +361,7 @@ public class Benchmark
 		// Don't forget to re-associate any plots to the new tests
 		for (int key : m_plots.keySet())
 		{
-			GnuPlot plot = m_plots.get(key);
+			Plot plot = m_plots.get(key);
 			plot.clear().addTests(this);
 		}
 	}
@@ -499,14 +499,14 @@ public class Benchmark
 		return out;
 	}
 	
-	public Benchmark addPlot(GnuPlot plot)
+	public Benchmark addPlot(Plot plot)
 	{
 		plot.addTests(this);
 		m_plots.put(s_plotCounter++, plot);
 		return this;
 	}
 	
-	public GnuPlot getPlot(int plot_id)
+	public Plot getPlot(int plot_id)
 	{
 		return m_plots.get(plot_id);
 	}
