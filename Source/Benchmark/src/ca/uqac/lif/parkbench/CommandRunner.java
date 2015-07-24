@@ -106,6 +106,7 @@ public class CommandRunner
 		{
 			// Wait for both gobblers to finish
 		} while (error_gobbler.isAlive() || output_gobbler.isAlive());
+		//System.err.println(new String(error_gobbler.getBytes()));
 		return output_gobbler.getBytes();
 	}
 

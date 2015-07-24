@@ -39,5 +39,14 @@ public class JsonString extends JsonElement
     out.append("\"").append(m_string).append("\"");
     return out.toString();
   }
+  
+  public static String escape(String s)
+  {
+	  String out = new String(s);
+	  out = out.replaceAll("\"", "\\\\\"");
+	  out = out.replaceAll("\n", "\\\\n");
+	  out = out.replaceAll("\t", "\\\\t");
+	  return out;
+  }
 
 }

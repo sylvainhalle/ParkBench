@@ -486,8 +486,7 @@ public abstract class Test implements Runnable
 		out.put("id", m_id);
 		out.put("starttime", m_startTime);
 		out.put("endtime", m_stopTime);
-		String failure = new String(m_failureMessage);
-		out.put("failure-message", failure.replaceAll("\"", "\\\""));
+		out.put("failure-message", JsonString.escape(m_failureMessage));
 		if (prerequisitesFulilled(m_parameters))
 		{
 			out.put("prerequisites", "true");
@@ -630,10 +629,5 @@ public abstract class Test implements Runnable
 			return;
 		}
 
-	}
-
-	public void clean() {
-		// TODO Auto-generated method stub
-		
 	}
 }

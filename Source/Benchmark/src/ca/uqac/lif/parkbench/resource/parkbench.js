@@ -431,7 +431,7 @@ function toggle_section(divname) {
 };
 
 $(document).ready(function() {
-  $("#refresh-status").click(function() {refresh_test_list(true);});
+  $("#refresh-status").click(function() {refresh_test_list(false);});
   $("#check-all").click(select_all_tests);
   $("#uncheck-all").click(unselect_all_tests);
   $("#check-category").click(select_category);

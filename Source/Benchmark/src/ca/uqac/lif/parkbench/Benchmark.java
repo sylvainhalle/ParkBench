@@ -494,6 +494,17 @@ public class Benchmark
 		m_dispatcher.stopAll();
 		m_dispatcherThread.interrupt();
 	}
+	
+	/**
+	 * Retrieves a set of tests based on a set of parameters
+	 * @param parameters The parameters
+	 * @return The tests with the corresponding parameters, if
+	 *   any
+	 */
+	public Collection<Test> getTests(Parameters params)
+	{
+		return getTests(m_tests, params);
+	}
 
 	static Map<String,Integer> fillStatusMap()
 	{
@@ -511,7 +522,7 @@ public class Benchmark
 
 	public Benchmark addPlot(Plot plot)
 	{
-		plot.addTests(this);
+		//plot.addTests(this);
 		m_plots.put(s_plotCounter++, plot);
 		return this;
 	}
