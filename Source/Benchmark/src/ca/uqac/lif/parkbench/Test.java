@@ -78,6 +78,11 @@ public abstract class Test implements Runnable
 	private final String m_name;
 	
 	/**
+	 * A message explaining the failure of that test, if any
+	 */
+	private String m_failureMessage;
+	
+	/**
 	 * Unique ID for this test. This number is meaningless and is
 	 * used only to interact with the GUI
 	 */
@@ -106,6 +111,7 @@ public abstract class Test implements Runnable
 		m_dryRun = false;
 		m_startTime = 0;
 		m_stopTime = 0;
+		m_failureMessage = "";
 	}
 	
 	Test(String name, int test_id)
@@ -120,6 +126,7 @@ public abstract class Test implements Runnable
 		m_dryRun = false;
 		m_startTime = 0;
 		m_stopTime = 0;
+		m_failureMessage = "";
 	}
 	
 	public abstract void runTest(final Parameters params, Parameters results);
@@ -131,6 +138,26 @@ public abstract class Test implements Runnable
 	public String getName()
 	{
 		return m_name;
+	}
+	
+	/**
+	 * Gets the failure message
+	 * @return The message
+	 */
+	public String getFailureMessage()
+	{
+		return m_failureMessage;
+	}
+	
+	/**
+	 * Sets a message explaining the failure of that test, if any
+	 * @param message The message
+	 * @return This test
+	 */
+	public Test setFailureMessage(String message)
+	{
+		m_failureMessage = message;
+		return this;
 	}
 	
 	/**
@@ -459,6 +486,8 @@ public abstract class Test implements Runnable
 		out.put("id", m_id);
 		out.put("starttime", m_startTime);
 		out.put("endtime", m_stopTime);
+		String failure = new String(m_failureMessage);
+		out.put("failure-message", failure.replaceAll("\"", "\\\""));
 		if (prerequisitesFulilled(m_parameters))
 		{
 			out.put("prerequisites", "true");
@@ -503,6 +532,7 @@ public abstract class Test implements Runnable
 		m_startTime = state.getNumber("starttime").intValue();
 		m_stopTime = state.getNumber("endtime").intValue();
 		m_status = stringToStatus(state.getString("status"));
+		m_failureMessage = state.getString("failure-message");
 		for (String param_name : in_params.keySet())
 		{
 			JsonElement param_value = in_params.get(param_name);

@@ -55,7 +55,6 @@ public abstract class CommandTest extends Test
 			{
 				System.out.println("Dry run: would execute " + command_list);
 			}
-			stopWithStatus(Status.DONE);
 		}
 		catch (IOException e)
 		{

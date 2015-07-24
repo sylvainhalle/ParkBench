@@ -91,7 +91,7 @@ function refresh_test_list(incremental) {
 	        var param_name = result["param-names"][j];
 	        out_list += "<th>" + param_name + "</th>";
 	      }
-	      out_list += "<th></th></tr></thead>\n";
+	      out_list += "<th></th><th>Message</th></tr></thead>\n";
 	      out_list += "<tbody>\n";
 	      for (var i = 0; i < result.tests.length; i++) {
 	        var test = result.tests[i];
@@ -148,6 +148,7 @@ function fill_table_line(test, param_names) {
         out_list += "<button class=\"btn btn-mini\" onclick=\"reset_test(" + test.id + ");\">Reset</button> ";	
     }    	
     out_list += "</td>\n";
+    out_list += "<td>" + test["failure-message"] + "</td>\n";
     return out_list;  
 };
 
