@@ -9,8 +9,17 @@ span.text-only {
   display: none;
 }
 
+tr.impossible td {
+	color: darkgrey;
+}
+
 .status-done {
   background-color: blue;
+}
+
+.status-impossible {
+  background-color: white;
+  border: solid 1px darkgrey;
 }
 
 .status-ready {

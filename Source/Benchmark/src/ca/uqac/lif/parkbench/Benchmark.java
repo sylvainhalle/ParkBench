@@ -40,30 +40,30 @@ public class Benchmark
 	 * The set of tests managed by the benchmark
 	 */
 	protected Set<Test> m_tests;
-	
+
 	/**
 	 * A name for this benchmark
 	 */
 	protected String m_name;
-	
+
 	/**
 	 * The dispatcher for the threads for running the tests
 	 */
 	protected ThreadDispatcher m_dispatcher;
-	
+
 	/**
 	 * A counter for plot IDs
 	 */
 	protected int s_plotCounter = 0;
-	
+
 	/**
 	 * The thread running the dispatcher
 	 */
 	protected Thread m_dispatcherThread;
-	
+
 	protected Map<Integer,Plot> m_plots;
-	
-	
+
+
 	/**
 	 * Create an empty benchmark 
 	 */
@@ -72,7 +72,7 @@ public class Benchmark
 		// By default, single-threaded
 		this(1);
 	}
-	
+
 	/**
 	 * Create an empty benchmark 
 	 */
@@ -86,7 +86,7 @@ public class Benchmark
 		m_dispatcherThread.start();
 		m_plots = new HashMap<Integer,Plot>();
 	}
-	
+
 	/**
 	 * Sets the benchmark's name
 	 * @param name The name
@@ -95,7 +95,7 @@ public class Benchmark
 	{
 		m_name = name;
 	}
-	
+
 	/**
 	 * Gets the benchmark's name
 	 * @return The name
@@ -104,7 +104,7 @@ public class Benchmark
 	{
 		return m_name;
 	}
-	
+
 	/**
 	 * Add a test to the benchmark
 	 * @param t The test to add
@@ -113,7 +113,7 @@ public class Benchmark
 	{
 		m_tests.add(t);
 	}
-	
+
 	/**
 	 * Retrieves a set of tests based on a set of parameters
 	 * @param parameters The parameters
@@ -133,7 +133,7 @@ public class Benchmark
 		}
 		return out;
 	}
-	
+
 	/**
 	 * Return the set of all tests in the benchmark
 	 * @return The tests
@@ -142,7 +142,7 @@ public class Benchmark
 	{
 		return m_tests;
 	}
-	
+
 	/**
 	 * Retrieves a single test based on a set of parameters. In case
 	 * many tests match the parameters, one is picked nondeterministically.
@@ -182,7 +182,7 @@ public class Benchmark
 			}
 		}
 	}
-	
+
 	/**
 	 * Retrieves the set of all parameter names contained in
 	 * at least one test
@@ -197,7 +197,7 @@ public class Benchmark
 		}
 		return out;
 	}
-	
+
 	/**
 	 * Counts the threads associated to the benchmark
 	 * @return The number of threads
@@ -206,7 +206,7 @@ public class Benchmark
 	{
 		return m_dispatcher.threadCount();
 	}
-	
+
 	/**
 	 * Sequentially runs all the tests in the benchmark
 	 */
@@ -222,21 +222,24 @@ public class Benchmark
 			}
 		}
 	}
-	
+
 	/**
 	 * Queues all the tests in the benchmark
 	 */
 	public void queueAllTests()
 	{
 		Iterator<Test> it = m_tests.iterator();
-		
+
 		while (it.hasNext())
 		{
 			Test t = it.next();
-			m_dispatcher.putInQueue(t);
+			if (t.canRun(t.getParameters()))
+			{
+				m_dispatcher.putInQueue(t);
+			}
 		}
 	}
-	
+
 	/**
 	 * Runs a test in the benchmark
 	 * @param test_id The id of the test to run
@@ -247,12 +250,15 @@ public class Benchmark
 		Test t = getTest(test_id);
 		if (t != null)
 		{
-			t.run();
-			return true;
+			if (t.canRun(t.getParameters()))
+			{
+				t.run();
+				return true;
+			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Places a test in the waiting queue to be executed
 	 * @param test_id The id of the test to run
@@ -263,12 +269,15 @@ public class Benchmark
 		Test t = getTest(test_id);
 		if (t != null)
 		{
-			m_dispatcher.putInQueue(t);
-			return true;
+			if (t.canRun(t.getParameters()))
+			{
+				m_dispatcher.putInQueue(t);
+				return true;
+			}
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Stops a test
 	 * @param test_id The ID of the test to stop
@@ -279,7 +288,7 @@ public class Benchmark
 	{
 		return m_dispatcher.cancel(test_id);		
 	}
-	
+
 	/**
 	 * Checks if all the tests in the benchmark are done
 	 * (either finished or interrupted)
@@ -289,7 +298,7 @@ public class Benchmark
 	{
 		return m_dispatcher.allDone();
 	}
-	
+
 	/**
 	 * Sets the dry run status of every test in the benchmark.
 	 * See {@link Test#setDryRun(boolean)}.
@@ -304,7 +313,7 @@ public class Benchmark
 		}
 		return this;
 	}
-	
+
 	/**
 	 * Sets the number of threads to be used with this benchmark.
 	 * <b>NOTE:</b> this will stop and <b>wipe out</b> the current
@@ -322,7 +331,7 @@ public class Benchmark
 		m_dispatcherThread.start();
 		return this;
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -365,7 +374,7 @@ public class Benchmark
 			plot.clear().addTests(this);
 		}
 	}
-	
+
 	/**
 	 * Retrieves a test with given ID
 	 * @param test_id The test ID to look for
@@ -385,7 +394,7 @@ public class Benchmark
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Cleans a test
 	 * @param test_id The test ID to clean
@@ -401,7 +410,7 @@ public class Benchmark
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Resets a test
 	 * @param test_id The test ID to reset
@@ -417,7 +426,7 @@ public class Benchmark
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Serializes the status of the benchmark into a JSON structure
 	 * @return The JSON structure
@@ -458,7 +467,7 @@ public class Benchmark
 		out.put("status", status_map);
 		return out;
 	}
-	
+
 	/**
 	 * In the set of current tests, finds a test with the same name as
 	 * the parameter
@@ -476,7 +485,7 @@ public class Benchmark
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Stops the benchmark
 	 */
@@ -485,7 +494,7 @@ public class Benchmark
 		m_dispatcher.stopAll();
 		m_dispatcherThread.interrupt();
 	}
-	
+
 	static Map<String,Integer> fillStatusMap()
 	{
 		Map<String,Integer> out = new HashMap<String,Integer>();
@@ -496,23 +505,29 @@ public class Benchmark
 		out.put("status-not-ready", 0);
 		out.put("status-queued", 0);
 		out.put("status-running", 0);
+		out.put("status-impossible", 0);
 		return out;
 	}
-	
+
 	public Benchmark addPlot(Plot plot)
 	{
 		plot.addTests(this);
 		m_plots.put(s_plotCounter++, plot);
 		return this;
 	}
-	
+
 	public Plot getPlot(int plot_id)
 	{
 		return m_plots.get(plot_id);
 	}
-	
+
 	static void putInStatusMap(Test t, Map<String,Integer> map)
 	{
+		if (!t.canRun(t.getParameters()))
+		{
+			map.put("status-impossible", map.get("status-impossible") + 1);
+			return;
+		}
 		switch (t.getStatus())
 		{
 		case DONE:

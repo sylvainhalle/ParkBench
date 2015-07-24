@@ -61,6 +61,10 @@ function refresh_test_list(incremental) {
           $("#status-nb-prerequisites").html(result.status["status-prerequisites"]);
         else
           $("#status-nb-prerequisites").html("0");
+      if (result.status["status-impossible"])
+          $("#status-nb-impossible").html(result.status["status-impossible"]);
+        else
+          $("#status-nb-impossible").html("0");
       if (result.status["status-ready"])
         $("#status-nb-ready").html(result.status["status-ready"]);
       else
@@ -91,7 +95,11 @@ function refresh_test_list(incremental) {
 	      out_list += "<tbody>\n";
 	      for (var i = 0; i < result.tests.length; i++) {
 	        var test = result.tests[i];
-	        out_list += "<tr id=\"tr-test-" + test.id + "\">\n";
+	        var class_grey = "";
+	        if (test["can-run"] === "false") {
+	        	class_grey = " class=\"impossible\" ";
+	        }
+	        out_list += "<tr " + class_grey + "id=\"tr-test-" + test.id + "\">\n";
 	        out_list += fill_table_line(test, result["param-names"]);
 	        out_list += "</tr>\n";
 	      }
@@ -125,7 +133,7 @@ function refresh_test_list(incremental) {
 function fill_table_line(test, param_names) {
     var out_list = "";
     out_list += "<td><input type=\"checkbox\" class=\"chk-test\" id=\"chktest-" + test.id + "\" /></td>\n";
-    out_list += "<td>" + get_status_div(test.status, test.prerequisites, test.id) + "</td>\n";
+    out_list += "<td>" + get_status_div(test.status, test.prerequisites, test["can-run"], test.id) + "</td>\n";
     out_list += "<td>" + get_time_string(test.status, test.starttime, test.endtime) + "</td>\n";
     //out_list += "<td>" + test.id + "</td>\n";
     out_list += "<td>" + test.name + "</td>\n";
@@ -134,9 +142,11 @@ function fill_table_line(test, param_names) {
       out_list += "<td>" + test.input[param_name] + "</td>";
     }
     out_list += "<td>";
-    out_list += "<button class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\">Start</button> ";
-    out_list += "<button class=\"btn btn-mini\" onclick=\"stop_test(" + test.id + ");\">Stop</button> ";
-    out_list += "<button class=\"btn btn-mini\" onclick=\"reset_test(" + test.id + ");\">Reset</button> ";
+    if (test["can-run"] === "true") {
+        out_list += "<button class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\">Start</button> ";
+        out_list += "<button class=\"btn btn-mini\" onclick=\"stop_test(" + test.id + ");\">Stop</button> ";
+        out_list += "<button class=\"btn btn-mini\" onclick=\"reset_test(" + test.id + ");\">Reset</button> ";	
+    }    	
     out_list += "</td>\n";
     return out_list;  
 };
@@ -193,7 +203,10 @@ function get_time_string(status, starttime, endtime) {
   return out_string;
 };
 
-function get_status_div(status, prerequisites, id) {
+function get_status_div(status, prerequisites, canrun, id) {
+  if (canrun === "false") {
+	  return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-impossible\"><span class=\"text-only\">Impossible</span></div>";
+  }
   if (status === "DONE")
     return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-done\"><span class=\"text-only\">Done</span></div>";
   else if (status === "FAILED")

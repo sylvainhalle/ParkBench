@@ -132,6 +132,20 @@ public abstract class Test implements Runnable
 	{
 		return m_name;
 	}
+	
+	/**
+	 * Determines if the test can run, given the set of parameters
+	 * it is provided. <b>NOTE:</b> this must not be confused with
+	 * whether a test has prerequisites that need to be fulfilled.
+	 * The present method must return false when it is <em>impossible</em>
+	 * to run the test with such input values.
+	 * @param input The test's input parameters
+	 * @return True if the test can potentially run, false otherwise
+	 */
+	public boolean canRun(Parameters input)
+	{
+		return true;
+	}
 
 	/**
 	 * Determines if the test is to be executed for real, or
@@ -452,6 +466,14 @@ public abstract class Test implements Runnable
 		else
 		{
 			out.put("prerequisites", "false");
+		}
+		if (canRun(m_parameters))
+		{
+			out.put("can-run", "true");
+		}
+		else
+		{
+			out.put("can-run", "false");
 		}
 		JsonMap in_params = new JsonMap();
 		for (String param_name : m_parameters.keySet())
