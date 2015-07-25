@@ -122,7 +122,7 @@ public class Cli
 		}
 		if (c_line.hasOption("version"))
 		{
-			stderr.println("(C) 2015 Sylvain Hall� et al., Universit� du Qu�bec � Chicoutimi");
+			stderr.println("(C) 2015 Sylvain Hallé et al., Université du Québec à Chicoutimi");
 			stderr.println("This program comes with ABSOLUTELY NO WARRANTY.");
 			stderr.println("This is a free software, and you are welcome to redistribute it");
 			stderr.println("under certain conditions. See the file LICENSE for details.\n");
@@ -160,8 +160,15 @@ public class Cli
 		JsonParser parser = new JsonFastParser();
 		for (String filename : remaining_args)
 		{
-			stdout.setForegroundColor(AnsiPrinter.Color.BROWN);
-			println(stdout, "Reading benchmark state " + filename, 1);
+			//stdout.setForegroundColor(AnsiPrinter.Color.BROWN);
+			if (merge)
+			{
+				println(stdout, "Merging with benchmark state " + filename, 1);
+			}
+			else
+			{
+				println(stdout, "Overwriting with benchmark state " + filename, 1);
+			}
 			String file_contents;
 			try
 			{
@@ -185,7 +192,7 @@ public class Cli
 			BenchmarkServer server = new BenchmarkServer(server_name, server_port, benchmark);
 			server.startServer();
 			println(stdout, "Server started on " + server_name + ":" + server_port, 1);
-			int loop_count = 1;
+			/*int loop_count = 1;
 			while (!benchmark.isFinished())
 			{
 				try
@@ -211,7 +218,7 @@ public class Cli
 						println(stderr, "Error writing to file " + save_filename, 2);
 					}
 				}
-			}
+			}*/
 		}
 		else
 		{

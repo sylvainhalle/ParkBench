@@ -521,6 +521,24 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
+	 * Mirrors an existing test. This will make the current test
+	 * instance copy all parameters, values and state of the test passed
+	 * as parameter, <strong>except the ID and the name</strong>.
+	 * @param t The test to mirror
+	 * @return This test
+	 */
+	Test mirror(Test t)
+	{
+		m_parameters = t.m_parameters;
+		m_results = t.m_results;
+		m_startTime = t.m_startTime;
+		m_stopTime = t.m_stopTime;
+		m_status = t.m_status;
+		m_failureMessage = t.m_failureMessage;
+		return this;
+	}
+	
+	/**
 	 * Sets the state of the test to the contents of a JSON structure
 	 * @param state The JSON structure
 	 */

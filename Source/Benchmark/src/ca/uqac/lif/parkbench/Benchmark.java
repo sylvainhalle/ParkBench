@@ -342,7 +342,11 @@ public class Benchmark
 		}
 		return out.toString();
 	}
-	
+
+	/**
+	 * Merges the state of the benchmark to the contents of a JSON structure
+	 * @param state The JSON structure
+	 */
 	public void deserializeState(JsonMap state)
 	{
 		deserializeState(state, false);
@@ -351,6 +355,8 @@ public class Benchmark
 	/**
 	 * Sets the state of the benchmark to the contents of a JSON structure
 	 * @param state The JSON structure
+	 * @param merge Whether the JSON will overwrite the existing benchmark
+	 *   (false) or be merged with it (true)
 	 */
 	public void deserializeState(JsonMap state, boolean merge)
 	{
@@ -367,30 +373,33 @@ public class Benchmark
 			{
 				Test new_test = test_instance.newTest(test_id);
 				new_test.deserializeState(el_test);
-				if (merge)
-				{
-					// The following two lines will have the effect of
-					// removing any test with the same input parameters
-					// (1st line) and putting the new test (2nd line)
-					m_tests.remove(new_test);
-					m_tests.add(new_test);
-				}
-				else
-				{
-					new_tests.add(new_test);
-				}
+				new_tests.add(new_test);
+			}
+		}
+		// Replaces the old set of tests with the ones created from the JSON
+		// Note that we take care of changing the existing objects, so that
+		// e.g. existing plots don't lose references to these tests
+		for (Test t : new_tests)
+		{
+			Test old_t = getTestFromTest(t);
+			if (old_t != null)
+			{
+				old_t.mirror(t);
 			}
 		}
 		if (!merge)
 		{
-			// Replaces the old set of tests with the one created from the JSON
-			m_tests = new_tests;
-		}
-		// Don't forget to re-associate any plots to the new tests
-		for (int key : m_plots.keySet())
-		{
-			Plot plot = m_plots.get(key);
-			plot.clear().addTests(this);
+			// We don't merge, so all tests that are not in the input
+			// JSON will be deleted
+			Iterator<Test> t_it = m_tests.iterator();
+			while (t_it.hasNext())
+			{
+				Test t = t_it.next();
+				if (!new_tests.contains(t))
+				{
+					t_it.remove();
+				}
+			}
 		}
 	}
 
@@ -588,5 +597,27 @@ public class Benchmark
 		default:
 			break;
 		}
+	}
+	
+	/**
+	 * Gets the test instance in the benchmark with the same
+	 * input parameters and the same name as the test passed as an
+	 * argument
+	 * @param t The test to look for
+	 * @return A test instance, null if none found
+	 */
+	protected Test getTestFromTest(Test t)
+	{
+		Parameters t_p = t.getParameters();
+		String t_name = t.getName();
+		for (Test in_t : m_tests)
+		{
+			if (in_t.getName().compareTo(t_name) == 0 &&
+					in_t.getParameters().equals(t_p))
+			{
+				return in_t;
+			}
+		}
+		return null;
 	}
 }

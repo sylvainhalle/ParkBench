@@ -177,9 +177,29 @@ public class Parameters extends HashMap<String,Object>
 			{
 				return false;
 			}
-			if (o1 != null && o2 != null && !o1.equals(o2))
+			if (o1 != null && o2 != null)
 			{
-				return false;
+				// We must do a rather tedious comparison here, as e.g.
+				// two instances of numbers n1 and n2 may have the same
+				// value, yet not have n1.equals(n2). :-(
+				if (o1 instanceof Number && o2 instanceof Number)
+				{
+					if (((Number) o1).floatValue() != ((Number) o2).floatValue())
+					{
+						return false;
+					}
+				}
+				else if (o1 instanceof String && o2 instanceof String)
+				{
+					if (o1.toString().compareTo(o2.toString()) != 0)
+					{
+						return false;
+					}
+				}
+				else if (!o1.equals(o2))
+				{
+					return false;
+				}
 			}
 		}
 		return true;

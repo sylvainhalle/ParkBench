@@ -59,7 +59,7 @@ public class ThreadDispatcher implements Runnable
 	 * The time (in ms) before the dispatcher looks again for new
 	 * tests in its queue. Don't set it too low, it will clog your CPU.
 	 */
-	protected static int s_pollInterval = 250;
+	protected static int s_pollInterval = 1000;
 	
 	/**
 	 * Creates a new thread dispatcher

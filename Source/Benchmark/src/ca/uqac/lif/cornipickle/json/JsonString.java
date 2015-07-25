@@ -48,5 +48,27 @@ public class JsonString extends JsonElement
 	  out = out.replaceAll("\t", "\\\\t");
 	  return out;
   }
+  
+  @Override
+  public int hashCode()
+  {
+	  return m_string.hashCode();
+	  
+  }
+  
+  @Override
+  public boolean equals(Object o)
+  {
+	  if (o == null || !(o instanceof JsonString))
+	  {
+		  return false;
+	  }
+	  return equals((JsonString) o);
+  }
+  
+  protected boolean equals(JsonString o)
+  {
+	  return m_string.compareTo(o.m_string) == 0;
+  }
 
 }

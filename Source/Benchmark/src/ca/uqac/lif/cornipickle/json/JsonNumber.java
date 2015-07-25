@@ -56,4 +56,26 @@ public class JsonNumber extends JsonElement
     return isNumeric(str.stringValue());
   }
   
+  @Override
+  public int hashCode()
+  {
+	  return m_number.intValue();
+	  
+  }
+  
+  @Override
+  public boolean equals(Object o)
+  {
+	  if (o == null || !(o instanceof JsonNumber))
+	  {
+		  return false;
+	  }
+	  return equals((JsonNumber) o);
+  }
+  
+  protected boolean equals(JsonNumber o)
+  {
+	  return m_number.floatValue() == o.m_number.floatValue();
+  }
+  
 }
