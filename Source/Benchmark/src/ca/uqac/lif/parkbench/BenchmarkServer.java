@@ -33,5 +33,6 @@ public class BenchmarkServer extends InnerFileServer
 		registerCallback(0, new ResetTest(b));
 		registerCallback(0, new GetPlot(b));
 		registerCallback(0, new SaveBenchmark(b));
+		registerCallback(0, new FilterTests(b));
 	}
 }

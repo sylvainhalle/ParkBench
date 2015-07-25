@@ -49,26 +49,15 @@
 <h2 id="benchmark-name">Benchmark info</h2>
 
 <table class="table table-condensed" id="benchmark-info">
-<tr><td>No info so far</td></td>
+<tr><td>No info so far</td></tr>
 </table>
-</div> <!-- /#section-info -->
-
-<div class="div-section" id="section-plots" style="display:none">
-<h2>Plots</h2>
-<div id="plots">
-</div>
-</div> <!-- /#section-plots -->
-
-<div class="div-section" id="section-tests" style="display:none">
-<h2>Tests in this benchmark</h2>
 
 <div>
-<button class="btn" id="refresh-status">Refresh status</button>
+<button class="btn" id="refresh-status"><span class="glyphicon glyphicon-refresh"></span> Refresh status</button>
 <a href="/save"><button class="btn" id="save-benchmark"><span class="glyphicon glyphicon-save"></span> Save benchmark</button></a>
 </div>
 
 <div class="well">
-<h3>Status</h2>
 <table>
 <tr><td id="status-nb-impossible">0</td><td><div class="status-icon status-impossible"><span class="text-only">Impossible</span></div></td><td>It is impossible to run that test</td></tr>
 <tr><td id="status-nb-not-ready">0</td><td><div class="status-icon status-not-ready"><span class="text-only">Not ready</span></div></td><td>The test has not run and its prerequisites are not fulfilled</td></tr>
@@ -80,20 +69,31 @@
 <tr><td id="status-nb-failed">0</td><td><div class="status-icon status-failed"><span class="text-only">Failed</span></div></td><td>The execution of the test has failed or was manually cancelled</td></tr>
 </table>
 </div>
+</div> <!-- /#section-info -->
+
+<div class="div-section" id="section-plots" style="display:none">
+<h2>Plots</h2>
+<div id="plots">
+</div>
+</div> <!-- /#section-plots -->
+
+<div class="div-section" id="section-tests" style="display:none">
+<h2>Tests in this benchmark</h2>
+
+<p>Filter by: <input type="text" id="filter-expression" /> <button class="btn btn-small" id="btn-filter">Show</button>  <button class="btn btn-small" id="btn-show-all">Show all</button></p>
 
 <p>
 <button class="btn btn-small" id="check-all">Select all</button>
 <button class="btn btn-small" id="uncheck-all">Unselect all</button>
 </p>
 
-<p><button class="btn btn-small" id="check-category">Select&hellip;</button>
+<p><button class="btn btn-small" id="check-category">Select&hellip;</button></p>
 <ul id="test-selection">
 <li class="status-prerequisites"><input type="checkbox" id="chktest-prerequisites" />&nbsp;Prerequisites</li>
 <li class="status-running"><input type="checkbox" id="chktest-running" />&nbsp;Running</li>
 <li class="status-ready"><input type="checkbox" id="chktest-ready" />&nbsp;Ready</li>
 <li class="status-failed"><input type="checkbox" id="chktest-failed" />&nbsp;Failed</li> 
 </ul>
-</p>
 
 <p>For selected tests:
 <button class="btn btn-small" id="start-all">Start</button>

@@ -86,7 +86,7 @@ function refresh_test_list(incremental) {
     	  // Create table contents
     	  $("#benchmark-name").html(result.name);
 	      var out_list = "";
-	      out_list += "<thead><tr><th></th><th>Status</th><th>Duration</th><th>Name</th>";
+	      out_list += "<thead><tr class=\"header\"><th></th><th>Status</th><th>Duration</th><th>Name</th>";
 	      for (var j = 0; j < result["param-names"].length; j++) {
 	        var param_name = result["param-names"][j];
 	        out_list += "<th>" + param_name + "</th>";
@@ -143,9 +143,9 @@ function fill_table_line(test, param_names) {
     }
     out_list += "<td>";
     if (test["can-run"] === "true") {
-        out_list += "<button class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\">Start</button> ";
-        out_list += "<button class=\"btn btn-mini\" onclick=\"stop_test(" + test.id + ");\">Stop</button> ";
-        out_list += "<button class=\"btn btn-mini\" onclick=\"reset_test(" + test.id + ");\">Reset</button> ";	
+        out_list += "<button title=\"Start\" class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\"><span class=\"glyphicon glyphicon-play\"></span><span class=\"text-only\">Start</span></button> ";
+        out_list += "<button title=\"Stop\" class=\"btn btn-mini\" onclick=\"stop_test(" + test.id + ");\"><span class=\"glyphicon glyphicon-stop\"></span><span class=\"text-only\">Stop</span></button> ";
+        out_list += "<button title=\"Reset\" class=\"btn btn-mini\" onclick=\"reset_test(" + test.id + ");\"><span class=\"glyphicon glyphicon-erase\"></span><span class=\"text-only\">Reset</span></button> ";	
     }    	
     out_list += "</td>\n";
     out_list += "<td>" + test["failure-message"] + "</td>\n";
@@ -153,7 +153,8 @@ function fill_table_line(test, param_names) {
 };
 
 function select_all_tests() {
-	$(".chk-test").prop("checked", true);
+	$(".chk-test").prop("checked", false);
+	$(".chk-test:visible").prop("checked", true);
 };
 
 function unselect_all_tests() {
@@ -162,7 +163,7 @@ function unselect_all_tests() {
 
 function select_category() {
 	if ($("#chktest-ready").prop("checked")) {
-		$("div.status-ready").each(function() {
+		$("div.status-ready:visible").each(function() {
 			var el_id = $(this).prop("id");
 			var id_parts = el_id.split("-");
 			var id = id_parts[2];
@@ -170,7 +171,7 @@ function select_category() {
 		});
 	}
 	if ($("#chktest-running").prop("checked")) {
-		$("div.status-running").each(function() {
+		$("div.status-running:visible").each(function() {
 			var el_id = $(this).prop("id");
 			var id_parts = el_id.split("-");
 			var id = id_parts[2];
@@ -178,7 +179,7 @@ function select_category() {
 		});
 	}
 	if ($("#chktest-failed").prop("checked")) {
-		$("div.status-failed").each(function() {
+		$("div.status-failed:visible").each(function() {
 			var el_id = $(this).prop("id");
 			var id_parts = el_id.split("-");
 			var id = id_parts[2];
@@ -430,6 +431,26 @@ function toggle_section(divname) {
 	$("#section-" + divname).show();
 };
 
+function show_all_tests() {
+	$("#test-list tr").show();
+};
+
+function filter_tests() {
+  var expression = encodeURIComponent($("#filter-expression").val());
+  $.ajax({
+	    url         : "/filter?" + expression,
+	    contentType : "application/json",
+	    success     : function(result) {
+	      $("#test-list tr").hide();
+	      $("#test-list tr.header").show();
+	      for (var i = 0; i < result.length; i++) {
+	    	  var test_id = result[i];
+	    	  $("#tr-test-" + test_id).show();
+	      }
+	  }
+  });
+};
+
 $(document).ready(function() {
   $("#refresh-status").click(function() {refresh_test_list(false);});
   $("#check-all").click(select_all_tests);
@@ -440,6 +461,8 @@ $(document).ready(function() {
   $("#reset-all").click(reset_selected_tests);
   $("#save-benchmark").click(save_benchmark);
   $("#refresh-plot").click(refresh_plot);
+  $("#btn-filter").click(filter_tests);
+  $("#btn-show-all").click(show_all_tests);
   show_benchmark_info();
   refresh_test_list(false);
   periodical_refresh();
