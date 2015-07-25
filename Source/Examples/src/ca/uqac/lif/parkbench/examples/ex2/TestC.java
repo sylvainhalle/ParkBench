@@ -28,7 +28,7 @@ public class TestC extends CommandTestRegex
 	}
 	
 	@Override
-	public void fulfillPrerequisites(Parameters params)
+	public boolean fulfillPrerequisites(Parameters params)
 	{
 		String filename = getPrerequisitesFilename();
 		String file_contents = fillFile();
@@ -38,8 +38,9 @@ public class TestC extends CommandTestRegex
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 	
 	@Override

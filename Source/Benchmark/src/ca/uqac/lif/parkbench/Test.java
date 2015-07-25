@@ -348,10 +348,13 @@ public abstract class Test implements Runnable
 	 * any additional commands, generating any files, etc. that the
 	 * test will require when run.
 	 * @param input The test's parameters
+	 * @return true if the prerequisites were correctly generated,
+	 *   false otherwise
 	 */
-	public void fulfillPrerequisites(final Parameters input)
+	public boolean fulfillPrerequisites(final Parameters input)
 	{
 		// Do nothing
+		return true;
 	}
 	
 	/**
@@ -379,14 +382,23 @@ public abstract class Test implements Runnable
 	public final void run()
 	{
 		m_startTime = System.currentTimeMillis() / 1000;
+		boolean prerequisites = true;
 		if (!prerequisitesFulilled(m_parameters))
 		{
 			// Before running, generate the prerequisites
 			setStatus(Status.PREREQUISITES);
-			fulfillPrerequisites(m_parameters);
+			prerequisites = fulfillPrerequisites(m_parameters);
 		}
-		setStatus(Status.RUNNING);
-		runTest(m_parameters, m_results);
+		if (prerequisites)
+		{
+			setStatus(Status.RUNNING);
+			runTest(m_parameters, m_results);
+		}
+		else
+		{
+			setFailureMessage("Test cancelled while generating prerequisites");
+			setStatus(Status.FAILED);
+		}
 	}
 
 	/**

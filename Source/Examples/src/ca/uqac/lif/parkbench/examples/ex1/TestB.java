@@ -52,7 +52,7 @@ public class TestB extends Test
 	}
 	
 	@Override
-	public void fulfillPrerequisites(final Parameters params)
+	public boolean fulfillPrerequisites(final Parameters params)
 	{
 		// Get the value of test parameters "k" and "n"
 		Number n = params.getNumber("n");
@@ -66,8 +66,9 @@ public class TestB extends Test
 		{
 			// This happens if the user cancels the test manually
 			stopWithStatus(Status.FAILED);
-			return;
+			return false;
 		}
+		return true;
 	}
 
 	@Override

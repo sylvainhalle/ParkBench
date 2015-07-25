@@ -25,96 +25,47 @@ import java.util.Vector;
 
 import ca.uqac.lif.util.FileReadWrite;
 
-public class CommandRunner
+public class CommandRunner extends Thread
 {
+	protected String[] m_command;
+	
+	protected String m_stdin;
+	
+	protected volatile boolean m_stop = false; 
+	
+	protected StreamGobbler m_stdoutGobbler;
+	
+	protected StreamGobbler m_stderrGobbler;
+	
+	protected int m_errorCode = 0;
+	
 	/**
-	 * Runs a command and returns the contents of stdout as a String
-	 * @param command The command to run
-	 * @return The contents of stdout sent by the command
-	 * @throws IOException
-	 */
-	public static String runCommandString(String[] command) throws IOException
-	{
-		return runCommandString(command, null);
-	}
-
-	/**
-	 * Runs a command and returns the contents of stdout as an array of bytes
-	 * @param command The command to run
-	 * @return The contents of stdout sent by the command
-	 * @throws IOException
-	 */
-	public static byte[] runCommandBytes(String[] command) throws IOException
-	{
-		return runCommandBytes(command, null);
-	}
-
-	/**
-	 * Runs a command and returns the contents of stdout as a String
+	 * Creates a CommandRunner to run a command.
 	 * @param command The command to run
 	 * @param stdin If not set to null, this string will be sent to the stdin
 	 *   of the command being run
-	 * @return The contents of stdout sent by the command
-	 * @throws IOException
 	 */
-	public static String runCommandString(String[] command, String stdin) throws IOException
+	public CommandRunner(String[] command, String stdin)
 	{
-		byte[] bytes = runCommandBytes(command, stdin);
-		String out = new String(bytes);
-		return out;
+		super();
+		m_command = command;
+		m_stdin = stdin;
 	}
-
+	
 	/**
-	 * Runs a command and returns the contents of stdout as an array of bytes
+	 * Creates a CommandRunner to run a command.
 	 * @param command The command to run
-	 * @param stdin If not set to null, this string will be sent to the stdin
-	 *   of the command being run
-	 * @return The contents of stdout sent by the command
-	 * @throws IOException
 	 */
-	public static byte[] runCommandBytes(String[] command, String stdin) throws IOException
+	public CommandRunner(String[] command)
 	{
-		ProcessBuilder builder = new ProcessBuilder(command);
-		Process process = builder.start();
-		StreamGobbler error_gobbler = new StreamGobbler(process.getErrorStream(), "ERR");
-		StreamGobbler output_gobbler = new StreamGobbler(process.getInputStream(), "IN");
-		// Send data into stdin of process
-		if (stdin != null)
-		{
-			OutputStream process_stdin = process.getOutputStream();
-			byte[] stdin_bytes = stdin.getBytes();
-			//System.out.println("Writing " + stdin_bytes.length + " bytes");
-			process_stdin.write(stdin_bytes, 0, stdin_bytes.length);
-			process_stdin.flush();
-			//System.out.println("Flushed");
-			process_stdin.close();
-		}
-		// Start gobblers
-		error_gobbler.start();
-		output_gobbler.start();
-		try 
-		{
-			@SuppressWarnings("unused")
-			int errCode = process.waitFor(); // We might do something with this value one day
-		}
-		catch (InterruptedException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		do
-		{
-			// Wait for both gobblers to finish
-		} while (error_gobbler.isAlive() || output_gobbler.isAlive());
-		//System.err.println(new String(error_gobbler.getBytes()));
-		return output_gobbler.getBytes();
+		this(command, null);
 	}
 
 	/**
 	 * Constantly reads an input stream and captures its content.
 	 * Inspired from <a href="http://stackoverflow.com/questions/14165517/processbuilder-forwarding-stdout-and-stderr-of-started-processes-without-blocki">Stack Overflow</a>
 	 */
-	protected static class StreamGobbler extends Thread
+	protected class StreamGobbler extends Thread
 	{
 		InputStream m_is;
 		Vector<Byte> m_contents;
@@ -135,7 +86,7 @@ public class CommandRunner
 			{
 				byte[] buffer = new byte[8192];
 				int len = -1;
-				while ((len = m_is.read(buffer)) > 0)
+				while (!m_stop && (len = m_is.read(buffer)) > 0)
 				{
 					synchronized (this)
 					{
@@ -225,9 +176,95 @@ public class CommandRunner
 		//String[] command = {"C:/Program Files/gnuplot/binary/gnuplot.exe"};
 		String[] command = {"gnuplot"};
 		String gpfile = FileReadWrite.readFile("/home/sylvain/test.gp");
-		//String gpfile = FileReadWrite.readFile("D:/Workspaces/ParkBench/test.gp");
-		byte[] out = CommandRunner.runCommandBytes(command, gpfile);
+		CommandRunner runner = new CommandRunner(command, gpfile);
+		runner.start();
+		// Wait until the command is done
+		while (runner.isAlive())
+		{
+			// Wait 0.1 s and check again
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e) 
+			{
+				// This happens if the user cancels the command manually
+				runner.stopCommand();
+				runner.interrupt();
+				System.err.println("Interrupted");
+				return;
+			}
+		}
+		byte[] out = runner.getBytes();
 		System.out.println(out.length);
+	}
+
+	@Override
+	public void run()
+	{
+		ProcessBuilder builder = new ProcessBuilder(m_command);
+		Process process = null;
+		try 
+		{
+			process = builder.start();
+			m_stderrGobbler = new StreamGobbler(process.getErrorStream(), "ERR");
+			m_stdoutGobbler = new StreamGobbler(process.getInputStream(), "IN");
+			// Send data into stdin of process
+			if (m_stdin != null)
+			{
+				OutputStream process_stdin = process.getOutputStream();
+				byte[] stdin_bytes = m_stdin.getBytes();
+				process_stdin.write(stdin_bytes, 0, stdin_bytes.length);
+				process_stdin.flush();
+				process_stdin.close();
+				//System.out.println("Writing " + stdin_bytes.length + " bytes");
+			}
+			// Start gobblers
+			m_stderrGobbler.start();
+			m_stdoutGobbler.start();
+			m_errorCode = process.waitFor();
+			do
+			{
+				// Wait for both gobblers to finish
+			} while (!m_stop && (m_stderrGobbler.isAlive() || m_stdoutGobbler.isAlive()));
+		} 
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (InterruptedException e) 
+		{
+			// Destroy the running command
+			if (process != null)
+			{
+				process.destroy();
+			}
+		}
+		//System.err.println(new String(error_gobbler.getBytes()));
+	}
+	
+	/**
+	 * Gets the contents of stdout sent by the command as an array of bytes
+	 * @return The contents of stdout
+	 */
+	synchronized public byte[] getBytes()
+	{
+		return m_stdoutGobbler.getBytes();
+	}
+	
+	/**
+	 * Gets the contents of stdout sent by the command as a string
+	 * @return The contents of stdout
+	 */
+	synchronized public String getString()
+	{
+		byte[] out = m_stdoutGobbler.getBytes();
+		return new String(out);
+	}
+	
+	synchronized public void stopCommand()
+	{
+		m_stop = true;
 	}
 
 }

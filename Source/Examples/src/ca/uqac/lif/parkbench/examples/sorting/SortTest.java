@@ -39,7 +39,7 @@ public abstract class SortTest extends Test
 	}
 	
 	@Override
-	public final void fulfillPrerequisites(Parameters input)
+	public final boolean fulfillPrerequisites(Parameters input)
 	{
 		// Generates a random list of integers of given size, and saves it
 		// to a file
@@ -63,9 +63,9 @@ public abstract class SortTest extends Test
 		}
 		catch (IOException e) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 	
 	protected final String sortFilename(Parameters input)

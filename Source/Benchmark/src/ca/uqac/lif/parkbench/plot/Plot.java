@@ -17,7 +17,6 @@
  */
 package ca.uqac.lif.parkbench.plot;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,33 +31,38 @@ public abstract class Plot
 	 * The terminal used for the plot's output
 	 */
 	public static enum Terminal {PDF, PNG, GIF, SVG, JPEG};
-	
+
 	/**
 	 * The default terminal to use if none is specified
 	 */
 	public static final Terminal DEFAULT_TERMINAL = Terminal.PNG;
-	
+
 	/**
 	 * The set of tests associated to that plot
 	 */
 	protected Set<Test> m_tests;
-	
+
 	/**
 	 * The path to launch GnuPlot
 	 */
 	protected static String s_path = new GnuPlotCommand().grab();
-	
+
 	/**
 	 * The plot's title
 	 */
 	protected String m_title;
-	
+
 	/**
 	 * The plot's name. This is different from the plot's <em>title</em>, which
 	 * is displayed in the graph
 	 */
 	protected String m_name;
-	
+
+	/**
+	 * The time to wait before polling GnuPlot's result 
+	 */
+	protected static long s_waitInterval = 100;
+
 	/**
 	 * Creates an empty plot
 	 * @param title The plot's title
@@ -70,7 +74,7 @@ public abstract class Plot
 		m_tests = new HashSet<Test>();
 		m_name = "";
 	}
-	
+
 	/**
 	 * Sets the plot's name
 	 * @param name The name
@@ -81,7 +85,7 @@ public abstract class Plot
 		m_name = name;
 		return this;
 	}
-	
+
 	/**
 	 * Gets the plot's name.
 	 * @return The name. If the name is empty, will return the plot's title.
@@ -94,7 +98,7 @@ public abstract class Plot
 		}
 		return m_name;
 	}
-	
+
 	/**
 	 * Adds a test to the plot
 	 * @param t The test to add
@@ -103,7 +107,7 @@ public abstract class Plot
 	{
 		m_tests.add(t);
 	}
-	
+
 	/**
 	 * Adds a collection of tests to the plot
 	 * @param tests The tests
@@ -112,7 +116,7 @@ public abstract class Plot
 	{
 		m_tests.addAll(tests);
 	}
-	
+
 	/**
 	 * Add all tests from a benchmark to the plot
 	 * @param b The benchmark
@@ -121,7 +125,7 @@ public abstract class Plot
 	{
 		addTests(b.getTests());
 	}
-	
+
 	/**
 	 * Creates a GnuPlot file from the plot's data
 	 * @return A character string representing the GnuPlot file to
@@ -139,7 +143,7 @@ public abstract class Plot
 	 *   generate this plot
 	 */
 	public abstract String toGnuPlot(Terminal term);
-	
+
 	/**
 	 * Sets the path to run the GnuPlot executable
 	 * @param path The path
@@ -150,12 +154,12 @@ public abstract class Plot
 		s_path = path;
 		return this;
 	}
-	
+
 	public final byte[] getImage()
 	{
 		return getImage(DEFAULT_TERMINAL);
 	}
-	
+
 	/**
 	 * Runs GnuPlot on a file and returns the resulting graph
 	 * @return The (binary) contents of the image produced by Gnuplot
@@ -165,18 +169,28 @@ public abstract class Plot
 		String instructions = toGnuPlot(term);
 		byte[] image = null;
 		String[] command = {s_path};
-		try 
+		CommandRunner runner = new CommandRunner(command, instructions);
+		runner.start();
+		// Wait until the command is done
+		while (runner.isAlive())
 		{
-			image = CommandRunner.runCommandBytes(command, instructions);
+			// Wait 0.1 s and check again
+			try
+			{
+				Thread.sleep(s_waitInterval);
+			}
+			catch (InterruptedException e) 
+			{
+				// This happens if the user cancels the command manually
+				runner.stopCommand();
+				runner.interrupt();
+				return null;
+			}
 		}
-		catch (IOException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		image = runner.getBytes();
 		return image;
 	}
-	
+
 	/**
 	 * Clears the plot
 	 * @return
@@ -186,7 +200,7 @@ public abstract class Plot
 		m_tests.clear();
 		return this;
 	}
-	
+
 	/**
 	 * Returns the terminal string associated to this plot 
 	 * @param term The terminal
@@ -217,7 +231,7 @@ public abstract class Plot
 		}
 		return out;
 	}
-	
+
 	public static Terminal stringToTerminal(String s)
 	{
 		s = s.trim();
