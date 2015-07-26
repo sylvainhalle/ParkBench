@@ -46,6 +46,11 @@ public class Cli
 	public static final int ERR_RUNTIME = 6;
 	
 	/**
+	 * Version string
+	 */
+	protected static String s_versionString = "0.1";
+	
+	/**
 	 * Default server name
 	 */
 	protected String m_defaultServerName = "localhost";
@@ -369,7 +374,7 @@ public class Cli
 
 	private static void showHeader(PrintStream out)
 	{
-		out.println("ParkBench, a versatile benchmark environment");
+		out.println("ParkBench " + s_versionString + ", a versatile benchmark environment");
 	}
 	
 	protected void println(PrintStream out, String message, int verbosity_level)

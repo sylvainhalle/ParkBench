@@ -62,13 +62,13 @@ public class GetPlot extends BenchmarkCallback
 		else
 		{
 			// Produce image
+			response.setContentType(terminalToContentType(terminal));
 			if (params.containsKey("download") && params.get("download").compareToIgnoreCase("true") == 0)
 			{
 				String filename = Server.urlEncode(plot.getName()) + "." + terminal;
 				response.setAttachment(filename);
 			}
 			byte[] image = plot.getImage(Plot.stringToTerminal(terminal));
-			response.setContentType(terminalToContentType(terminal));
 			response.setContents(image);
 		}			
 		return response;

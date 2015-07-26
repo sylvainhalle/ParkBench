@@ -21,6 +21,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import ca.uqac.lif.parkbench.Test.Status;
+
 /**
  * Manages the execution of tests using multiple threads.
  * The dispatcher works as follows.
@@ -194,6 +196,9 @@ public class ThreadDispatcher implements Runnable
 			{
 				// This is the test we look for: remove it from the
 				// queue and leave
+				// Since the test was not started, we put it back into the
+				// NOT_DONE state (rather than FAILED)
+				t.stopWithStatus(Status.NOT_DONE);
 				t_it.remove();
 				return true;
 			}
