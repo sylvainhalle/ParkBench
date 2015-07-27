@@ -37,7 +37,7 @@ public class CallbackResponse
   /**
    * The content type of the response
    */
-  public static enum ContentType {JSON, TEXT, XML, PNG, JS, HTML, JPEG};
+  public static enum ContentType {JSON, TEXT, XML, PNG, JS, HTML, JPEG, PDF};
   
   /**
    * The HTTP exchange containing the response headers
@@ -240,6 +240,9 @@ public class CallbackResponse
   		break;
   	case JS:
   		out = "application/javascript";
+  		break;
+  	case PDF:
+  		out = "application/pdf";
   		break;
   	}
   	return out;

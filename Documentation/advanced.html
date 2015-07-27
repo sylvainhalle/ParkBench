@@ -148,6 +148,17 @@ href="http://www.vogella.com/tutorials/JavaRegularExpressions/article.html">tuto
 on regular expressions</a>, but the point is to show how you can use whatever
 code you wish to break the program's output and make test results out of it.</p>
 
+<p>Advantages of extending the <code>CommandTest</code> class over running
+the commands by yourself are multiple:</p>
+
+<ul>
+<li>ParkBench takes care of starting that command in its own thread, which can
+be stopped at any time using the GUI</li>
+<li>ParkBench also takes care of watching when the command is finished,
+gathering its output in a String object and calling <code>readOutput</code> only
+when all this is over</li>
+</ul>
+
 <a name="prerequisites"></a><h2>Test prerequisites</h2>
 
 <p>Sometimes your test will require the presence of other artifacts (external

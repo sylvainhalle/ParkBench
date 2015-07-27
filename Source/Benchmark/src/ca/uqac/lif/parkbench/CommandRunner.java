@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Vector;
 
 import ca.uqac.lif.util.FileReadWrite;
@@ -38,6 +39,24 @@ public class CommandRunner extends Thread
 	protected StreamGobbler m_stderrGobbler;
 	
 	protected int m_errorCode = 0;
+
+	/**
+	 * Creates a CommandRunner to run a command.
+	 * @param command The command to run
+	 * @param stdin If not set to null, this string will be sent to the stdin
+	 *   of the command being run
+	 */
+	public CommandRunner(List<String> command, String stdin)
+	{
+		super();
+		m_command = new String[command.size()];
+		int i = 0;
+		for (String part : command)
+		{
+			m_command[i++] = part;
+		}
+		m_stdin = stdin;
+	}
 	
 	/**
 	 * Creates a CommandRunner to run a command.

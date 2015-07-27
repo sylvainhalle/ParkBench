@@ -15,25 +15,31 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.uqac.lif.parkbench;
+package ca.uqac.lif.parkbench.plot;
 
-import ca.uqac.lif.httpserver.InnerFileServer;
+import ca.uqac.lif.parkbench.ObjectGrabber;
+import ca.uqac.lif.parkbench.OperatingSystem;
 
-public class BenchmarkServer extends InnerFileServer
+/**
+ * Returns the command to call GnuPlot, depending on the host OS
+ */
+public class PdftkCommand extends ObjectGrabber<String>
 {
-	public BenchmarkServer(String server_name, int port, Benchmark b)
+	@Override
+	public String grab()
 	{
-		super(BenchmarkServer.class);
-		setServerName(server_name);
-		setServerPort(port);
-		registerCallback(0, new BenchmarkStatus(b));
-		registerCallback(0, new SystemInfo(b));
-		registerCallback(0, new RunTest(b));
-		registerCallback(0, new StopTest(b));
-		registerCallback(0, new ResetTest(b));
-		registerCallback(0, new GetPlot(b));
-		registerCallback(0, new GetPlots(b));
-		registerCallback(0, new SaveBenchmark(b));
-		registerCallback(0, new FilterTests(b));
+		String out = "";
+		OperatingSystem.Type type = OperatingSystem.getType();
+		switch (type)
+		{
+		case WINDOWS:
+			out = "C:/Program Files/PDFtk/bin/pdftk.exe";
+			break;
+		default:
+			out = "pdftk";
+			break;
+		}
+		return out;
 	}
+
 }

@@ -1,4 +1,3 @@
-
 /*
     ParkBench, a versatile benchmark environment
     Copyright (C) 2015 Sylvain Hallé

@@ -548,11 +548,27 @@ public class Benchmark
 		return out;
 	}
 
+	/**
+	 * Adds a plot to the benchmark. Note that this does not associate
+	 * any test to the plot; you have to do it by yourself using
+	 * {@link Plot#addTest(Test)} or {@link Plot#addTests(Collection)}.
+	 * @param plot The plot to add
+	 * @return This benchmark
+	 */
 	public Benchmark addPlot(Plot plot)
 	{
 		//plot.addTests(this);
 		m_plots.put(s_plotCounter++, plot);
 		return this;
+	}
+	
+	/**
+	 * Retrieves all the plots from the benchmark
+	 * @return The plots
+	 */
+	public Collection<Plot> getAllPlots()
+	{
+		return m_plots.values();
 	}
 
 	public Plot getPlot(int plot_id)
