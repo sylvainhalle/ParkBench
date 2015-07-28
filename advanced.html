@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+<link rel="stylesheet" type="text/css" href="screen.css" />
+<link rel="stylesheet" href="styles/default.css">
+<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+<script src="highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<title>ParkBench: Advanced Features</title>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/sylvainhalle/ParkBench">View on GitHub</a>
+
+          <h1 id="project_title">ParkBench: Advanced Features</h1>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/sylvainhalle/ParkBench/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/sylvainhalle/ParkBench/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+
+<p>First, did you read the <a href="instructions.html">10-minute introduction
+to ParkBench</a>?</p>
+
+<h2>Quick Links</h2>
+
+<ul id="quick-links">
+<li><a href="#external">Calling external commands</a></li>
+<li><a href="#prerequisites">Test prerequisites</a></li>
+<li><a href="#resuming">Resuming an interrupted test suite</a></li>
+<li><a href="#plots">Creating plots</a></li>
+</ul>
+
+<a name="test"></a><h2>Calling external commands</h2>
+
+<p>So far, we assumed that the execution of a test occurs in the
+<code>runTest()</code> method of your test class. Of course, you can write Java
+test code outside of that method (using any classes and packages you like), and
+call it from within <code>runTest()</code> --this is Java after all. But what if
+some of your test code is not in Java? ParkBench provides some helper classes
+and objects that allow you to run commands at the command line, as well as read
+and parse their output. Therefore, you can also use external programs in a
+ParkBench test suite.</p>
+
+<p>A simple way of doing so is to create a test that inherits from the
+<code>CommandTest</code> class. An empty test looks as follows:</p>
+
+<pre><code>import ca.uqac.lif.parkbench.*;
+
+class ProcedureB extends CommandTest {
+
+  public ProcedureB() {
+    super("Procedure B");
+  }
+  
+  public Test newTest() {
+    return new ProcedureB();
+  }
+  
+  public void createCommand(Parameters input, List&lt;String&gt; command) {
+  }
+  
+  public void readOutput(String output, Parameters results) {
+  }
+}
+</code>
+</pre>
+
+<p>The first part of the file is the same boilerplate code as in a regular
+test. In this case, the work happens in the <code>createCommand()</code> and
+<code>readOutput()</code> methods.</p>
+
+<h3>Generating the command to run</h3>
+
+<p>The method <code>createCommand()</code> is responsible for creating the
+command-line string that will be called. Since that external call will
+probably depend on the test's concrete parameters, these parameters are
+passed as the argument <code>input</code>; you can read from them as usual.
+The resulting command line is written into the <code>command</code> argument;
+it is a list of <code>String</code>s, each of which is a part of the
+command to run.</p>
+
+<p>Suppose for example that Procedure B takes two numerical parameters, <i>x</i>
+and <i>y</i>, and requires to call the external program
+<code>myprogram</code>. Suppose also that the value of <i>x</i> must be passed
+as is to <code>myprogram</code>, while the value of <i>y</i> must be passed
+as the <tt>-a</tt> command-line switch. Method <code>createCommand()</code>
+could look like this:</p>
+
+<pre>
+<code>  public void createCommand(Parameters input, List&lt;String&gt; command) {
+    int x = input.getNumber("x").intValue();
+    int y = input.getNumber("y").intValue();
+    command.add("myprogram").add(x).add("-a " + y);
+  }
+</code>
+</pre>
+
+<p>The first two lines extract the values of <i>x</i>
+and <i>y</i> as before. The last line creates the command line string.
+It first adds <code>myprogram</code>, followed by the first argument (the
+value of <i>x</i>), followed by the second (the value of <i>y</i> passed as
+the command-line argument <code>-a</code>). If <i>x</i>=2 and <i>y</i>=3,
+this would result in the following command-line string:</p>
+
+<pre><code>myprogram 2 -a 3
+</code></pre>
+
+<h3>Processing the output</h3>
+
+<p>The second part is to do something with the output of the program. To this
+end, method <code>readOutput()</code> is called once the command has run. It
+contains in argument <code>output</code> the <code>String</code> of what the
+command sent to the standard output (if that output contained multiple lines, 
+these lines are present in the string). After processing that string
+content, you should, as usual, put whatever results of your tests into the
+<code>results</code> parameter map.</p>
+
+<p>Suppose that <code>mycommand</code> prints to the standrd output a single
+number, which we will use as the output <i>z</i>. We need to write the following
+code:</p>
+
+<pre><code>  public void readOutput(String output, Parameters results) {
+    int result = Integer.parseInt(output);
+    results.put("z", result);
+  }
+</code>
+</pre>
+
+<p>That's it. If you have already read the <a href="instructions.html">10-minute
+tutorial</a>, you can add instances of <code>ProcedureB</code> to the same test
+suite we created earlier.</p>
+
+<p>Of course, it seldom happens that the program's output contains directly the
+value we are looking for; more often than not, we need to extract that value
+from a more complicated output. For example, <code>mycommand</code> could
+output something like this:</p>
+
+<pre><code>The output value of this program is 3. Good bye!
+</code></pre>
+
+<p>In such a case, you can use Java's standard regular expression matching to
+parse such a string. Method <code>readOutput()</code> could look like:</p>
+
+<pre><code>  public void readOutput(String output, Parameters results) {
+    Pattern p = Pattern.compile("The output value of this program is (\\d+)");
+    Matcher m = p.matcher(output);
+    if (m.find()) {
+      results.put("z", Integer.parseInt(m.group(1)));
+    }
+  }
+</code></pre>
+
+<p>This document is by no means a <a                              
+href="http://www.vogella.com/tutorials/JavaRegularExpressions/article.html">tutorial
+on regular expressions</a>, but the point is to show how you can use whatever
+code you wish to break the program's output and make test results out of it.</p>
+
+<p>Advantages of extending the <code>CommandTest</code> class over running
+the commands by yourself are multiple:</p>
+
+<ul>
+<li>ParkBench takes care of starting that command in its own thread, which can
+be stopped at any time using the GUI</li>
+<li>ParkBench also takes care of watching when the command is finished,
+gathering its output in a String object and calling <code>readOutput</code> only
+when all this is over</li>
+</ul>
+
+<a name="prerequisites"></a><h2>Test prerequisites</h2>
+
+<p>Sometimes your test will require the presence of other artifacts (external
+files, connection to a database, etc.) before it can run; these are called
+<em>prerequisites</em>. You can write code
+taking care of that directly in the tests's <code>runTest()</code> method, but
+this method is not available to you in the case of <code>CommandTest</code>s and
+some other test classes. A cleaner way of doing so is to use two methods defined
+for every <code>Test</code>: <code>prerequisitesFulfilled()</code> and
+<code>fulfillPrerequisites()</code>.</p>
+
+<p>Let us create a new test class, <code>ProcedureC</code>, with the same
+input parameters <i>x</i> and <i>y</i> as for the other tests. We don't care about
+what it does; however suppose that procedure C, in order to run, requires that
+the values of <i>x</i> and <i>y</i> be in a text file, separated by a comma.</p>
+
+<h3>Check for prerequisites</h3>
+
+<p>Method <code>prerequisitesFulfilled()</code>, as its name implies, is there
+to check whether the test's prerequisites are fulfilled. In the case of
+<code>ProcedureC</code>, this means checking that the input file corresponding
+to that test exists in the file system. Suppose that every test instance has
+its own input file, which we name <code>testC-x-y.csv</code> (you can use
+whatever naming convention you wish). Then checking that the test's prerequisite
+is fulfilled can be written as:</p>
+
+<pre><code>  public boolean prerequisitesFulfilled(Parameters input) {
+    int x = input.getNumber("x").intValue();
+    int y = input.getNumber("y").intValue();
+    String filename = "testC-" + x + "-" + y + ".csv";
+    return CommandRunner.fileExists(filename);
+  }
+</code></pre>
+
+<p>Lines 1-3 build the filename from the test's input parameters. Line 4
+calls <code>fileExists()</code>, a helper method of class
+<code>CommandRunner</code> which checks the existence of the file. (You can
+use whatever other means you wish to check for that, but ParkBench provides a
+bunch of helper methods for the most common tasks.) If the file exists,
+<code>fileExists()</code> returns <code>true</code>, and the test's
+prerequisites are fulfilled. Otherwise the method returns false.</p>
+
+<p>The effects of such a method have an impact in ParkBench's web interface.
+When a test has prerequisites that are not fulfilled, its status square is
+different (<span class="status-icon status-not-ready"><span>Not ready</span></span>)
+than when it does not have prerequisites or these prerequisites are already
+fulfilled (<span class="status-icon status-ready"><span>Ready</span></span>).</p>
+
+<h3>Generate prerequisites</h3>
+
+<p>The second step is to take care of generating the test's prerequisites. This
+is the task of method <code>fulfillPrerequisites()</code>. As we have already
+said, for <code>ProcedureC</code> this amounts to generating a text file with
+values of <i>x</i> and <i>y</i> separated by a comma. Implementing this is
+straightforward:</p>
+
+<pre><code>  public boolean prerequisitesFulfilled(Parameters input) {
+    int x = input.getNumber("x").intValue();
+    int y = input.getNumber("y").intValue();
+    String filename = "testC-" + x + "-" + y + ".csv";
+    String file_contents = x + "," + y;
+    FileReadWrite.writeToFile(filename, file_contents);
+  }
+</code></pre>
+
+<p>The last two lines generate the file's contents, and write them into the
+proper filename. Here, <code>FileReadWrite</code> is another convenience class
+that allows you to easily write character strings into a file.</p>
+
+<p>Note here that the part of code generating the filename from input parameters
+is repeated in both <code>prerequisitesFulfilled()</code> and
+<code>fulfillPrerequisites()</code>. A cleaner implementation would refactor
+that functionality into a separate method (say <code>getFilename()</code>),
+which would be called by both prerequisite methods. From here on, you are free to
+implement the inner workings of the test as you would do for any other piece of
+code --good coding practices still apply.</p>
+
+<p>This, again, can be seen in the web interface. When a test is generating its
+prerequisites (which still count into the test's global running time), its
+status square (<span class="status-icon status-prerequisites"><span>Prerequisites</span></span>)
+is different than when the test itself is running (<span class="status-icon status-running"><span>Running</span></span>).
+ParkBench is wise, however: if a test declares that its prerequisites are already
+fulfilled, it will not call its <code>fulfillPrerequisites()</code> method
+another time before running it.</p>
+
+<h3>Calling other commands</h3>
+
+<p>Generating prerequisites can be done directly as Java code (as for running
+the test itself), or can use external commands. ParkBench provides the
+<code>CommandRunner</code> class to help you launch external programs,
+receive their output, as well as manipulate filenames (change their extension,
+get the base name, etc.). As usual, if these functions do not fit your needs,
+you are free to write whatever Java code you like.</p>
+
+<a name="resuming"></a><h2>Resuming an interrupted test suite</h2>
+
+<p>We said in the first part of this tutorial that ParkBench was resistant to
+crashes and interruptions by regularly saving the state of every test in a JSON
+file. This makes sure that whatever test results that were already computed are
+not lost, but what happens of the tests that were not executed?</p>
+
+<p>It is possible to use the JSON file to reload a test suite and put it back
+into the same state as it was when that file was saved. This means that
+ParkBench will recreate the same test instances with the same input parameters,
+and that any tests that were already completed will be marked as such (complete
+with all their output values). From that point on, is it possible to start any
+test in the suite, whose results will be added to the existing results when it
+completes. Hence it is possible to load an "empty" test suite, run a few tests,
+save the suite to a file, reload that file at a later time to run a few more
+tests, save the file again, etc.</p>
+
+<p>To load a test suite with a JSON file, one simply needs to pass the filename
+as a command-line parameter to the test suite; for example:</p>
+
+<pre><code>java -jar MyTestSuite.jar --interactive Untitled.json
+</code></pre>
+
+<p>Note that it does not matter if the <code>TestSuite</code> object and the
+JSON file define tests with different parameters, as long as they contain tests
+of the same classes. ParkBench will overwrite whatever tests instances the
+<code>TestSuite</code> contains with those defined in the file.</p>
+
+<a name="plots"></a><h2>Creating plots</h2>
+
+<p>ParkBench can also auto-create (and auto-update) plots created from test
+results. For example, you may want to create a two-dimensional, x-y plot where
+each dot represents a value of the <i>x</i> input parameter and a value of the
+<i>z</i> input parameter. The simplest way to do so is to add the following
+lines at the end of the <code>setup()</code> method of your test suite:</p>
+
+<pre><code>  Plot plot = new ScatterPlot("The plot's title")
+    .withLines()
+    .setParameterX("x").setCaptionX("Value of x")
+    .setParameterY("z").setCaptionY("Value of z");
+    b.addPlotToAll(plot);
+  }
+</code></pre>
+
+<p>Methods <code>setParameterX()</code> and <code>setParameterY()</code> tell
+the plot what values in each test to pick for the <i>x</i> and <i>y</i>
+coordinates (in this case, we use x and z). Methods <code>setCaptionX()</code>
+and <code>setCaptionY()</code> provide the caption for the x and y axis in the
+plot (they are optional).</p>
+
+<p>Restart your test suite in interactive mode and re-run the tests. This time,
+in the graphical interface, you can select the "Plots" sub-menu at the top of
+the page, which will lead you to a display of all plots associated with your
+test suite. You will also notice that the plots auto-update periodically (every
+few seconds), so that you can see the trends in the results as the data from
+the tests progressively comes in. Buttons for each plot also allow you to
+manually refresh a graph, download the graph locally in PDF format, and download
+a stand-alone <a href="http://gnuplot.info">GnuPlot</a> file that generates that
+graph. (As a matter of fact, ParkBench uses GnuPlot in the background to
+produce the images.)</p>
+
+<p>As the plot above is two-dimensional, ParkBench will create one data series
+with every combination of test parameters that remains. For example, in our
+case, <code>ProcedureA</code> has <em>two</em> input parameters: <i>x</i> and
+<i>y</i>. Parameter <i>x</i> is used for the x-axis, but parameter <i>y</i> is
+not used. Therefore, ParkBench will treat all tests with <i>y</i>=1 as one data
+series, using the values of <i>x</i> and <i>z</i> to plot a line of a given
+colour. Similarly, all tests with <i>y</i>=2 will be another data series, which
+ParkBench will plot as another line of a different colour, etc. Moreover, the
+name of the test also counts as a parameter, so tests of
+<code>ProcedureA</code> with <i>y</i>=0 will be in a different data series as
+the tests of <code>ProcedureB</code> with <i>y</i>=0.</p>
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">ParkBench maintained by <a href="https://github.com/sylvainhalle">sylvainhalle</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+</body>
+</html>
