@@ -15,11 +15,42 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+
+import ca.uqac.lif.parkbench.Test;
+
 /**
- * 
+ * Shell sort algorithm, as found here:
+ * http://stackoverflow.com/a/17543917
  */
-/**
- * @author Sylvain
- *
- */
-package ca.uqac.lif.parkbench.examples.sorting;
+public class ShellSortTest extends SortTest
+{
+	public ShellSortTest()
+	{
+		super("Shell Sort");
+	}
+
+	@Override
+	public Test newTest()
+	{
+		return new ShellSortTest();
+	}
+
+	@Override
+	public void sort(int[] array)
+	{
+		int j;
+		for( int gap = array.length / 2; gap > 0; gap /= 2 )
+		{
+			for( int i = gap; i < array.length; i++ )
+			{
+				int tmp = array[ i ];
+				for( j = i; j >= gap && tmp < array[ j - gap ]; j -= gap )
+				{
+					array[ j ] = array[ j - gap ];
+				}
+				array[ j ] = tmp;
+			}
+		}
+	}
+}

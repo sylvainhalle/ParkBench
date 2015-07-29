@@ -15,37 +15,47 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.uqac.lif.parkbench.examples.ex1;
+
 
 import ca.uqac.lif.parkbench.Benchmark;
 import ca.uqac.lif.parkbench.Test;
 import ca.uqac.lif.parkbench.TestSuite;
+import ca.uqac.lif.parkbench.plot.PlanarPlot;
+import ca.uqac.lif.parkbench.plot.ScatterPlot;
 
-public class Main extends TestSuite
+public class MyTestSuite extends TestSuite
 {
 	public static void main(String[] args)
 	{
-		initialize(args, new Main());
+		initialize(args, new MyTestSuite());
 	}
-	
+
 	public void setup(Benchmark b)
 	{
+		// Give a name to the benchmark
+		b.setName("Sorting Algorithms");
+
+		// Initialize tests
 		Test[] tests_to_create = {
-				new TestA(),
-				new TestB()
+				new QuickSortTest(),
+				new ShellSortTest(),
+				new BubbleSortTest(),
+				new GnomeSortTest()
 		};
-		for (int k = 1; k < 3; k++)
+		for (int length = 5000; length <= 40000; length += 5000)
 		{
-			for (int n = 1; n < 4; n++)
+			for (Test t : tests_to_create)
 			{
-				for (Test t : tests_to_create)
-				{
-					Test new_t = t.newTest();
-					new_t.setParameter("n", n);
-					new_t.setParameter("k", k);
-					b.addTest(new_t);
-				}
+				b.addTest(t.newTest().setParameter("size", length));
 			}
 		}
+
+		// Add a plot
+		PlanarPlot plot = new ScatterPlot("Sorting time")
+			.withLines()
+			.setParameterX("size", "List size")
+			.setParameterY("time", "Time (ms)")
+			.setLogscaleY();
+		b.addPlot(plot);		
 	}
 }

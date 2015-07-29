@@ -392,5 +392,12 @@ public class Cli
 			out.print(message);
 		}
 	}
+	
+	public static void main(String[] args)
+	{
+		Cli cli = new Cli(args);
+		showHeader(System.out);
+		cli.println(System.out, "You are running parkbench.jar, which is only a library to create\nyour own test suites. As a result nothing will happen here. Read the \nonline documentation to learn how to use ParkBench.", 1000);
+	}
 
 }

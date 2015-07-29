@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.uqac.lif.parkbench.examples.sorting;
+
 
 import java.io.IOException;
 import java.util.Random;
@@ -27,6 +27,11 @@ import ca.uqac.lif.util.FileReadWrite;
 
 public abstract class SortTest extends Test
 {
+	/**
+	 * The folder where the generated data will be put
+	 */
+	protected static final String s_dataDir = "data/";
+	
 	public SortTest(String name)
 	{
 		super(name);
@@ -35,7 +40,17 @@ public abstract class SortTest extends Test
 	@Override
 	public final boolean prerequisitesFulilled(final Parameters input)
 	{
-		return CommandRunner.fileExists(sortFilename(input));
+		return CommandRunner.fileExists(getDataFilename(input));
+	}
+	
+	@Override
+	public final void clean(final Parameters input)
+	{
+		String filename = getDataFilename(input);
+		if (CommandRunner.fileExists(filename))
+		{
+			CommandRunner.deleteFile(filename);
+		}
 	}
 	
 	@Override
@@ -44,7 +59,7 @@ public abstract class SortTest extends Test
 		// Generates a random list of integers of given size, and saves it
 		// to a file
 		Random random = new Random();
-		String filename = sortFilename(input);
+		String filename = getDataFilename(input);
 		StringBuilder out = new StringBuilder();
 		int size = input.getNumber("size").intValue();
 		int range = 2 * size;
@@ -68,10 +83,10 @@ public abstract class SortTest extends Test
 		return true;
 	}
 	
-	protected final String sortFilename(Parameters input)
+	protected final String getDataFilename(Parameters input)
 	{
 		int size = input.getNumber("size").intValue();
-		return "list-" + size + ".txt";
+		return s_dataDir + "list-" + size + ".txt";
 	}
 	
 	@Override
@@ -94,7 +109,7 @@ public abstract class SortTest extends Test
 	{
 		int size = input.getNumber("size").intValue();
 		int[] array = new int[size];
-		String filename = sortFilename(input);
+		String filename = getDataFilename(input);
 		try
 		{
 			String contents = FileReadWrite.readFile(filename);

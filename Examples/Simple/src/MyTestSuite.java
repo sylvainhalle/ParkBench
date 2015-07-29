@@ -15,36 +15,36 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.uqac.lif.parkbench.examples.sorting;
 
+import ca.uqac.lif.parkbench.Benchmark;
 import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.TestSuite;
 
-/**
- * Gnome sort algorithm, as found here:
- * http://dickgrune.com/Programs/gnomesort.html
- */
-public class GnomeSortTest extends SortTest
+public class MyTestSuite extends TestSuite
 {
-	public GnomeSortTest()
+	public static void main(String[] args)
 	{
-		super("Gnome Sort");
+		initialize(args, new MyTestSuite());
 	}
-
-	@Override
-	public Test newTest()
+	
+	public void setup(Benchmark b)
 	{
-		return new GnomeSortTest();
-	}
-
-	@Override
-	public void sort(int[] array)
-	{
-		int n = array.length;
-		int i = 0;
-
-		while (i < n) {
-			if (i == 0 || array[i-1] <= array[i]) i++;
-			else {int tmp = array[i]; array[i] = array[i-1]; array[--i] = tmp;}
+		Test[] tests_to_create = {
+				new TestA(),
+				new TestB()
+		};
+		for (int k = 1; k < 3; k++)
+		{
+			for (int n = 1; n < 4; n++)
+			{
+				for (Test t : tests_to_create)
+				{
+					Test new_t = t.newTest();
+					new_t.setParameter("n", n);
+					new_t.setParameter("k", k);
+					b.addTest(new_t);
+				}
+			}
 		}
 	}
 }
