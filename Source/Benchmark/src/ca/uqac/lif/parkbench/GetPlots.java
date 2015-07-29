@@ -52,7 +52,7 @@ public class GetPlots extends BenchmarkCallback
 	}
 	
 	@Override
-	public CallbackResponse process(HttpExchange t)
+	public synchronized CallbackResponse process(HttpExchange t)
 	{
 		CallbackResponse response = new CallbackResponse(t);
 		Collection<Plot> all_plots = m_benchmark.getAllPlots();
@@ -61,6 +61,7 @@ public class GetPlots extends BenchmarkCallback
 		for (Plot plot : all_plots)
 		{
 			String filename = "plot-" + file_cnt + ".pdf";
+			file_cnt++;
 			// Get plot's image and write to temporary file
 			byte[] image = plot.getImage(Plot.Terminal.PDF);
 			File f = new File(filename);
@@ -73,6 +74,7 @@ public class GetPlots extends BenchmarkCallback
 				if (image.length > 0)
 				{
 					// Don't add filename if pdftk produced a zero-sized file
+					System.err.println(filename);
 					filenames.add(filename);
 				}
 			}
@@ -118,5 +120,5 @@ public class GetPlots extends BenchmarkCallback
 		response.setAttachment(filename);
 		response.setContents(file_contents);
 		return response;
-	}	
+	}
 }

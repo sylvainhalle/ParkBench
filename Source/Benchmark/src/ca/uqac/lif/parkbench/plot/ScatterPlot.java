@@ -124,6 +124,10 @@ public class ScatterPlot extends PlanarPlot
 	protected static Map<Parameters,String> createLegends(Vector<Parameters> columns)
 	{
 		Map<Parameters,String> out = new HashMap<Parameters,String>();
+		if (columns.size() == 0)
+		{
+			return out;
+		}
 		Vector<Parameters> cols = copyColumns(columns);
 		Parameters p_first = cols.firstElement();
 		Iterator<String> key_it = p_first.keySet().iterator();
