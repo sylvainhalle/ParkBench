@@ -61,7 +61,6 @@ public class GetPlots extends BenchmarkCallback
 		for (Plot plot : all_plots)
 		{
 			String filename = "plot-" + file_cnt + ".pdf";
-			filenames.add(filename);
 			// Get plot's image and write to temporary file
 			byte[] image = plot.getImage(Plot.Terminal.PDF);
 			File f = new File(filename);
@@ -71,6 +70,11 @@ public class GetPlots extends BenchmarkCallback
 				fos.write(image, 0, image.length);
 				fos.flush();
 				fos.close();
+				if (image.length > 0)
+				{
+					// Don't add filename if pdftk produced a zero-sized file
+					filenames.add(filename);
+				}
 			}
 			catch (FileNotFoundException e) 
 			{
