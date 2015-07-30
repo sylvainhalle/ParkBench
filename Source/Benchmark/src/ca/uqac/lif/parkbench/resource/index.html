@@ -37,6 +37,7 @@
           <li class="active"><a href="#" onclick="toggle_section('info');">Home</a></li>
           <li><a href="#" onclick="toggle_section('tests');">Tests</a></li>
           <li><a href="#" onclick="toggle_section('plots');">Plots</a></li>
+          <li><a href="#" onclick="toggle_section('about');">About</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
@@ -52,10 +53,12 @@
 <tr><td>No info so far</td></tr>
 </table>
 
-<div>
+<p>
 <button class="btn" id="refresh-status"><span class="glyphicon glyphicon-refresh"></span> Refresh status</button>
 <a href="/save"><button class="btn" id="save-benchmark"><span class="glyphicon glyphicon-save"></span> Save benchmark</button></a>
-</div>
+</p>
+
+<h3>Current test status</h3>
 
 <div class="well">
 <table>
@@ -82,6 +85,12 @@
 
 <div class="div-section" id="section-tests" style="display:none">
 <h2>Tests in this benchmark</h2>
+
+<p>Enter in the textbox below a filtering expression. This is a list of
+attribute-value pairs, separated by commas. For example, to select all
+tests with name Procedure A, status RUNNING and k=3, you would write:
+<code>name="Procedure A",status="RUNNING",k=3</code>. At the moment only
+equality is supported.</p>
 
 <p>Filter by: <input type="text" id="filter-expression" /> <button class="btn btn-small" id="btn-filter">Show</button>  <button class="btn btn-small" id="btn-show-all">Show all</button></p>
 
@@ -113,6 +122,33 @@ to sort according to multiple columns. The list auto-refreshes every
 </table>
 
 </div> <!-- /#section-tests -->
+
+<div class="div-section" id="section-about" style="display:none">
+<h2>About ParkBench</h2>
+
+<p>A versatile environment for running batches of tests and collecting
+results. &copy; 2015 <a href="http://leduotang.ca/sylvain/">Sylvain
+Hall&eacute;</a>, Universit&eacute; du Qu&eacute;bec &agrave;
+Chicoutimi.</p>
+
+<p>Get tutorials, instructions and the latest version at
+<a href="http://sylvainhalle.github.io/ParkBench/">http://sylvainhalle.github.io/ParkBench</a>.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under 
+the terms of the GNU General Public License as published by the Free Software 
+Foundation; either version 3 of the License, or (at your option) any later 
+version.</p>
+
+<p>This program is distributed in the hope that it will be useful, but WITHOUT 
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU General Public License along 
+with this program; if not, write to the Free Software Foundation, Inc., 51 
+Franklin St, Fifth Floor, Boston, MA 02110-1301 USA</p>
+
+</div> <!-- /#section-about -->
+
 
 <hr />
 <p>&copy; 2015 Sylvain Hall&eacute;. Laboratoire d'informatique formelle,

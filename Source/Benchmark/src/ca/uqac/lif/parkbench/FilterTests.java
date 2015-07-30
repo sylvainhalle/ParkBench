@@ -41,6 +41,7 @@ public class FilterTests extends BenchmarkCallback
 		String[] equalities = expression.split(",");
 		Parameters p = new Parameters();
 		String name_criterion = "";
+		String status_criterion = "";
 		for (String equality : equalities)
 		{
 			String[] parts = equality.split("=");
@@ -53,6 +54,10 @@ public class FilterTests extends BenchmarkCallback
 				if (param_name.compareTo("name") == 0)
 				{
 					name_criterion = real_string;
+				}
+				else if (param_name.compareTo("status") == 0)
+				{
+					status_criterion = real_string;
 				}
 				else
 				{
@@ -71,7 +76,13 @@ public class FilterTests extends BenchmarkCallback
 			if (name_criterion.isEmpty() 
 					|| name_criterion.compareTo(test.getName()) == 0)
 			{
-				list.add(test.getId());
+				// Test has the correct name
+				if (status_criterion.isEmpty()
+						|| status_criterion.compareToIgnoreCase(Test.statusToString(test.getStatus())) == 0)
+				{
+					// Test has the correct status
+					list.add(test.getId());
+				}
 			}
 		}
 		response.setContents(list.toString());
