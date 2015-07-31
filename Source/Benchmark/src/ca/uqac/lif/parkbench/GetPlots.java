@@ -57,24 +57,22 @@ public class GetPlots extends BenchmarkCallback
 		CallbackResponse response = new CallbackResponse(t);
 		Collection<Plot> all_plots = m_benchmark.getAllPlots();
 		List<String> filenames = new LinkedList<String>();
-		int file_cnt = 0;
 		for (Plot plot : all_plots)
 		{
-			String filename = "plot-" + file_cnt + ".pdf";
-			file_cnt++;
 			// Get plot's image and write to temporary file
 			byte[] image = plot.getImage(Plot.Terminal.PDF);
-			File f = new File(filename);
 			try 
 			{
-				FileOutputStream fos = new FileOutputStream(f);
-				fos.write(image, 0, image.length);
-				fos.flush();
-				fos.close();
 				if (image.length > 0)
 				{
-					// Don't add filename if pdftk produced a zero-sized file
-					System.err.println(filename);
+					// Do something only if pdftk produced a non-zero-sized file
+					File tmp_file = File.createTempFile("plot", ".pdf");
+					tmp_file.deleteOnExit();
+					FileOutputStream fos = new FileOutputStream(tmp_file);
+					fos.write(image, 0, image.length);
+					fos.flush();
+					fos.close();
+					String filename = tmp_file.getPath();
 					filenames.add(filename);
 				}
 			}

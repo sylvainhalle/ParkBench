@@ -447,6 +447,8 @@ function filter_tests() {
 	    	  var test_id = result[i];
 	    	  $("#tr-test-" + test_id).show();
 	      }
+	      // Uncheck all tests that are invisible
+	      $(".chk-test:hidden").prop("checked", false);
 	  }
   });
 };
