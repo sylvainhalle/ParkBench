@@ -384,7 +384,12 @@ public class Benchmark
 			Test old_t = getTestFromTest(t);
 			if (old_t != null)
 			{
-				old_t.mirror(t);
+				if (!merge || old_t.getStatus() == Test.Status.DONE)
+				{
+					// We take the content of the test in the file only
+					// if its status is DONE, or if we overwrite everything
+					old_t.mirror(t);					
+				}
 			}
 		}
 		if (!merge)

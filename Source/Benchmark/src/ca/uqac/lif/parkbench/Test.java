@@ -17,6 +17,9 @@
  */
 package ca.uqac.lif.parkbench;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import ca.uqac.lif.cornipickle.json.JsonElement;
 import ca.uqac.lif.cornipickle.json.JsonMap;
 import ca.uqac.lif.cornipickle.json.JsonNumber;
@@ -100,6 +103,11 @@ public abstract class Test implements Runnable
 	 */
 	private long m_stopTime;
 	
+	/**
+	 * The host where this particular test was run
+	 */
+	private String m_host;
+	
 	public Test(String name)
 	{
 		super();
@@ -112,6 +120,7 @@ public abstract class Test implements Runnable
 		m_startTime = 0;
 		m_stopTime = 0;
 		m_failureMessage = "";
+		m_host = "";
 	}
 	
 	Test(String name, int test_id)
@@ -127,6 +136,7 @@ public abstract class Test implements Runnable
 		m_startTime = 0;
 		m_stopTime = 0;
 		m_failureMessage = "";
+		m_host = "";
 	}
 	
 	public abstract void runTest(final Parameters params, Parameters results);
@@ -158,6 +168,16 @@ public abstract class Test implements Runnable
 	{
 		m_failureMessage = message;
 		return this;
+	}
+	
+	/**
+	 * Gets the host name that ran the test
+	 * @return The host name, empty if the test was not
+	 *   run yet
+	 */
+	public String getHost()
+	{
+		return m_host;
 	}
 	
 	/**
@@ -381,6 +401,16 @@ public abstract class Test implements Runnable
 	@Override
 	public final void run()
 	{
+		try
+		{
+			// Set as the host for this test the current hostname
+			m_host = InetAddress.getLocalHost().getHostAddress();
+		} 
+		catch (UnknownHostException e) 
+		{
+			// Or null if it fails
+			m_host = null;
+		}
 		m_startTime = System.currentTimeMillis() / 1000;
 		boolean prerequisites = true;
 		if (!prerequisitesFulilled(m_parameters))
@@ -498,6 +528,7 @@ public abstract class Test implements Runnable
 		out.put("id", m_id);
 		out.put("starttime", m_startTime);
 		out.put("endtime", m_stopTime);
+		out.put("host", m_host);
 		out.put("failure-message", JsonString.escape(m_failureMessage));
 		if (prerequisitesFulilled(m_parameters))
 		{
@@ -566,6 +597,14 @@ public abstract class Test implements Runnable
 		{
 			// The test was running; put it back to "not-done"
 			m_status = Status.NOT_DONE;
+		}
+		if (m_status == Status.DONE || m_status == Status.FAILED)
+		{
+			// We get the host name only if the test is finished
+			if (state.containsKey("host"))
+			{
+				m_host = state.getString("host");
+			}
 		}
 		m_failureMessage = state.getString("failure-message");
 		for (String param_name : in_params.keySet())

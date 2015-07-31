@@ -44,7 +44,7 @@
   <srcdir>Benchmark/src</srcdir>
   <bindir>Benchmark/bin</bindir>
   <docdir>Benchmark/doc</docdir>
-  <libdir>Benchmark/doc</libdir>
+  <libdir>Benchmark/lib</libdir>
   
   <!--
     Write JAR dependencies here.

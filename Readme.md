@@ -75,11 +75,23 @@ the JAR file. To show documentation in Eclipse, right-click on the jar,
 click "Properties", then fill the Javadoc location (which is the JAR
 itself).
 
+### Installing external software
+
+ParkBench also requires the following (optional) software to run:
+
+- [GnuPlot](http://gnuplot.info) for generating graphs. Under Windows, please
+  make sure the executable is in `C:\Program Files\gnuplot\binary`. Under other
+  systems, simply ensure that GnuPlot is in the system's path.
+- [PDFtk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/) for bundling
+  multiple graphs into a single PDF document. Install it in the default location
+  and it should work for all systems.
+
 Now what?
 ---------
 
 You are ready to use ParkBench to create your own test suites. Please read
-the [instructions](http://sylvainhalle.github.io) on how to use ParkBench.
+the [instructions](http://sylvainhalle.github.io/ParkBench/instructions.html)
+on how to use ParkBench.
 
 
 About the author                                                   {#about}
