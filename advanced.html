@@ -300,6 +300,28 @@ JSON file define tests with different parameters, as long as they contain tests
 of the same classes. ParkBench will overwrite whatever tests instances the
 <code>TestSuite</code> contains with those defined in the file.</p>
 
+<h3>Merging and running tests on multiple machines</h3> 
+
+<p>If you use the <code>--merge</code> option, ParkBench will <em>merge</em>,
+rather than overwrite, the tests from the JSON file. Only tests that have the
+status <code>DONE</code> in the file will be imported in the test suite.</p>
+
+<p>This option makes it easy to split the execution of your test suite across
+multiple machines. Simply&hellip;</p>
+
+<ol>
+<li>Start the same test suite on every computer.</li>
+<li>Select different test instances to run on each (using e.g. filtering through
+the web interface)</li>
+<li>Save the JSON file resulting from the execution of each test suite.</li>
+<li>In one instance of the test suite, merge the JSON files produced by the
+others. Only tests that are finished will be imported.</li>
+</ol>
+
+<p>It is possible to keep track of which test was executed on which machine,
+as every test carries in its parameters the IP address of the host where it
+was run. That value remains empty until the test is started.</p>
+
 <a name="plots"></a><h2>Creating plots</h2>
 
 <p>ParkBench can also auto-create (and auto-update) plots created from test
