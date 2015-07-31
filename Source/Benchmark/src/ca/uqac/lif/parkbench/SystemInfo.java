@@ -17,6 +17,9 @@
  */
 package ca.uqac.lif.parkbench;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import ca.uqac.lif.cornipickle.json.JsonMap;
 import ca.uqac.lif.httpserver.CallbackResponse;
 import ca.uqac.lif.httpserver.RequestCallback;
@@ -41,6 +44,15 @@ public class SystemInfo extends BenchmarkCallback
 		out.put("osversion", System.getProperty("os.version"));
 		//out.put("numcpu", System.getenv("NUMBER_OF_PROCESSORS")); // Windows only
 		out.put("numcpu", Runtime.getRuntime().availableProcessors());
+		try 
+		{
+			out.put("host", InetAddress.getLocalHost().getHostAddress());
+		} 
+		catch (UnknownHostException e) 
+		{
+			// Do nothing
+		}
+		out.put("version", Cli.s_versionString);
 		CallbackResponse response = new CallbackResponse(t);
 		response.setContents(out.toString("", true));
 		response.setContentType(CallbackResponse.ContentType.JSON);

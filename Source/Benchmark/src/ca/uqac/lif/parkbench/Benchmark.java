@@ -384,7 +384,7 @@ public class Benchmark
 			Test old_t = getTestFromTest(t);
 			if (old_t != null)
 			{
-				if (!merge || old_t.getStatus() == Test.Status.DONE)
+				if (!merge || t.getStatus() == Test.Status.DONE)
 				{
 					// We take the content of the test in the file only
 					// if its status is DONE, or if we overwrite everything
@@ -531,7 +531,7 @@ public class Benchmark
 	
 	/**
 	 * Retrieves a set of tests based on a set of parameters
-	 * @param parameters The parameters
+	 * @param params The parameters
 	 * @return The tests with the corresponding parameters, if
 	 *   any
 	 */

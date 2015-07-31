@@ -433,13 +433,13 @@ public abstract class Test implements Runnable
 
 	/**
 	 * Creates a new empty instance of the test
-	 * @return
+	 * @return A new test
 	 */
 	public abstract Test newTest();
 	
 	/**
 	 * Creates a new empty instance of the test
-	 * @return
+	 * @return A new test
 	 */
 	public Test newTest(int test_id)
 	{
@@ -643,8 +643,9 @@ public abstract class Test implements Runnable
 	
 	/**
 	 * Cleans a test. This means removing any prerequisites the test may have.
-	 * It is the responsibility of the test writer to make sure that {@link #clean()}
-	 * undoes the work done in {@link #fulfillPrerequisites(Parameters)}.
+	 * It is the responsibility of the test writer to make sure tha
+	 * {@link #clean(Parameters)} undoes the work done in
+	 * {@link #fulfillPrerequisites(Parameters)}.
 	 * <p>
 	 * <b>NOTE:</b> it is probably not well advised to call this method while
 	 * the test is running, but no check is done to that effect. <i>Caveat
@@ -664,7 +665,7 @@ public abstract class Test implements Runnable
 	 * Resets the test's state. This means:
 	 * <ul>
 	 * <li>Putting the test back to the <tt>NOT_DONE</tt> state</li>
-	 * <li>Cleaning any prerequisites (through {@link #clean()})</li>
+	 * <li>Cleaning any prerequisites (through {@link #clean(Parameters)})</li>
 	 * <li>Clearing any results the test has generated</li> 
 	 * </ul>
 	 */

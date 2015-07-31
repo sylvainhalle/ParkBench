@@ -154,7 +154,7 @@ public class Server implements HttpHandler
   /**
    * Sets the server's name. This name will be used as the value for
    * parameter "User-Agent" in every HTTP response sent.
-   * @param name The name
+   * @param ua The name
    */
   public void setUserAgent(String ua)
   {
@@ -268,7 +268,7 @@ public class Server implements HttpHandler
    * attribute-value pairs. For example, given an URI object
    * representing the URL "http://abc.com/xyz?a=1&b=2", the method
    * will return an object mapping "a" to "1" and "b" to "2".
-   * @param u The URI to process
+   * @param query The URI to process
    * @return A map of attribute-value pairs
    */
   public static Map<String,String> queryToMap(String query)
@@ -344,7 +344,7 @@ public class Server implements HttpHandler
   
   /**
    * Encodes a string in an URL-encoded form. This is a wrapper method around
-   * Java's {@link URLEncoder.encode()} method, which deals with the encoding
+   * Java's <code>URLEncoder.encode()</code> method, which deals with the encoding
    * and possible exception.
    * @param s The input string
    * @return The encoded string

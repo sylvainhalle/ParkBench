@@ -186,7 +186,7 @@ public class ScatterPlot extends PlanarPlot
 	 * Attempts to creates a legible legend (going into the plot's key)
      * from the column's parameters
 	 * @param p The parameters
-	 * @return
+	 * @return The legend
 	 */
 	protected static String createLegend(Parameters p)
 	{

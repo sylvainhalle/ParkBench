@@ -193,7 +193,7 @@ public abstract class Plot
 
 	/**
 	 * Clears the plot
-	 * @return
+	 * @return This plot
 	 */
 	public Plot clear()
 	{

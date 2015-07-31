@@ -101,7 +101,6 @@ public class CallbackResponse
   
   /**
    * Disables the client-side caching in the HTTP response to be sent 
-   * @param t The exchange
    */
   public void disableCaching()
   {
@@ -167,7 +166,7 @@ public class CallbackResponse
   
   /**
    * Sets the response's content type
-   * @param t The content type
+   * @param mime The MIME type
    */
   public void setContentType(String mime)
   {
