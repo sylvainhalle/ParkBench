@@ -468,6 +468,7 @@ public class Benchmark
 	{
 		JsonMap out = new JsonMap();
 		out.put("name", m_name);
+		out.put("version", Cli.s_versionString);
 		JsonList list = new JsonList();
 		Set<String> test_params = getTestParameterNames();
 		JsonList param_list = new JsonList();

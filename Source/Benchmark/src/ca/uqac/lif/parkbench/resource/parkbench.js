@@ -335,6 +335,7 @@ function show_benchmark_info() {
     contentType : "application/json",
     success     : function(result) {
       var contents = "";
+      contents += "<tr><th>ParkBench version</th><td>" + result.version + "</td></tr>\n";
       contents += "<tr><th>OS name</th><td>" + result.osname + "</td></tr>\n";
       contents += "<tr><th>Version</th><td>" + result.osversion + "</td></tr>\n";
       contents += "<tr><th>Architecture</th><td>" + result.osarch + "</td></tr>\n";
