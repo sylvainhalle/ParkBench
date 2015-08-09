@@ -33,7 +33,10 @@ public class GnuPlotCommand extends ObjectGrabber<String>
 		switch (type)
 		{
 		case WINDOWS:
-			out = "C:/Program Files/gnuplot/binary/gnuplot.exe";
+			//64 bit version needs to be installed
+			//Binairies are on SF
+			//http://sourceforge.net/projects/gnuplot/files/gnuplot/5.0.1/
+			out = "C:/Program Files/gnuplot/bin/gnuplot.exe";
 			break;
 		default:
 			out = "gnuplot";

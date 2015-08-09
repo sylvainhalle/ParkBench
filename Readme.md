@@ -80,8 +80,12 @@ itself).
 ParkBench also requires the following (optional) software to run:
 
 - [GnuPlot](http://gnuplot.info) for generating graphs. Under Windows, please
-  make sure the executable is in `C:\Program Files\gnuplot\binary`. Under other
+  make sure the executable is in `C:\Program Files\gnuplot\bin`. Under other
   systems, simply ensure that GnuPlot is in the system's path.
+
+  This is a link to a Windows Gnuplot installer. Choose the 64 bit version.
+  http://sourceforge.net/projects/gnuplot/files/gnuplot/5.0.1/
+
 - [PDFtk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/) for bundling
   multiple graphs into a single PDF document. Install it in the default location
   and it should work for all systems.
