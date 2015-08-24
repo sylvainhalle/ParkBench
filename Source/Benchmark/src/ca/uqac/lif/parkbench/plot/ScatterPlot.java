@@ -17,9 +17,7 @@
  */
 package ca.uqac.lif.parkbench.plot;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -114,102 +112,5 @@ public class ScatterPlot extends PlanarPlot
 		return out.toString();
 	}
 	
-	/**
-	 * Removes from a list of columns all parameters that
-	 * don't vary across columns
-	 * @param columns The list of columns
-	 * @return A new list of columns with the non-variying parameters
-	 *   removed
-	 */
-	protected static Map<Parameters,String> createLegends(Vector<Parameters> columns)
-	{
-		Map<Parameters,String> out = new HashMap<Parameters,String>();
-		if (columns.size() == 0)
-		{
-			return out;
-		}
-		Vector<Parameters> cols = copyColumns(columns);
-		Parameters p_first = cols.firstElement();
-		Iterator<String> key_it = p_first.keySet().iterator();
-		HashSet<String> keys_to_remove = new HashSet<String>();
-		while (key_it.hasNext())
-		{
-			String key = key_it.next();
-			boolean can_remove = true;
-			Object initial_value = p_first.get(key);
-			for (Parameters p_other : cols)
-			{
-				Object other_value = p_other.get(key);
-				if (other_value != null && !other_value.equals(initial_value))
-				{
-					// Found a different value; must keep this param in the key
-					can_remove = false;
-					break;
-				}
-			}
-			if (can_remove)
-			{
-				// This parameter has the same value in all columns;
-				// remove it from the key
-				keys_to_remove.add(key);
-			}
-		}
-		// Remove all collected parameters
-		for (String key : keys_to_remove)
-		{
-			for (Parameters p : cols)
-			{
-				p.remove(key);
-			}
-		}
-		for (int i = 0; i < columns.size(); i++)
-		{
-			Parameters key = columns.get(i);
-			Parameters cleaned_key = cols.get(i);
-			out.put(key, createLegend(cleaned_key));
-		}
-		return out;
-	}
-	
-	protected static Vector<Parameters> copyColumns(Vector<Parameters> columns)
-	{
-		Vector<Parameters> out = new Vector<Parameters>();
-		for (Parameters p : columns)
-		{
-			Parameters new_p = new Parameters(p);
-			out.add(new_p);
-		}
-		return out;
-	}
-	
-	/**
-	 * Attempts to creates a legible legend (going into the plot's key)
-     * from the column's parameters
-	 * @param p The parameters
-	 * @return The legend
-	 */
-	protected static String createLegend(Parameters p)
-	{
-		StringBuilder out = new StringBuilder();
-		Set<String> param_names = p.keySet();
-		if (param_names.isEmpty())
-		{
-			return out.toString();
-		}
-		if (param_names.size() == 1)
-		{
-			// A single parameter; don't put its name, just its value
-			for (String p_name : param_names)
-			{
-				Object value = p.get(p_name);
-				out.append(value.toString());
-			}
-		}
-		else
-		{
-			// Should do something more fancy eventually
-			out.append(p.toString());
-		}
-		return out.toString();
-	}
+
 }

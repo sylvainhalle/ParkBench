@@ -15,7 +15,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import ca.uqac.lif.parkbench.Benchmark;
 import ca.uqac.lif.parkbench.Test;
 import ca.uqac.lif.parkbench.TestSuite;
