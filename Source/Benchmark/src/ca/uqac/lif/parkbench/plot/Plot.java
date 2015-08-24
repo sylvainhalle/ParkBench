@@ -62,6 +62,12 @@ public abstract class Plot
 	 * is displayed in the graph
 	 */
 	protected String m_name;
+	
+	/**
+	 * A set of parameters that will be ignored when creating the
+	 * plot's legend
+	 */
+	protected Set<String> m_ignoredParameters;
 
 	/**
 	 * The time to wait before polling GnuPlot's result 
@@ -78,6 +84,7 @@ public abstract class Plot
 		m_title = title;
 		m_tests = new HashSet<Test>();
 		m_name = "";
+		m_ignoredParameters = new HashSet<String>();
 	}
 
 	/**
@@ -102,6 +109,18 @@ public abstract class Plot
 			return m_title;
 		}
 		return m_name;
+	}
+	
+	/**
+	 * Adds a parameters that will be ignored when creating the
+	 * plot's legend
+	 * @param parameter_name The parameter's name
+	 * @return This plot
+	 */
+	public Plot ignoreParameter(String parameter_name)
+	{
+		m_ignoredParameters.add(parameter_name);
+		return this;
 	}
 
 	/**
@@ -298,7 +317,7 @@ public abstract class Plot
 	 * Removes from a list of columns all parameters that
 	 * don't vary across columns
 	 * @param columns The list of columns
-	 * @return A new list of columns with the non-variying parameters
+	 * @return A new list of columns with the non-varying parameters
 	 *   removed
 	 */
 	protected static Map<Parameters,String> createLegends(Vector<Parameters> columns)

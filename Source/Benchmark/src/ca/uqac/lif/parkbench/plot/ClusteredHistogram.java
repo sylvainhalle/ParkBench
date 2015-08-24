@@ -47,6 +47,7 @@ public class ClusteredHistogram extends PlanarPlot
 		for (Test t : m_tests)
 		{
 			Parameters params = new Parameters(t.getParameters());
+			params.removeAll(m_ignoredParameters);
 			// Put test's name into params
 			params.put("name", t.getName());
 			String value_x = params.get(m_paramNameX).toString();
