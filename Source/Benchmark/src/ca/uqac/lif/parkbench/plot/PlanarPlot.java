@@ -46,6 +46,24 @@ public abstract class PlanarPlot extends Plot
 	protected boolean m_logY = false;
 	
 	/**
+	 * Whether the data on each row is normalized (i.e. expressed
+	 * as the ratio to the smallest value of the line)
+	 */
+	protected boolean m_normalizedRows = false;
+	
+	/**
+	 * Sets whether the data on each row is normalized (i.e. expressed
+	 * as the ratio to the smallest value of the line)
+	 * @param b True to normalize, false to leave the data as is
+	 * @return This plot
+	 */
+	public PlanarPlot normalizeRows(boolean b)
+	{
+		m_normalizedRows = b;
+		return this;
+	}
+	
+	/**
 	 * Set the name of the parameter to use as the "x" value of the
 	 * plot
 	 * @param name The parameter name

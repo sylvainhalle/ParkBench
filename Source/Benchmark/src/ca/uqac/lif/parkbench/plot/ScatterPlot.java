@@ -70,6 +70,7 @@ public class ScatterPlot extends PlanarPlot
 		group_by.add(m_paramNameX);
 		// Fill a 2D map with data
 		Map2D<Float,Parameters,Number> map = new Map2D<Float,Parameters,Number>();
+		map.normalizeRows(m_normalizedRows);
 		for (Test t : m_tests)
 		{
 			Parameters params = new Parameters(t.getParameters());

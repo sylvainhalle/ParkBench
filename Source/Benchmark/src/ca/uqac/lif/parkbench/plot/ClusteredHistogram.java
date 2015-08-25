@@ -44,6 +44,7 @@ public class ClusteredHistogram extends PlanarPlot
 		group_by.add(m_paramNameX);
 		// Fill a 2D map with data
 		Map2D<String,Parameters,Number> map = new Map2D<String,Parameters,Number>();
+		map.normalizeRows(m_normalizedRows);
 		for (Test t : m_tests)
 		{
 			Parameters params = new Parameters(t.getParameters());

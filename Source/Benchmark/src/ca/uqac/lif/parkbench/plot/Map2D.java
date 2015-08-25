@@ -42,6 +42,12 @@ public class Map2D<T extends Comparable<? super T>,U,V>
 	protected DataFormatter<V> m_formatterY;
 	
 	/**
+	 * Whether the data on each row is normalized (i.e. expressed
+	 * as the ratio to the smallest value of the line)
+	 */
+	protected boolean m_normalizedRows = false;
+	
+	/**
 	 * The columns, in the order they have been arranged the last time
 	 * the plot was asked for
 	 */
@@ -71,8 +77,20 @@ public class Map2D<T extends Comparable<? super T>,U,V>
 		}
 		else
 		{
-			m_formatterY = new PassthroughFormatter<V>();
+			m_formatterY = new ZeroFormatter<V>();
 		}		
+	}
+	
+	/**
+	 * Sets whether the data on each row is normalized (i.e. expressed
+	 * as the ratio to the smallest value of the line)
+	 * @param b Set to true to normalize, false otherwise
+	 * @return This map
+	 */
+	public Map2D<T,U,V> normalizeRows(boolean b)
+	{
+		m_normalizedRows = true;
+		return this;
 	}
 	
 	/**
@@ -114,18 +132,67 @@ public class Map2D<T extends Comparable<? super T>,U,V>
 		Collections.sort(sorted_keys);
 		for (T key : sorted_keys)
 		{
-			out.append(m_formatterX.format(key));
+			StringBuilder line = new StringBuilder();
+			line.append(m_formatterX.format(key));
 			Map<U,V> values = m_contents.get(key);
+			Vector<V> out_values = new Vector<V>();
 			for (U col_name : columns)
 			{
-				out.append(",");
 				if (values.containsKey(col_name))
 				{
-					V value = values.get(col_name);
-					out.append(m_formatterY.format(value));
+					out_values.add(values.get(col_name));
+				}
+				else
+				{
+					out_values.add(null);
 				}
 			}
-			out.append("\n");
+			/* TODO: find a way to normalize
+			if (m_normalizedRows)
+			{
+				// Find smallest value in row
+				boolean first_value = true;
+				double smallest = 0;
+				for (V value : out_values)
+				{
+					double cur_value = ((Number) value).doubleValue();
+					if (first_value)
+					{
+						first_value = false;
+						smallest = cur_value;
+					}
+					else
+					{
+						if (cur_value < smallest)
+						{
+							cur_value = smallest;
+						}
+					}
+				}
+				if (smallest != 0)
+				{
+					for (int i = 0; i < out_values.size(); i++) // Now normalize
+					{
+						double cur_value = ((Number) out_values.get(i)).doubleValue();
+						double new_value = cur_value / smallest;
+						out_values.setElementAt((V) new_value, i);
+					}					
+				}
+			}*/
+			for (V value : out_values)
+			{
+				line.append(",");
+				if (value != null)
+				{
+					line.append(m_formatterY.format(value));
+				}
+				else
+				{
+					line.append("0");
+				}
+			}
+			line.append("\n");
+			out.append(line);
 		}
 		return out.toString();
 	}
@@ -166,6 +233,25 @@ public class Map2D<T extends Comparable<? super T>,U,V>
 			if (x == null)
 			{
 				return "";
+			}
+			return x.toString();
+		}
+		
+	}
+	
+	protected static class ZeroFormatter<X> implements DataFormatter<X>
+	{
+		public ZeroFormatter()
+		{
+			super();
+		}
+		
+		@Override
+		public String format(X x)
+		{
+			if (x == null)
+			{
+				return "0";
 			}
 			return x.toString();
 		}
