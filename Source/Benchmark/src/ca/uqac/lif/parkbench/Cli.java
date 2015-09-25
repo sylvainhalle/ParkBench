@@ -48,7 +48,7 @@ public class Cli
 	/**
 	 * Version string
 	 */
-	protected static String s_versionString = "0.2.2b";
+	protected static String s_versionString = "0.2.3";
 	
 	/**
 	 * Default server name

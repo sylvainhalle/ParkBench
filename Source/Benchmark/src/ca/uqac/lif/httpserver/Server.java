@@ -252,7 +252,7 @@ public class Server implements HttpHandler
   /**
    * Convenience method to transform a GET query into a map of
    * attribute-value pairs. For example, given an URI object
-   * representing the URL "http://abc.com/xyz?a=1&b=2", the method
+   * representing the URL "http://abc.com/xyz?a=1&amp;b=2", the method
    * will return an object mapping "a" to "1" and "b" to "2".
    * @param u The URI to process
    * @return A map of attribute-value pairs

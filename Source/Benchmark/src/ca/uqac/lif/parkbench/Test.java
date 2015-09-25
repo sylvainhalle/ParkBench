@@ -642,6 +642,21 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
+	 * Checks if the current test is "compatible" with the parameters
+	 * present in the JSON state passed as an argument. By default, a test
+	 * is compatible if it has the same <code>name</code> value as the one 
+	 * given in the JSON; other test classes may override this method to
+	 * provide a finer condition.
+	 * @param state The parameters
+	 * @return true if test is compatible, false otherwise
+	 */
+	protected boolean isCompatible(JsonMap state)
+	{
+		String state_name = state.getString("name");
+		return state_name.compareTo(m_name) == 0;
+	}
+	
+	/**
 	 * Cleans a test. This means removing any prerequisites the test may have.
 	 * It is the responsibility of the test writer to make sure tha
 	 * {@link #clean(Parameters)} undoes the work done in

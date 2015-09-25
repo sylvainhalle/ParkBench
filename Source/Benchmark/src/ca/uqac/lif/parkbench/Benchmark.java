@@ -40,6 +40,13 @@ public class Benchmark
 	 * The set of tests managed by the benchmark
 	 */
 	protected Set<Test> m_tests;
+	
+	/**
+	 * A subset of tests managed by the benchmark. This set should
+	 * contain one test instance per distinct class in the benchmark.
+	 * It is used for deserializing tests from JSON documents. 
+	 */
+	protected Set<Test> m_classInstances;
 
 	/**
 	 * A name for this benchmark
@@ -80,6 +87,7 @@ public class Benchmark
 	{
 		super();
 		m_tests = new HashSet<Test>();
+		m_classInstances = new HashSet<Test>();
 		m_name = "Untitled";
 		m_dispatcher = new ThreadDispatcher(num_threads);
 		m_dispatcherThread = new Thread(m_dispatcher);
@@ -112,6 +120,35 @@ public class Benchmark
 	public void addTest(Test t)
 	{
 		m_tests.add(t);
+		addTestToClassInstances(t);
+	}
+	
+	/**
+	 * Conditionally adds a test instances to the set of test
+	 * classes. The test will be added to the set only if there is
+	 * no test of the same class already present.
+	 * @param t The test to add
+	 * @return true if the test was <em>not</em> added to the set,
+	 *   false otherwise
+	 */
+	protected boolean addTestToClassInstances(Test t)
+	{
+		// Loop through class instances and add only if this class does
+		// not exist
+		boolean found = false;
+		for (Test t_i : m_classInstances)
+		{
+			if (t.getClass() == t_i.getClass())
+			{
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+		{
+			m_classInstances.add(t);
+		}
+		return found;
 	}
 
 	/**
@@ -366,9 +403,8 @@ public class Benchmark
 		for (JsonElement el : test_list)
 		{
 			JsonMap el_test = (JsonMap) el;
-			String test_name = el_test.getString("name");
 			int test_id = el_test.getNumber("id").intValue();
-			Test test_instance = findTestWithName(test_name);
+			Test test_instance = findTestWithState(el_test);
 			if (test_instance != null)
 			{
 				Test new_test = test_instance.newTest(test_id);
@@ -513,6 +549,24 @@ public class Benchmark
 		for (Test t : m_tests)
 		{
 			if (name.compareTo(t.getName()) == 0)
+			{
+				return t;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * In the set of current tests, finds a test instance compatible
+	 * with the parameter values present in the JSON
+	 * @param state The JSON to analyze
+	 * @return A compatible test instance, null if none found
+	 */
+	protected Test findTestWithState(JsonMap state)
+	{
+		for (Test t : m_classInstances)
+		{
+			if (t.isCompatible(state))
 			{
 				return t;
 			}
