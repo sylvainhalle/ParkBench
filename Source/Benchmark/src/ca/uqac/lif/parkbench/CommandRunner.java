@@ -188,6 +188,33 @@ public class CommandRunner extends Thread
 		File f = new File(filename);
 		return f.delete();
 	}
+	
+	public static byte[] runAndGet(String command, String inputs)
+	{
+		String[] s_command = new String[1];
+		s_command[0] = command;
+		CommandRunner runner = new CommandRunner(s_command, inputs);
+		runner.run();
+		// Wait until the command is done
+		while (runner.isAlive())
+		{
+			// Wait 0.1 s and check again
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e) 
+			{
+				// This happens if the user cancels the command manually
+				runner.stopCommand();
+				runner.interrupt();
+				System.err.println("Interrupted");
+				return null;
+			}
+		}
+		byte[] out = runner.getBytes();
+		return out;
+	}
 
 	public static void main(String[] args) throws IOException
 	{
