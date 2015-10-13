@@ -42,10 +42,12 @@ public abstract class Test implements Runnable
 	 * <li><tt>DONE</tt>: the execution of the test has finished without error</li>
 	 * <li><tt>FAILED</tt>: the execution of the test has failed, or was
 	 *   manually cancelled</li>
+	 * <li><tt>TIMEOUT</tt>: the execution of the test has exceeded its
+	 *   maximal duration and was interrupted</li>
 	 * </ul>
 	 */
 	public static enum Status {DONE, FAILED, RUNNING, NOT_DONE,
-		QUEUED, PREREQUISITES};
+		QUEUED, PREREQUISITES, TIMEOUT};
 	
 	/**
 	 * Determines if the test is to be executed for real, or
@@ -86,6 +88,13 @@ public abstract class Test implements Runnable
 	private String m_failureMessage;
 	
 	/**
+	 * A number of seconds after which the benchmark is allowed to
+	 * interrupt this test. A value of 0 indicates the test should not
+	 * be interrupted.
+	 */
+	private long m_killAfter;
+	
+	/**
 	 * Unique ID for this test. This number is meaningless and is
 	 * used only to interact with the GUI
 	 */
@@ -121,6 +130,7 @@ public abstract class Test implements Runnable
 		m_stopTime = 0;
 		m_failureMessage = "";
 		m_host = "";
+		m_killAfter = 0;
 	}
 	
 	Test(String name, int test_id)
@@ -137,6 +147,7 @@ public abstract class Test implements Runnable
 		m_stopTime = 0;
 		m_failureMessage = "";
 		m_host = "";
+		m_killAfter = 0;
 	}
 	
 	public abstract void runTest(final Parameters params, Parameters results);
@@ -148,6 +159,39 @@ public abstract class Test implements Runnable
 	public String getName()
 	{
 		return m_name;
+	}
+	
+	/**
+	 * Sets the number of <em>seconds</em> after which the benchmark is allowed to
+	 * interrupt this test. A value of 0 indicates the test should not
+	 * be interrupted.
+	 * @param sec The number of seconds
+	 * @return The test instance
+	 */
+	public final Test setKillTime(long sec)
+	{
+		m_killAfter = sec;
+		return this;
+	}
+	
+	/**
+	 * Determines if a test can be interrupted by the benchmark
+	 * @return true if test can be interrupted, false otherwise
+	 */
+	public final boolean canKill()
+	{
+		if (m_status != Test.Status.RUNNING)
+		{
+			// Can't kill a test that is not running
+			return false;
+		}
+		long cur_time = System.currentTimeMillis() / 1000;
+		if (cur_time - m_startTime > m_killAfter)
+		{
+			// Test has run for long enough: can kill
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -439,6 +483,7 @@ public abstract class Test implements Runnable
 	
 	/**
 	 * Creates a new empty instance of the test
+	 * @param test_id The test ID to give this new test
 	 * @return A new test
 	 */
 	public Test newTest(int test_id)
@@ -477,6 +522,9 @@ public abstract class Test implements Runnable
 		case QUEUED:
 			out = "QUEUED";
 			break;
+		case TIMEOUT:
+			out = "TIMEOUT";
+			break;
 		}
 		return out;
 	}
@@ -512,6 +560,10 @@ public abstract class Test implements Runnable
 		else if (s.compareToIgnoreCase("PREREQUISITES") == 0)
 		{
 			return Status.PREREQUISITES;
+		}
+		else if (s.compareToIgnoreCase("TIMEOUT") == 0)
+		{
+			return Status.TIMEOUT;
 		}
 		return Status.NOT_DONE;
 	}
@@ -656,6 +708,11 @@ public abstract class Test implements Runnable
 		return state_name.compareTo(m_name) == 0;
 	}
 	
+	protected boolean isCompatible(Test t)
+	{
+		return t.m_name.compareTo(m_name) == 0;
+	}
+	
 	/**
 	 * Cleans a test. This means removing any prerequisites the test may have.
 	 * It is the responsibility of the test writer to make sure tha
@@ -677,7 +734,7 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Resets the test's state. This means:
+	 * Completely resets the the test. This means:
 	 * <ul>
 	 * <li>Putting the test back to the <tt>NOT_DONE</tt> state</li>
 	 * <li>Cleaning any prerequisites (through {@link #clean(Parameters)})</li>
@@ -692,8 +749,19 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
+	 * Resets the test's state only. This works like {@link #reset()}, but 
+	 * without cleaning the prerequisites.
+	 */
+	public final void resetState()
+	{
+		setStatus(Status.NOT_DONE);
+		m_results.clear();
+	}
+	
+	/**
 	 * Stops the tests and gives it a status
-	 * @param s The status of the test (normally FAILED or DONE)
+	 * @param s The status of the test (normally <code>FAILED</code> or
+	 * <code>DONE</code>)
 	 */
 	public void stopWithStatus(Status s)
 	{

@@ -44,6 +44,7 @@ public abstract class CommandTestRegex extends CommandTest
 
 	/**
 	 * Instantiates a command test
+	 * @param test_name The name of the test to instantiate
 	 * @param command_pattern The pattern to build a command
 	 */
 	public CommandTestRegex(String test_name, String command_pattern)

@@ -95,9 +95,9 @@ public class Map2D<T extends Comparable<? super T>,U,V>
 	
 	/**
 	 * Add a new data point to the plot
-	 * @param key
-	 * @param column
-	 * @param value
+	 * @param key The key
+	 * @param column The column to put the value
+	 * @param value The value to put in the map
 	 */
 	public void put(T key, U column, V value)
 	{

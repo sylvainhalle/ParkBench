@@ -55,7 +55,7 @@ public abstract class PlanarPlot extends Plot
 	 * Sets whether the data on each row is normalized (i.e. expressed
 	 * as the ratio to the smallest value of the line)
 	 * @param b True to normalize, false to leave the data as is
-	 * @return This plot
+	 * @return An instance of this planar plot
 	 */
 	public PlanarPlot normalizeRows(boolean b)
 	{
@@ -67,6 +67,7 @@ public abstract class PlanarPlot extends Plot
 	 * Set the name of the parameter to use as the "x" value of the
 	 * plot
 	 * @param name The parameter name
+	 * @return An instance of this planar plot
 	 */
 	public PlanarPlot setParameterX(String name)
 	{
@@ -79,6 +80,7 @@ public abstract class PlanarPlot extends Plot
 	 * plot
 	 * @param name The parameter name
 	 * @param caption The caption to use for the x-axis in the graph
+	 * @return An instance of this planar plot
 	 */
 	public PlanarPlot setParameterX(String name, String caption)
 	{
@@ -91,6 +93,7 @@ public abstract class PlanarPlot extends Plot
 	 * Set the name of the parameter to use as the "y" value of the
 	 * plot
 	 * @param name The parameter name
+	 * @return An instance of this planar plot
 	 */
 	public PlanarPlot setParameterY(String name)
 	{
@@ -100,7 +103,7 @@ public abstract class PlanarPlot extends Plot
 	
 	/**
 	 * Sets the x-axis with a logarithmic scale
-	 * @return This plot
+	 * @return An instance of this planar plot
 	 */
 	public PlanarPlot setLogscaleX()
 	{
@@ -124,6 +127,7 @@ public abstract class PlanarPlot extends Plot
 	 * plot
 	 * @param name The parameter name
 	 * @param caption The caption to use for the y-axis in the graph
+	 * @return An instance of this planar plot
 	 */
 	public PlanarPlot setParameterY(String name, String caption)
 	{

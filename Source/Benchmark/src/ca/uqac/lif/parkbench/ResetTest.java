@@ -44,7 +44,7 @@ public class ResetTest extends BenchmarkCallback
 			if (!test_id_string.isEmpty())
 			{
 				int test_id = Integer.parseInt(test_id_string);
-				outcome &= m_benchmark.resetTest(test_id);
+				outcome &= m_benchmark.resetTestState(test_id);
 			}
 		}
 		CallbackResponse response = new CallbackResponse(t);

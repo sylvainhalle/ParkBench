@@ -46,6 +46,10 @@ tr.impossible td {
   background-color: green;
 }
 
+.status-timeout{
+  background-color: darkred;
+}
+
 #test-selection > li {
   list-style-type: none;
   display: inline-block;

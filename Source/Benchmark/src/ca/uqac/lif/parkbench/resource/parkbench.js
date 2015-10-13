@@ -19,12 +19,12 @@
 /**
  *  The minimum interval for refreshing the list of tests (in ms)
  */
-var MIN_REFRESH_INTERVAL = 1000;
+var MIN_REFRESH_INTERVAL = 2000;
 
 /**
  *  The interval for refreshing the list of tests (in ms)
  */
-var REFRESH_INTERVAL = 2000;
+var REFRESH_INTERVAL = 4000;
 
 /**
  *  The interval for refreshing the graphs (in multiples
@@ -81,6 +81,10 @@ function refresh_test_list(incremental) {
         $("#status-nb-queued").html(result.status["status-queued"]);
       else
         $("#status-nb-queued").html("0");
+      if (result.status["status-timeout"])
+        $("#status-nb-timeout").html(result.status["status-timeout"]);
+      else
+        $("#status-nb-timeout").html("0");
       if (!incremental)
       {
     	  // Create table contents
@@ -145,7 +149,8 @@ function fill_table_line(test, param_names) {
     if (test["can-run"] === "true") {
         out_list += "<button title=\"Start\" class=\"btn btn-mini\" onclick=\"start_test(" + test.id + ");\"><span class=\"glyphicon glyphicon-play\"></span><span class=\"text-only\">Start</span></button> ";
         out_list += "<button title=\"Stop\" class=\"btn btn-mini\" onclick=\"stop_test(" + test.id + ");\"><span class=\"glyphicon glyphicon-stop\"></span><span class=\"text-only\">Stop</span></button> ";
-        out_list += "<button title=\"Reset\" class=\"btn btn-mini\" onclick=\"reset_test(" + test.id + ");\"><span class=\"glyphicon glyphicon-erase\"></span><span class=\"text-only\">Reset</span></button> ";	
+        out_list += "<button title=\"Reset\" class=\"btn btn-mini\" onclick=\"reset_test(" + test.id + ");\"><span class=\"glyphicon glyphicon-erase\"></span><span class=\"text-only\">Reset</span></button> ";
+        out_list += "<button title=\"Clean all\" class=\"btn btn-mini\" onclick=\"clean_test(" + test.id + ");\"><span class=\"glyphicon glyphicon-erase\"></span><span class=\"text-only\">Clean</span></button> ";	
     }    	
     out_list += "</td>\n";
     out_list += "<td>" + test["failure-message"] + "</td>\n";
@@ -219,6 +224,8 @@ function get_status_div(status, prerequisites, canrun, id) {
 	    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-prerequisites\"><span class=\"text-only\">Prerequisites</span></div>";
   else if (status === "QUEUED")
     return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-queued\"><span class=\"text-only\">Queued</span></div>";
+  else if (status === "TIMEOUT")
+    return "<div id=\"status-icon-" + id + "\" class=\"status-icon status-timeout\"><span class=\"text-only\">Timed out</span></div>";
   else if (status === "NOT_DONE")
   {
     if (prerequisites === "true")
@@ -237,6 +244,21 @@ function start_test(test_id) {
   $("#status-icon-" + test_id).removeClass("status-ready").addClass("status-queued").html("<span class=\"text-only\">Queued</span>");
   $.ajax({
     url         : "/run?id=" + test_id,
+    contentType : "application/json",
+    success     : function(result) {
+      setTimeout(function() {refresh_test_list(true);}, 1000);
+      }
+  });
+};
+
+/**
+ * Cleans one or more tests
+ * @param test_id A comma-separated list of test IDs
+ */
+function clean_test(test_id) {
+  //$("#status-icon-" + test_id).removeClass("status-ready").addClass("status-queued").html("<span class=\"text-only\">Queued</span>");
+  $.ajax({
+    url         : "/clean?id=" + test_id,
     contentType : "application/json",
     success     : function(result) {
       setTimeout(function() {refresh_test_list(true);}, 1000);

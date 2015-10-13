@@ -263,6 +263,7 @@ public class CallbackResponse
 
   /**
    * Add multiple cookies to the response
+   * @param t The HttpExchange the cookies will be added to
    * @param cookies The cookies to add
    */
   public void addResponseCookies(HttpExchange t, Collection<Cookie> cookies)

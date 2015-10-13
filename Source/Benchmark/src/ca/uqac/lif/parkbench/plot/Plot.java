@@ -186,6 +186,7 @@ public abstract class Plot
 
 	/**
 	 * Runs GnuPlot on a file and returns the resulting graph
+	 * @param term The terminal (i.e. PNG, etc.) to use for the image
 	 * @return The (binary) contents of the image produced by Gnuplot
 	 */
 	public final byte[] getImage(Terminal term)

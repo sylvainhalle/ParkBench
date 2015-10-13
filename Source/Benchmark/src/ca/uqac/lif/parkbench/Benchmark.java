@@ -82,6 +82,8 @@ public class Benchmark
 
 	/**
 	 * Create an empty benchmark 
+	 * @param num_threads The number of threads to allow to this benchmark
+	 *  (i.e. the number of tests that are allowed to run simultaneously)
 	 */
 	public Benchmark(int num_threads)
 	{
@@ -138,7 +140,7 @@ public class Benchmark
 		boolean found = false;
 		for (Test t_i : m_classInstances)
 		{
-			if (t.getClass() == t_i.getClass())
+			if (t.isCompatible(t_i))
 			{
 				found = true;
 				break;
@@ -153,6 +155,7 @@ public class Benchmark
 
 	/**
 	 * Retrieves a set of tests based on a set of parameters
+	 * @param tests The collection of tests to pick from
 	 * @param parameters The parameters
 	 * @return The tests with the corresponding parameters, if
 	 *   any
@@ -183,6 +186,7 @@ public class Benchmark
 	/**
 	 * Retrieves a single test based on a set of parameters. In case
 	 * many tests match the parameters, one is picked nondeterministically.
+	 * @param tests The collection of tests to pick from
 	 * @param parameters The parameters
 	 * @return The test with the corresponding parameters,
 	 *   null if not found
@@ -491,6 +495,22 @@ public class Benchmark
 		if (t != null)
 		{
 			t.reset();
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Resets a test
+	 * @param test_id The test ID to reset
+	 * @return true if the test was found, false otherwise
+	 */
+	public boolean resetTestState(int test_id)
+	{
+		Test t = getTest(test_id);
+		if (t != null)
+		{
+			t.resetState();
 			return true;
 		}
 		return false;

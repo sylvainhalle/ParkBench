@@ -107,14 +107,26 @@ public class ThreadDispatcher implements Runnable
 	 */
 	synchronized protected void check()
 	{
-		if (m_testQueue.isEmpty())
-			return;
 		for (int i = 0; i < m_threads.length; i++)
 		{
-			Thread th = m_threads[i];
+			TestThread th = m_threads[i];
 			if (th != null && th.isAlive())
 			{
-				continue;
+				if (th.m_test.canKill())
+				{
+					// This test can be interrupted
+					th.interrupt();
+					th.m_test.setStatus(Test.Status.TIMEOUT);
+				}
+				else
+				{
+					Test.Status st = th.m_test.getStatus();
+					if (!(st == Test.Status.FAILED || st == Test.Status.DONE || 
+							st == Test.Status.TIMEOUT))
+					{
+						continue;
+					}
+				}
 			}
 			// This thread has finished its execution, and a test is
 			// waiting to be run
@@ -168,6 +180,7 @@ public class ThreadDispatcher implements Runnable
 	 * Interrupts the execution of a test. This either removes it from the
 	 * queue if it was not started, or stops it if it is currently running.
 	 * @param test_id The id of the test to stop
+	 * @return true if a test was found and cancelled, false otherwise
 	 */
 	synchronized public boolean cancel(int test_id)
 	{

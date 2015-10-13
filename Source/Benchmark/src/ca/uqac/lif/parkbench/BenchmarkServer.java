@@ -30,7 +30,7 @@ public class BenchmarkServer extends InnerFileServer
 		registerCallback(0, new SystemInfo(b));
 		registerCallback(0, new RunTest(b));
 		registerCallback(0, new StopTest(b));
-		registerCallback(0, new ResetTest(b));
+		registerCallback(0, new CleanTest(b));
 		registerCallback(0, new GetPlot(b));
 		registerCallback(0, new GetPlots(b));
 		registerCallback(0, new SaveBenchmark(b));
