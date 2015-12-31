@@ -85,7 +85,7 @@ public class Cli
 	{
 		String server_name = m_defaultServerName;
 		int server_port = m_defaultPort;
-		boolean interactive_mode = false;
+		boolean interactive_mode = false, text_interactive = false;
 		int num_threads = s_defaultNumThreads;
 		boolean merge = false;
 
@@ -140,13 +140,17 @@ public class Cli
 		{
 			server_name = a_map.getOptionValue("s");
 		}
-		if (a_map.hasOption("i"))
+		if (a_map.hasOption("server"))
 		{
 			interactive_mode = true;
 		}
-		if (a_map.hasOption("i"))
+		if (a_map.hasOption("server"))
 		{
 			merge = true;
+		}
+		if (a_map.hasOption("interactive"))
+		{
+			text_interactive = true;
 		}
 		if (a_map.hasOption("t"))
 		{
@@ -218,6 +222,11 @@ public class Cli
 					}
 				}
 			}*/
+		}
+		else if (text_interactive) 
+		{
+			TextInterface ti = new TextInterface(benchmark, stdout);
+			ti.run();
 		}
 		else
 		{
@@ -294,7 +303,10 @@ public class Cli
 		.withLongName("help")
 		.withShortName("h"));
 		options.addArgument(new CliParser.Argument()
-		.withDescription("Use interactive mode")
+		.withDescription("Use server mode")
+		.withLongName("server"));
+		options.addArgument(new CliParser.Argument()
+		.withDescription("Use interactive text mode")
 		.withLongName("interactive")
 		.withShortName("i"));
 		options.addArgument(new CliParser.Argument()
