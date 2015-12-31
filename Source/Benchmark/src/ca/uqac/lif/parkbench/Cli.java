@@ -21,18 +21,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-
 import ca.uqac.lif.cornipickle.json.JsonFastParser;
 import ca.uqac.lif.cornipickle.json.JsonMap;
 import ca.uqac.lif.cornipickle.json.JsonParser;
 import ca.uqac.lif.cornipickle.json.JsonParser.JsonParseException;
 import ca.uqac.lif.cornipickle.util.AnsiPrinter;
+import ca.uqac.lif.util.CliParser;
+import ca.uqac.lif.util.CliParser.ArgumentMap;
 import ca.uqac.lif.util.FileReadWrite;
 
 public class Cli
@@ -44,12 +39,12 @@ public class Cli
 	public static final int ERR_IO = 3;
 	public static final int ERR_ARGUMENTS = 4;
 	public static final int ERR_RUNTIME = 6;
-	
+
 	/**
 	 * Version string
 	 */
 	protected static String s_versionString = "0.3";
-	
+
 	/**
 	 * Default server name
 	 */
@@ -59,27 +54,27 @@ public class Cli
 	 * Default port to listen to
 	 */
 	protected int m_defaultPort = 21212;
-	
+
 	/**
 	 * Verbosity level for CLI
 	 */
 	protected int m_verbosity = 1;
-	
+
 	/**
 	 * The number of refresh loops between two saves of the benchmark's status
 	 */
 	protected static final int s_saveInterval = 10;
-	
+
 	/**
 	 * The number of threads used by default
 	 */
 	protected static final int s_defaultNumThreads = 2;
-	
+
 	/**
 	 * Command-line arguments
 	 */
 	protected String[] m_args;
-	
+
 	public Cli(String[] args)
 	{
 		super();
@@ -93,7 +88,7 @@ public class Cli
 		boolean interactive_mode = false;
 		int num_threads = s_defaultNumThreads;
 		boolean merge = false;
-		
+
 		final AnsiPrinter stderr = new AnsiPrinter(System.err);
 		final AnsiPrinter stdout = new AnsiPrinter(System.out);
 		//stdout.setForegroundColor(AnsiPrinter.Color.BLACK);
@@ -114,18 +109,17 @@ public class Cli
 		}));
 
 		// Parse command line arguments
-		Options options = setupOptions();
-		CommandLine c_line = setupCommandLine(m_args, options, stderr);
-		assert c_line != null;
-		if (c_line.hasOption("verbosity"))
+		CliParser c_line = setupOptions();
+		ArgumentMap a_map = c_line.parse(m_args);
+		if (a_map.hasOption("verbosity"))
 		{
-			m_verbosity = Integer.parseInt(c_line.getOptionValue("verbosity"));
+			m_verbosity = Integer.parseInt(a_map.getOptionValue("verbosity"));
 		}
 		if (m_verbosity > 0)
 		{
 			showHeader(stdout);
 		}
-		if (c_line.hasOption("version"))
+		if (a_map.hasOption("version"))
 		{
 			stderr.println("(C) 2015 Sylvain Hallé et al., Université du Québec à Chicoutimi");
 			stderr.println("This program comes with ABSOLUTELY NO WARRANTY.");
@@ -133,35 +127,35 @@ public class Cli
 			stderr.println("under certain conditions. See the file LICENSE for details.\n");
 			System.exit(ERR_OK);
 		}
-		if (c_line.hasOption("h"))
+		if (a_map.hasOption("h"))
 		{
-			showUsage(options);
+			c_line.printHelp("ParkBench " + s_versionString + ", a versatile benchmark environment", stderr);
 			System.exit(ERR_OK);
 		}
-		if (c_line.hasOption("p"))
+		if (a_map.hasOption("p"))
 		{
-			server_port = Integer.parseInt(c_line.getOptionValue("p"));
+			server_port = Integer.parseInt(a_map.getOptionValue("p"));
 		}
-		if (c_line.hasOption("s"))
+		if (a_map.hasOption("s"))
 		{
-			server_name = c_line.getOptionValue("s");
+			server_name = a_map.getOptionValue("s");
 		}
-		if (c_line.hasOption("i"))
+		if (a_map.hasOption("i"))
 		{
 			interactive_mode = true;
 		}
-		if (c_line.hasOption("i"))
+		if (a_map.hasOption("i"))
 		{
 			merge = true;
 		}
-		if (c_line.hasOption("t"))
+		if (a_map.hasOption("t"))
 		{
-			num_threads = Integer.parseInt(c_line.getOptionValue("p"));
+			num_threads = Integer.parseInt(a_map.getOptionValue("p"));
 		}
 		benchmark.setThreads(num_threads);
-		
+
 		// The remaining arguments are configuration files to read
-		List<String> remaining_args = c_line.getArgList();
+		List<String> remaining_args = a_map.getOthers();
 		JsonParser parser = new JsonFastParser();
 		for (String filename : remaining_args)
 		{
@@ -191,7 +185,7 @@ public class Cli
 			}
 		}
 		String save_filename = benchmark.getName() + ".json";
-		
+
 		if (interactive_mode)
 		{
 			BenchmarkServer server = new BenchmarkServer(server_name, server_port, benchmark);
@@ -229,7 +223,7 @@ public class Cli
 		{
 			// Run all tests
 			int loop_count = 1;
-			
+
 			println(stdout, "Running " + benchmark.getName() 
 					+ " test suite in batch mode, using " 
 					+ benchmark.threadCount() + " threads", 1000);
@@ -287,96 +281,44 @@ public class Cli
 			benchmark.stop();
 		}
 	}
-	
+
 	/**
 	 * Sets up the options for the command line parser
 	 * @return The options
 	 */
-	private Options setupOptions()
+	private CliParser setupOptions()
 	{
-		Options options = new Options();
-		Option opt;
-		opt = Option.builder("h")
-				.longOpt("help")
-				.desc("Display command line usage")
-				.build();
-		options.addOption(opt);
-		opt = Option.builder("i")
-				.longOpt("interactive")
-				.desc("Use interactive mode")
-				.build();
-		options.addOption(opt);
-		opt = Option.builder("m")
-				.longOpt("merge")
-				.desc("Merge JSON file with existing test suite")
-				.build();
-		options.addOption(opt);
-		opt = Option.builder("s")
-				.longOpt("servername")
-				.argName("x")
-				.hasArg()
-				.desc("Set server name or IP address x (default: " + m_defaultServerName + ")")
-				.build();
-		options.addOption(opt);
-		opt = Option.builder("p")
-				.longOpt("port")
-				.argName("x")
-				.hasArg()
-				.desc("Listen on port x (default: " + m_defaultPort + ")")
-				.build();
-		options.addOption(opt);
-		opt = Option.builder("t")
-				.longOpt("threads")
-				.argName("x")
-				.hasArg()
-				.desc("Use x threads (default: " + s_defaultNumThreads + ")")
-				.build();
-		options.addOption(opt);
+		CliParser options = new CliParser();
+		options.addArgument(new CliParser.Argument()
+		.withDescription("Display command line usage")
+		.withLongName("help")
+		.withShortName("h"));
+		options.addArgument(new CliParser.Argument()
+		.withDescription("Use interactive mode")
+		.withLongName("interactive")
+		.withShortName("i"));
+		options.addArgument(new CliParser.Argument()
+		.withDescription("Merge JSON file with existing test suite")
+		.withLongName("merge")
+		.withShortName("m"));
+		options.addArgument(new CliParser.Argument()
+		.withDescription("Set server name or IP address x (default: " + m_defaultServerName + ")")
+		.withLongName("servername")
+		.withShortName("s")
+		.withArgument("x"));
+		options.addArgument(new CliParser.Argument()
+		.withDescription("Listen on port x (default: " + m_defaultPort + ")")
+		.withLongName("port")
+		.withShortName("p")
+		.withArgument("x"));
+		options.addArgument(new CliParser.Argument()
+		.withDescription("Use x threads (default: " + s_defaultNumThreads + ")")
+		.withLongName("threads")
+		.withShortName("t")
+		.withArgument("x"));		
 		return options;
 	}
 
-	/**
-	 * Show the benchmark's usage
-	 * @param options The options created for the command line parser
-	 */
-	private static void showUsage(Options options)
-	{
-		HelpFormatter hf = new HelpFormatter();
-		hf.printHelp("java -jar Barkbench.jar [options] [filename]", options);
-	}
-	
-	/**
-	 * Sets up the command line parser
-	 * @param args The command line arguments passed to the class' {@link main}
-	 * method
-	 * @param options The command line options to be used by the parser
-	 * @return The object that parsed the command line parameters
-	 */
-	private static CommandLine setupCommandLine(String[] args, Options options, PrintStream stderr)
-	{
-		CommandLineParser parser = new DefaultParser();
-		CommandLine c_line = null;
-		try
-		{
-			// parse the command line arguments
-			c_line = parser.parse(options, args);
-		}
-		catch (org.apache.commons.cli.ParseException exp)
-		{
-			// oops, something went wrong
-			stderr.println("ERROR: " + exp.getMessage() + "\n");
-			//HelpFormatter hf = new HelpFormatter();
-			//hf.printHelp(t_gen.getAppName() + " [options]", options);
-			System.exit(ERR_ARGUMENTS);
-		}
-		return c_line;
-	}
-
-	private static void showHeader(PrintStream out)
-	{
-		out.println("ParkBench " + s_versionString + ", a versatile benchmark environment");
-	}
-	
 	protected void println(PrintStream out, String message, int verbosity_level)
 	{
 		if (verbosity_level >= m_verbosity)
@@ -384,7 +326,7 @@ public class Cli
 			out.println(message);
 		}
 	}
-	
+
 	protected void print(PrintStream out, String message, int verbosity_level)
 	{
 		if (verbosity_level >= m_verbosity)
@@ -393,6 +335,11 @@ public class Cli
 		}
 	}
 	
+	protected static void showHeader(PrintStream ps)
+	{
+		ps.println("ParkBench " + s_versionString + ", a versatile benchmark environment");
+	}
+
 	public static void main(String[] args)
 	{
 		Cli cli = new Cli(args);
