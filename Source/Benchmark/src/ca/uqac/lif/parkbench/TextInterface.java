@@ -328,11 +328,17 @@ public class TextInterface
 			{
 				if (params.containsKey(param))
 				{
-					m_stdout.printf(" %s", padToLength(params.get(param).toString(), 8));
+					Object p_value = params.get(param);
+					String p_value_string = "";
+					if (p_value != null)
+					{
+						p_value_string = p_value.toString();
+					}
+					m_stdout.printf(" %s", padToLength(p_value_string, 8));
 				}
 				else
 				{
-					m_stdout.printf("         ", padToLength(params.get(param).toString(), 8));
+					m_stdout.printf("         ", padToLength("", 8));
 				}
 			}
 			if (total_tests % m_numColumns == 0)
@@ -366,6 +372,10 @@ public class TextInterface
 
 	private static String padToLength(String s, int length)
 	{
+		if (s == null)
+		{
+			s = "";
+		}
 		int str_len = s.length();
 		if (str_len == length)
 		{
