@@ -41,7 +41,7 @@ import ca.uqac.lif.util.FileReadWrite;
  * for selecting, running and saving tests. Use it in environments where
  * memory or CPU is limited.
  * 
- * @author Sylvain Hallé
+ * @author Sylvain HallÃ©
  *
  */
 public class TextInterface

@@ -35,7 +35,7 @@ public abstract class Plot
 	/**
 	 * The terminal used for the plot's output
 	 */
-	public static enum Terminal {PDF, PNG, GIF, SVG, JPEG};
+	public static enum Terminal {PDF, PNG, GIF, SVG, JPEG, DUMB};
 
 	/**
 	 * The default terminal to use if none is specified
@@ -56,6 +56,11 @@ public abstract class Plot
 	 * The plot's title
 	 */
 	protected String m_title;
+	
+	/**
+	 * The plot's numerical ID
+	 */
+	protected int m_id;
 
 	/**
 	 * The plot's name. This is different from the plot's <em>title</em>, which
@@ -109,6 +114,26 @@ public abstract class Plot
 			return m_title;
 		}
 		return m_name;
+	}
+	
+	/**
+	 * Gets the plot's ID
+	 * @return The ID
+	 */
+	public int getId()
+	{
+		return m_id;
+	}
+	
+	/**
+	 * Sets the plot's ID
+	 * @param id The iD
+	 * @return This plot
+	 */
+	public Plot setId(int id)
+	{
+		m_id = id;
+		return this;
 	}
 	
 	/**
@@ -251,6 +276,9 @@ public abstract class Plot
 		case JPEG:
 			out = "jpg";
 			break;
+		case DUMB:
+			out = "dumb";
+			break;
 		default:
 			break;
 		}
@@ -279,6 +307,10 @@ public abstract class Plot
 		if (s.compareToIgnoreCase("jpg") == 0)
 		{
 			return Terminal.JPEG;
+		}
+		if (s.compareToIgnoreCase("txt") == 0)
+		{
+			return Terminal.DUMB;
 		}
 		return DEFAULT_TERMINAL;
 	}
