@@ -225,6 +225,24 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
+	 * Gets the start time of the test
+	 * @return The start time, 0 if test not started
+	 */
+	public long getStartTime()
+	{
+		return m_startTime;
+	}
+	
+	/**
+	 * Gets the end time of the test
+	 * @return The end time, 0 if test not finished
+	 */
+	public long getStopTime()
+	{
+		return m_stopTime;
+	}
+	
+	/**
 	 * Determines if the test can run, given the set of parameters
 	 * it is provided. <b>NOTE:</b> this must not be confused with
 	 * whether a test has prerequisites that need to be fulfilled.

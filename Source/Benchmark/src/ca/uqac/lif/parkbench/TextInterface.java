@@ -140,6 +140,11 @@ public class TextInterface
 					// Get list of graphs
 					plotMenu();
 				}
+				else if (line.compareToIgnoreCase("I") == 0)
+				{
+					// Settings
+					settingsMenu();
+				}
 				else if (line.compareToIgnoreCase("A") == 0)
 				{
 					m_stdout.print("(S)tart S(t)op (R)eset (C)ancel (D)etails ");
@@ -163,10 +168,10 @@ public class TextInterface
 							Test t = m_benchmark.getTest(test_num);
 							m_stdout.printf("Test %d: %s %s\n", test_num, t.getName(), t.getStatus().toString());
 							Parameters params = t.getParameters();
-							if (t.getStatus() == Status.RUNNING)
+							if (t.getStatus() == Status.RUNNING || t.getStatus() == Status.PREREQUISITES)
 							{
-								Number start_time = (Number) params.get("starttime");
-								m_stdout.printf("Started %d sec. ago", sec_time - start_time.longValue());
+								long start_time = t.getStartTime();
+								m_stdout.printf("Started %d sec. ago", sec_time - start_time);
 							}
 							m_stdout.print("");
 							for (String key : params.keySet())
@@ -497,6 +502,47 @@ public class TextInterface
 				m_stdout.printf("[ ] ");
 			}
 			m_stdout.printf("%2d %s\n", plot_id, padToLength(plot_name, 16));
+		}
+	}
+	
+	private void settingsMenu()
+	{
+		boolean run = true;
+		while (run)
+		{
+			try
+			{
+				m_stdout.printf("\nSettings\n--------\n");
+				m_stdout.printf("(C)olumns:     %d\n", m_numColumns);
+				m_stdout.printf("Back to (t)ests\n");
+				String line = null;
+				line = m_console.readLine();
+				if (line == null)
+				{
+					continue;
+				}
+				if (line.compareToIgnoreCase("T") == 0)
+				{
+					run = false;
+				}
+				else if (line.compareToIgnoreCase("C") == 0)
+				{
+					m_stdout.printf("Number of columns [%d]: ", m_numColumns);
+					String s_col = m_console.readLine();
+					if (s_col != null && !s_col.trim().isEmpty())
+					{
+						int n_col = Integer.parseInt(s_col.trim());
+						if (n_col > 0)
+						{
+							m_numColumns = n_col;
+						}
+					}
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 
