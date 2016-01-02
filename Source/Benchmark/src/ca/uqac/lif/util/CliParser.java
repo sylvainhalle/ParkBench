@@ -274,7 +274,7 @@ public class CliParser
 		
 		/**
 		 * Set the description for this argument
-		 * @param name The description
+		 * @param description The description
 		 * @return This argument
 		 */		
 		public Argument withDescription(String description)

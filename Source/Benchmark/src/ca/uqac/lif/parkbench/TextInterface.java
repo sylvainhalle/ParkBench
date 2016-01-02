@@ -162,7 +162,7 @@ public class TextInterface
 					}
 					else if (choice.compareToIgnoreCase("D") == 0)
 					{
-						long sec_time = (System.nanoTime() / 1000000000);
+						long sec_time = System.currentTimeMillis() / 1000;
 						for (int test_num : m_selectedTests)
 						{
 							Test t = m_benchmark.getTest(test_num);
@@ -180,6 +180,16 @@ public class TextInterface
 								m_stdout.printf("%s=%s ", key, value);
 							}
 							m_stdout.print("");
+							Parameters results = t.getResults();
+							if (t.getStatus() == Status.DONE)
+							{
+								for (String key : results.keySet())
+								{
+									String value = results.get(key).toString();
+									m_stdout.printf("%s=%s ", key, value);									
+								}
+								m_stdout.print("");
+							}
 						}
 					}
 					else if (choice.compareToIgnoreCase("T") == 0)
@@ -242,13 +252,13 @@ public class TextInterface
 						}
 					}
 				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
+			} 
+			catch (IOException e) 
+			{
 				e.printStackTrace();
 			}
 
 		}
-
 	}
 
 	/**

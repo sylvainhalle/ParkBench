@@ -262,8 +262,7 @@ public class AnsiPrinter extends PrintStream
    */
   public AnsiPrinter resetColors()
   {
-	  printBytes("\u001B[39m"); // Foreground
-	  printBytes("\u001B[49m"); // Background
+	  printBytes("\u001B[0m");
 	  return this;	  
   }
   
