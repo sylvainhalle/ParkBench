@@ -71,12 +71,13 @@ public class AnsiPrinter extends PrintStream
    * Until this color is changed, the text will be printed using
    * that color.
    * @param c The color
+   * @return This printer
    */
-  public void setForegroundColor(AnsiPrinter.Color c)
+  public AnsiPrinter setForegroundColor(AnsiPrinter.Color c)
   {
     if (!m_enabled)
     {
-      return;
+      return this;
     }
     String to_print = "";
     switch (c)
@@ -133,22 +134,153 @@ public class AnsiPrinter extends PrintStream
         // Do nothing
         break;
     }
-    try
+    printBytes(to_print);
+    return this;
+  }
+  
+  /**
+   * Shortcut to {@link #setForegroundColor(Color)}.
+   * @param c The colour
+   * @return This printer
+   */
+  public AnsiPrinter fg(Color c)
+  {
+	  return setForegroundColor(c);
+  }
+  
+  /**
+   * Sets the foreground color based on its RGB components.
+   * @param r The amount of red (R), between 0 and 255
+   * @param g The amount of green (G), between 0 and 255
+   * @param b The amount of blue (B), between 0 and 255
+   * @return This printer
+   */
+  public AnsiPrinter setForegroundColor(int r, int g, int b)
+  {
+	  printBytes("\u001B[38;2;" + r + ";" + g + ";" + b + "m");
+	  return this;	  
+  }
+
+  /**
+   * Sets the background color for printed text.
+   * Until this color is changed, the text will be printed using
+   * that color.
+   * @param c The color
+   * @return This printer
+   */
+  public AnsiPrinter setBackgroundColor(AnsiPrinter.Color c)
+  {
+    if (!m_enabled)
     {
-      out.write(to_print.getBytes());
+      return this;
     }
-    catch (IOException e)
+    String to_print = "";
+    switch (c)
     {
-      e.printStackTrace();
+      case BLACK:
+        to_print = "\u001B[0;40m";
+        break;
+      case RED:
+        to_print = "\u001B[0;41m";
+        break;
+      case GREEN:
+        to_print = "\u001B[0;42m";
+        break;
+      case BROWN:
+        to_print = "\u001B[0;43m";
+        break;
+      case BLUE:
+        to_print = "\u001B[0;44m";
+        break;
+      case PURPLE:
+        to_print = "\u001B[0;45m";
+        break;
+      case CYAN:
+        to_print = "\u001B[0;46m";
+        break;
+      case LIGHT_GRAY:
+        to_print = "\u001B[0;47m";
+        break;
+      case DARK_GRAY:
+        to_print = "\u001B[1;40m";
+        break;
+      case LIGHT_RED:
+        to_print = "\u001B[1;41m";
+        break;
+      case LIGHT_GREEN:
+        to_print = "\u001B[1;42m";
+        break;
+      case YELLOW:
+        to_print = "\u001B[1;43m";
+        break;
+      case LIGHT_BLUE:
+        to_print = "\u001B[1;44m";
+        break;
+      case LIGHT_PURPLE:
+        to_print = "\u001B[1;45m";
+        break;
+      case LIGHT_CYAN:
+        to_print = "\u001B[1;46m";
+        break;
+      case WHITE:
+        to_print = "\u001B[1;47m";
+        break;
+      default:
+        // Do nothing
+        break;
     }
+    printBytes(to_print);
+    return this;
+  }
+  
+  /**
+   * Shortcut to {@link #setBackgroundColor(Color)}.
+   * @param c The colour
+   * @return This printer
+   */
+  public AnsiPrinter bg(Color c)
+  {
+	  return setBackgroundColor(c);
+  }
+  
+  /**
+   * Sets the background color based on its RGB components.
+   * @param r The amount of red (R), between 0 and 255
+   * @param g The amount of green (G), between 0 and 255
+   * @param b The amount of blue (B), between 0 and 255
+   * @return This printer
+   */
+  public AnsiPrinter setBackgroundColor(int r, int g, int b)
+  {
+	  printBytes("\u001B[48;2;" + r + ";" + g + ";" + b + "m");
+	  return this;	  
   }
   
   /**
    * Resets the colors to their default values
+   * @return This printer
    */
-  public void resetColors()
+  public AnsiPrinter resetColors()
   {
-    setForegroundColor(Color.LIGHT_GRAY);
+	  printBytes("\u001B[39m"); // Foreground
+	  printBytes("\u001B[49m"); // Background
+	  return this;	  
+  }
+  
+  /**
+   * Prints a string to bytes
+   * @param s The string to print
+   */
+  private void printBytes(String s)
+  {
+	  try
+	  {
+		  out.write(s.getBytes());
+	  }
+	  catch (IOException e)
+	  {
+		  e.printStackTrace();
+	  }	  
   }
 
 }

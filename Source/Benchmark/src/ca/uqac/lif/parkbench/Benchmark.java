@@ -637,8 +637,9 @@ public class Benchmark
 	 */
 	public Benchmark addPlot(Plot plot)
 	{
-		//plot.addTests(this);
-		m_plots.put(s_plotCounter++, plot);
+		int plot_id = s_plotCounter++; 
+		plot.setId(plot_id);
+		m_plots.put(plot_id, plot);
 		return this;
 	}
 	

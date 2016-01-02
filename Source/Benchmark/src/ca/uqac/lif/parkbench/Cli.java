@@ -227,6 +227,8 @@ public class Cli
 		{
 			TextInterface ti = new TextInterface(benchmark, stdout);
 			ti.run();
+			benchmark.stop();
+			System.exit(ERR_OK);
 		}
 		else
 		{
