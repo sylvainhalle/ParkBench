@@ -28,6 +28,8 @@ import ca.uqac.lif.cornipickle.json.JsonElement;
 import ca.uqac.lif.cornipickle.json.JsonList;
 import ca.uqac.lif.cornipickle.json.JsonMap;
 import ca.uqac.lif.parkbench.plot.Plot;
+import ca.uqac.lif.util.CliParser;
+import ca.uqac.lif.util.CliParser.ArgumentMap;
 
 /**
  * A benchmark controls the execution of a set of tests
@@ -716,5 +718,29 @@ public class Benchmark
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Adds command-line parameters specific to this benchmark. These parameters
+	 * will be added to ParkBench's own command-line parameters.
+	 * @param c_line The instance of CliParser to add parameters to
+	 */
+	public void setupCommandLine(CliParser c_line)
+	{
+		// Do nothing
+		return;
+	}
+	
+	/**
+	 * Processes the arguments parsed from the command line. This is useful
+	 * only if the benchmark has defined its own arguments in 
+	 * {@link #setupCommandLine(CliParser)}. 
+	 * @param arguments The map of arguments values parsed from the
+	 *   command line 
+	 */
+	public void readCommandLine(ArgumentMap arguments)
+	{
+		// Do nothing
+		return;
 	}
 }

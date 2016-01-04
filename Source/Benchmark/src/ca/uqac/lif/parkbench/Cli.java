@@ -43,7 +43,7 @@ public class Cli
 	/**
 	 * Version string
 	 */
-	protected static String s_versionString = "0.3.1c";
+	protected static String s_versionString = "0.3.2";
 
 	/**
 	 * Default server name
@@ -91,10 +91,8 @@ public class Cli
 
 		final AnsiPrinter stderr = new AnsiPrinter(System.err);
 		final AnsiPrinter stdout = new AnsiPrinter(System.out);
-		//stdout.setForegroundColor(AnsiPrinter.Color.BLACK);
-		//stderr.setForegroundColor(AnsiPrinter.Color.BLACK);
 
-		// Propertly close print streams when closing the program
+		// Properly close print streams when closing the program
 		// https://www.securecoding.cert.org/confluence/display/java/FIO14-J.+Perform+proper+cleanup+at+program+termination
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
 		{
@@ -110,6 +108,7 @@ public class Cli
 
 		// Parse command line arguments
 		CliParser c_line = setupOptions();
+		benchmark.setupCommandLine(c_line);
 		ArgumentMap a_map = c_line.parse(m_args);
 		if (a_map.hasOption("verbosity"))
 		{
@@ -121,7 +120,7 @@ public class Cli
 		}
 		if (a_map.hasOption("version"))
 		{
-			stderr.println("(C) 2015 Sylvain Hallé et al., Université du Québec à Chicoutimi");
+			stderr.println("(C) 2015-2016 Sylvain Hallé et al., Université du Québec à Chicoutimi");
 			stderr.println("This program comes with ABSOLUTELY NO WARRANTY.");
 			stderr.println("This is a free software, and you are welcome to redistribute it");
 			stderr.println("under certain conditions. See the file LICENSE for details.\n");
@@ -152,9 +151,9 @@ public class Cli
 		{
 			text_interactive = true;
 		}
-		if (a_map.hasOption("t"))
+		if (a_map.hasOption("threads"))
 		{
-			num_threads = Integer.parseInt(a_map.getOptionValue("p"));
+			num_threads = Integer.parseInt(a_map.getOptionValue("threads"));
 		}
 		benchmark.setThreads(num_threads);
 
@@ -163,7 +162,6 @@ public class Cli
 		JsonParser parser = new JsonFastParser();
 		for (String filename : remaining_args)
 		{
-			//stdout.setForegroundColor(AnsiPrinter.Color.BROWN);
 			if (merge)
 			{
 				println(stdout, "Merging with benchmark state " + filename, 1);
@@ -189,6 +187,10 @@ public class Cli
 			}
 		}
 		String save_filename = benchmark.getName() + ".json";
+		
+		// Now that the main loop has parsed arguments, send them to the
+		// benchmark instance for further processing
+		benchmark.readCommandLine(a_map);
 
 		if (interactive_mode)
 		{

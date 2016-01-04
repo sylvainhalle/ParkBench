@@ -151,15 +151,7 @@ public class CliParser
 				// none: error
 				return false;
 			}
-			if (current_argument.m_shortName != null)
-			{
-				parsed.put(current_argument.m_longName, current_value);							
-			}
-			else
-			{
-				// Use short name as a key only if no short name
-				parsed.put(current_argument.m_shortName, current_value);
-			}
+			parsed.put(current_argument, current_value);
 		}	
 		else
 		{
@@ -299,7 +291,11 @@ public class CliParser
 		{
 			if (m_shortName == null)
 			{
-				return 0;
+				if (m_longName == null)
+				{
+					return 0;
+				};
+				return m_longName.hashCode();
 			}
 			return m_shortName.hashCode();
 		}
@@ -317,12 +313,12 @@ public class CliParser
 		}
 	}
 	
-	public static class ArgumentMap
+	public class ArgumentMap
 	{
 		/**
 		 * Map of named parameters and their values
 		 */
-		private final Map<String,String> m_arguments;
+		private final Map<Argument,String> m_arguments;
 		
 		/**
 		 * List of unnamed parameters
@@ -335,7 +331,7 @@ public class CliParser
 		public ArgumentMap()
 		{
 			super();
-			m_arguments = new HashMap<String,String>();
+			m_arguments = new HashMap<Argument,String>();
 			m_others = new LinkedList<String>();
 		}
 		
@@ -346,7 +342,12 @@ public class CliParser
 		 */
 		public boolean hasOption(String name)
 		{
-			return m_arguments.containsKey(name);
+			Argument a = findArgument(name);
+			if (a == null)
+			{
+				return false;
+			}
+			return m_arguments.containsKey(a);
 		}
 		
 		/**
@@ -357,11 +358,12 @@ public class CliParser
 		 */
 		public String getOptionValue(String name)
 		{
-			if (m_arguments.containsKey(name))
+			Argument a = findArgument(name);
+			if (a == null)
 			{
-				return m_arguments.get(name);
+				return null;
 			}
-			return null;
+			return m_arguments.get(a);
 		}
 		
 		/**
@@ -375,13 +377,13 @@ public class CliParser
 		
 		/**
 		 * Puts an argument into the map with its value
-		 * @param name The argument's <em>short</em> name
+		 * @param name The argument
 		 * @param value Its value
 		 * @return The element just put
 		 */
-		String put(String name, String value)
+		String put(Argument a, String value)
 		{
-			return m_arguments.put(name, value);
+			return m_arguments.put(a, value);
 		}
 		
 		/**
