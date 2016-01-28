@@ -23,6 +23,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+/**
+ * A named set of input or output data for a test
+ * @author Sylvain Hallé
+ */
 public class Parameters extends HashMap<String,Object>
 {
 	/**
@@ -30,11 +34,19 @@ public class Parameters extends HashMap<String,Object>
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Creates an empty set of parameters
+	 */
 	public Parameters()
 	{
 		super();
 	}
 	
+	/**
+	 * Creates a set of parameters by copying the contents of another
+	 * set
+	 * @param params The parameters to copy
+	 */
 	public Parameters(Parameters params)
 	{
 		super();
