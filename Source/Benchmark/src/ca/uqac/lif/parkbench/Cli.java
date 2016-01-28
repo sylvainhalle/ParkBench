@@ -43,7 +43,7 @@ public class Cli
 	/**
 	 * Version string
 	 */
-	protected static String s_versionString = "0.3.2";
+	protected static final String s_versionString = Cli.class.getPackage().getImplementationVersion();
 
 	/**
 	 * Default server name
@@ -354,6 +354,7 @@ public class Cli
 	protected static void showHeader(PrintStream ps)
 	{
 		ps.println("ParkBench " + s_versionString + ", a versatile benchmark environment");
+		ps.println("(C) 2015-2016 Sylvain Hallé, Université du Québec à Chicoutimi");
 	}
 
 	public static void main(String[] args)
