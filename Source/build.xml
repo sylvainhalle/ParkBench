@@ -146,7 +146,7 @@
       includeantruntime="false">
       <classpath>
         <pathelement location="${build.bindir}"/>
-        <pathelement location="${build.depdir}"/>
+        <pathelement path="${build.depdir}"/>
         <pathelement path="${java.class.path}"/>
       </classpath>
     </javac>
@@ -206,7 +206,7 @@
       <tstamp>
          <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
       </tstamp>
-      <jar destfile="${build.jar.filename}" filesetmanifest="mergewithoutmain">
+      <jar destfile="${build.jar.filename}" filesetmanifest="skip">
 	  <manifest>
 	      <attribute name="Main-Class" value="${build.mainclass}"/>
 	      <attribute name="Class-Path" value="."/>
@@ -215,9 +215,9 @@
           <attribute name="Implementation-Version" value="${build.version}"/>
 	  </manifest>
 	  <fileset dir="${build.bindir}"/>
-	  <fileset dir="${build.depdir}">
+	  <zipgroupfileset dir="${build.depdir}">
 	    <include name="*" if="${build.jar.withdeps}"/>
-	  </fileset>
+	  </zipgroupfileset>
 	  <fileset dir="${build.srcdir}">
 	    <include name="*" if="${build.jar.withsrc}"/>
 	  </fileset>

@@ -41,9 +41,13 @@ public class Cli
 	public static final int ERR_RUNTIME = 6;
 
 	/**
-	 * Version string
+	 * Version string. This must be written here, rather than reading it
+	 * from the containing manifest. The reason is that the parkbench jar
+	 * is likely to be contained within a test suite jar, and all manifest
+	 * information (including this version number) will be overwritten by that
+	 * of the containing jar.
 	 */
-	protected static final String s_versionString = Cli.class.getPackage().getImplementationVersion();
+	protected static final String s_versionString = "0.3.3b";
 
 	/**
 	 * Default server name
@@ -331,7 +335,10 @@ public class Cli
 		.withDescription("Use x threads (default: " + s_defaultNumThreads + ")")
 		.withLongName("threads")
 		.withShortName("t")
-		.withArgument("x"));		
+		.withArgument("x"));
+		options.addArgument(new CliParser.Argument()
+		.withDescription("Show version information")
+		.withLongName("version"));
 		return options;
 	}
 

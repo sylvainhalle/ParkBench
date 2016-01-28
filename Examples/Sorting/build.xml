@@ -49,6 +49,10 @@
   <!-- The project's version number -->
   <property name="build.version" value="1.0"/>
   
+  <!-- The folder where libraries (ant-contrib, etc.) will be downloaded
+       if necessary -->
+  <property name="build.libdir" value="lib"/>
+  
   <!-- The folder with the project's source files -->
   <property name="build.srcdir" value="src"/>
   
@@ -56,7 +60,7 @@
   <property name="build.bindir" value="bin"/>
   
   <!-- The folder where the downloaded dependencies (if any) should go -->
-  <property name="build.depdir" value="deps"/>
+  <property name="build.depdir" value="dep"/>
 
   <!-- The folder where the Javadoc files should go -->
   <property name="build.docdir" value="doc"/>
@@ -66,6 +70,9 @@
   
   <!-- Generate a jar with the sources -->
   <property name="build.jar.withsrc" value="true"/>
+  
+  <!-- Generate a jar with the dependencies -->
+  <property name="build.jar.withdeps" value="true"/>
   
   <!-- Base name of the jar to produce (used by the "zip" target) -->
   <basename property="build.jar.basename" file="${build.jar.filename}" suffix=".jar"/>
@@ -77,6 +84,10 @@
   -->
   <target name="init" depends=""
     description="Initialize the project">
+    <mkdir dir="${build.libdir}"/>
+    <mkdir dir="${build.bindir}"/>
+    <mkdir dir="${build.docdir}"/>
+    <mkdir dir="${build.depdir}"/>
   </target>
   
   <!-- Target: zip
@@ -142,7 +153,7 @@
       <tstamp>
          <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
       </tstamp>
-      <jar destfile="${build.jar.filename}" filesetmanifest="mergewithoutmain">
+      <jar destfile="${build.jar.filename}" filesetmanifest="skip">
 	  <manifest>
 	      <attribute name="Main-Class" value="${build.mainclass}"/>
 	      <attribute name="Class-Path" value="."/>
@@ -150,7 +161,10 @@
 	      <attribute name="Built-Date" value="${TODAY}"/>
 	      <attribute name="Implementation-Version" value="${build.version}"/>
 	  </manifest>
-	  <zipfileset excludes="META-INF/*.SF" src="${build.parkbench}"/>
+	  <!-- <zipfileset excludes="META-INF/*.SF" src="${build.parkbench}"/> -->
+	  <zipgroupfileset dir="${build.depdir}">
+	    <include name="*" if="${build.jar.withdeps}"/>
+	  </zipgroupfileset>
 	  <fileset dir="${build.bindir}"/>
 	  <fileset dir="${build.srcdir}">
 	    <include name="*" if="${build.jar.withsrc}"/>
@@ -193,13 +207,6 @@
   -->
   <target name="run" description="Invoke the runnable JAR">
     <java jar="${build.jar.filename}" fork="true"/>
-  </target>
-  
-  <!-- Target: antrun-version
-       Shows the version of AntRun
-  -->
-  <target name="antrun-version" description="Show build script version">
-    <echo message="This is AntRun version ${antrun.version}" level="info"/>
   </target>
   
 </project>
