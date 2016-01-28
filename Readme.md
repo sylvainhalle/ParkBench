@@ -38,7 +38,7 @@ The project requires the following libraries to be present in the system:
 - The [json-simple](https://code.google.com/p/json-simple/) library for
   fast JSON parsing *(tested with version 1.1.1)*
 - The [Bullwinkle parser](https://github.com/sylvainhalle/Bullwinkle),
-  an on-the-fly parser for BNF grammars
+  an on-the-fly parser for BNF grammars *(requires version 1.1.8b or later)*
 
 Using Ant, you can automatically download any libraries missing from your
 system by typing:
