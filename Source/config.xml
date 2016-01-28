@@ -38,6 +38,7 @@
   <!-- Output jar -->
   <jar>
     <filename>../parkbench.jar</filename>
+    <withdeps>true</withdeps>
   </jar>
   
   <!-- Redefine directories -->
@@ -45,6 +46,7 @@
   <bindir>Benchmark/bin</bindir>
   <docdir>Benchmark/doc</docdir>
   <libdir>Benchmark/lib</libdir>
+  <depdir>Benchmark/dep</depdir>
   
   <!--
     Write JAR dependencies here.
