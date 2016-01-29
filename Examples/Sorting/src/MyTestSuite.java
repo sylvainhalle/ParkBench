@@ -56,6 +56,7 @@ public class MyTestSuite extends TestSuite
 			.setParameterX("size", "List size")
 			.setParameterY("time", "Time (ms)")
 			.setLogscaleY();
-		b.addPlot(plot);		
+		plot.addTests(b);
+		b.addPlot(plot);
 	}
 }
