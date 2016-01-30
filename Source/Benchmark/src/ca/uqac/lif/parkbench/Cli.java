@@ -27,6 +27,7 @@ import ca.uqac.lif.cornipickle.json.JsonParser;
 import ca.uqac.lif.cornipickle.json.JsonParser.JsonParseException;
 import ca.uqac.lif.cornipickle.util.AnsiPrinter;
 import ca.uqac.lif.util.CliParser;
+import ca.uqac.lif.util.CliParser.Argument;
 import ca.uqac.lif.util.CliParser.ArgumentMap;
 import ca.uqac.lif.util.FileReadWrite;
 
@@ -52,12 +53,12 @@ public class Cli
 	/**
 	 * Default server name
 	 */
-	protected String m_defaultServerName = "localhost";
+	protected static String s_defaultServerName = "localhost";
 
 	/**
 	 * Default port to listen to
 	 */
-	protected int m_defaultPort = 21212;
+	protected static int s_defaultPort = 21212;
 
 	/**
 	 * Verbosity level for CLI
@@ -78,17 +79,25 @@ public class Cli
 	 * Command-line arguments
 	 */
 	protected String[] m_args;
+	
+	protected Argument[] m_testSuiteArguments;
 
-	public Cli(String[] args)
+	public Cli(String[] args, Argument[] arguments)
 	{
 		super();
 		m_args = args;
+		m_testSuiteArguments = arguments;
+	}
+	
+	public Cli(String[] args)
+	{
+		this(args, new Argument[0]);
 	}
 
 	public void start(final Benchmark benchmark)
 	{
-		String server_name = m_defaultServerName;
-		int server_port = m_defaultPort;
+		String server_name = s_defaultServerName;
+		int server_port = s_defaultPort;
 		boolean interactive_mode = false, text_interactive = false;
 		int num_threads = s_defaultNumThreads;
 		boolean merge = false;
@@ -109,10 +118,13 @@ public class Cli
 				stdout.close();
 			}
 		}));
-
 		// Parse command line arguments
 		CliParser c_line = setupOptions();
-		benchmark.setupCommandLine(c_line);
+		Argument[] arguments = benchmark.setupCommandLineArguments();
+		for (Argument arg : arguments)
+		{
+			c_line.addArgument(arg);
+		}
 		ArgumentMap a_map = c_line.parse(m_args);
 		if (a_map.hasOption("verbosity"))
 		{
@@ -303,7 +315,7 @@ public class Cli
 	 * Sets up the options for the command line parser
 	 * @return The options
 	 */
-	private CliParser setupOptions()
+	static CliParser setupOptions()
 	{
 		CliParser options = new CliParser();
 		options.addArgument(new CliParser.Argument()
@@ -322,12 +334,12 @@ public class Cli
 		.withLongName("merge")
 		.withShortName("m"));
 		options.addArgument(new CliParser.Argument()
-		.withDescription("Set server name or IP address x (default: " + m_defaultServerName + ")")
+		.withDescription("Set server name or IP address x (default: " + s_defaultServerName + ")")
 		.withLongName("servername")
 		.withShortName("s")
 		.withArgument("x"));
 		options.addArgument(new CliParser.Argument()
-		.withDescription("Listen on port x (default: " + m_defaultPort + ")")
+		.withDescription("Listen on port x (default: " + s_defaultPort + ")")
 		.withLongName("port")
 		.withShortName("p")
 		.withArgument("x"));

@@ -21,8 +21,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public abstract class TestSuite
-{
-	public static void initialize(String[] args, TestSuite reference)
+{	
+	public void initialize(String[] args, TestSuite reference)
 	{
 		Cli cli = new Cli(args);
 		Benchmark b = new Benchmark();
@@ -49,7 +49,7 @@ public abstract class TestSuite
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		cli.start(b);		
+		cli.start(b);
 	}
 	
 	public abstract void setup(Benchmark b);
