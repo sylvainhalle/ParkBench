@@ -28,7 +28,6 @@ import ca.uqac.lif.cornipickle.json.JsonElement;
 import ca.uqac.lif.cornipickle.json.JsonList;
 import ca.uqac.lif.cornipickle.json.JsonMap;
 import ca.uqac.lif.parkbench.plot.Plot;
-import ca.uqac.lif.util.CliParser;
 import ca.uqac.lif.util.CliParser.Argument;
 import ca.uqac.lif.util.CliParser.ArgumentMap;
 
