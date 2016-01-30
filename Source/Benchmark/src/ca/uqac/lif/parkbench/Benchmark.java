@@ -724,7 +724,7 @@ public class Benchmark
 	/**
 	 * Processes the arguments parsed from the command line. This is useful
 	 * only if the benchmark has defined its own arguments in 
-	 * {@link #setupCommandLine(CliParser)}. 
+	 * {@link  #setupCommandLineArguments()}. 
 	 * @param arguments The map of arguments values parsed from the
 	 *   command line 
 	 */
