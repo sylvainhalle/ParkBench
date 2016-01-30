@@ -12,6 +12,7 @@ Table of Contents                                                    {#toc}
 
 - [Downloading](#download)
 - [Quick start guide](#quickstart)
+- [Now what?](#what)
 - [About the author](#about)
 
 Downloading
@@ -99,7 +100,7 @@ ParkBench also requires the following (optional) software to run:
 are in the system's path. This is especially true for Windows systems where
 this is not the case by default.
 
-Now what?
+Now what?                                                           {#what}
 ---------
 
 You are ready to use ParkBench to create your own test suites. Please read
