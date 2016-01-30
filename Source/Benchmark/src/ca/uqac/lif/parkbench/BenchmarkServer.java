@@ -28,12 +28,12 @@ public class BenchmarkServer extends InnerFileServer
 		setServerPort(port);
 		registerCallback(0, new BenchmarkStatus(b));
 		registerCallback(0, new SystemInfo(b));
-		registerCallback(0, new RunTest(b));
-		registerCallback(0, new StopTest(b));
-		registerCallback(0, new CleanTest(b));
+		registerCallback(0, new RunExperiment(b));
+		registerCallback(0, new StopExperiment(b));
+		registerCallback(0, new CleanExperiment(b));
 		registerCallback(0, new GetPlot(b));
 		registerCallback(0, new GetPlots(b));
 		registerCallback(0, new SaveBenchmark(b));
-		registerCallback(0, new FilterTests(b));
+		registerCallback(0, new FilterExperiments(b));
 	}
 }

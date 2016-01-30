@@ -28,27 +28,25 @@ import ca.uqac.lif.cornipickle.json.JsonElement;
 import ca.uqac.lif.cornipickle.json.JsonList;
 import ca.uqac.lif.cornipickle.json.JsonMap;
 import ca.uqac.lif.parkbench.plot.Plot;
-import ca.uqac.lif.util.CliParser.Argument;
-import ca.uqac.lif.util.CliParser.ArgumentMap;
 
 /**
- * A benchmark controls the execution of a set of tests
+ * A benchmark controls the execution of a set of experiments
  * @author Sylvain
  *
  */
 public class Benchmark
 {
 	/**
-	 * The set of tests managed by the benchmark
+	 * The set of experiments managed by the benchmark
 	 */
-	protected Set<Test> m_tests;
+	protected Set<Experiment> m_tests;
 	
 	/**
-	 * A subset of tests managed by the benchmark. This set should
-	 * contain one test instance per distinct class in the benchmark.
+	 * A subset of experiments managed by the benchmark. This set should
+	 * contain one experiment instance per distinct class in the benchmark.
 	 * It is used for deserializing tests from JSON documents. 
 	 */
-	protected Set<Test> m_classInstances;
+	protected Set<Experiment> m_classInstances;
 
 	/**
 	 * A name for this benchmark
@@ -56,7 +54,7 @@ public class Benchmark
 	protected String m_name;
 
 	/**
-	 * The dispatcher for the threads for running the tests
+	 * The dispatcher for the threads for running the experiments
 	 */
 	protected ThreadDispatcher m_dispatcher;
 
@@ -70,8 +68,12 @@ public class Benchmark
 	 */
 	protected Thread m_dispatcherThread;
 
+	/**
+	 * A map containing all plots managed by this benchmark. Its keys
+	 * are "meaningless" integers, and its values are the plots
+	 * corresponding to each key. 
+	 */
 	protected Map<Integer,Plot> m_plots;
-
 
 	/**
 	 * Create an empty benchmark 
@@ -84,14 +86,15 @@ public class Benchmark
 
 	/**
 	 * Create an empty benchmark 
-	 * @param num_threads The number of threads to allow to this benchmark
-	 *  (i.e. the number of tests that are allowed to run simultaneously)
+	 * @param num_threads The number of threads to allocate to this benchmark
+	 *  (i.e. the number of experiments that are allowed to run
+	 *  simultaneously)
 	 */
 	public Benchmark(int num_threads)
 	{
 		super();
-		m_tests = new HashSet<Test>();
-		m_classInstances = new HashSet<Test>();
+		m_tests = new HashSet<Experiment>();
+		m_classInstances = new HashSet<Experiment>();
 		m_name = "Untitled";
 		m_dispatcher = new ThreadDispatcher(num_threads);
 		m_dispatcherThread = new Thread(m_dispatcher);
@@ -118,29 +121,29 @@ public class Benchmark
 	}
 
 	/**
-	 * Add a test to the benchmark
-	 * @param t The test to add
+	 * Add an experiment to the benchmark
+	 * @param t The experiment to add
 	 */
-	public void addTest(Test t)
+	public void addExperiment(Experiment t)
 	{
 		m_tests.add(t);
-		addTestToClassInstances(t);
+		addExperimentToClassInstances(t);
 	}
 	
 	/**
-	 * Conditionally adds a test instances to the set of test
-	 * classes. The test will be added to the set only if there is
-	 * no test of the same class already present.
-	 * @param t The test to add
-	 * @return true if the test was <em>not</em> added to the set,
+	 * Conditionally adds an experiment instances to the set of test
+	 * classes. The experiment will be added to the set only if there is
+	 * no experiment of the same class already present.
+	 * @param t The experiment to add
+	 * @return true if the experiment was <em>not</em> added to the set,
 	 *   false otherwise
 	 */
-	protected boolean addTestToClassInstances(Test t)
+	protected boolean addExperimentToClassInstances(Experiment t)
 	{
 		// Loop through class instances and add only if this class does
 		// not exist
 		boolean found = false;
-		for (Test t_i : m_classInstances)
+		for (Experiment t_i : m_classInstances)
 		{
 			if (t.isCompatible(t_i))
 			{
@@ -156,16 +159,16 @@ public class Benchmark
 	}
 
 	/**
-	 * Retrieves a set of tests based on a set of parameters
-	 * @param tests The collection of tests to pick from
+	 * Retrieves a set of experiments based on a set of parameters
+	 * @param tests The collection of experiments to pick from
 	 * @param parameters The parameters
-	 * @return The tests with the corresponding parameters, if
+	 * @return The experiments with the corresponding parameters, if
 	 *   any
 	 */
-	public static final Set<Test> getTests(Collection<Test> tests, Parameters parameters)
+	public static final Set<Experiment> getExperiments(Collection<Experiment> tests, Parameters parameters)
 	{
-		Set<Test> out = new HashSet<Test>();
-		for (Test t : tests)
+		Set<Experiment> out = new HashSet<Experiment>();
+		for (Experiment t : tests)
 		{
 			Parameters t_params = t.getParameters();
 			if (t_params.match(parameters))
@@ -180,27 +183,28 @@ public class Benchmark
 	 * Return the set of all tests in the benchmark
 	 * @return The tests
 	 */
-	public Set<Test> getTests()
+	public Set<Experiment> getExperiments()
 	{
 		return m_tests;
 	}
 
 	/**
-	 * Retrieves a single test based on a set of parameters. In case
-	 * many tests match the parameters, one is picked nondeterministically.
-	 * @param tests The collection of tests to pick from
+	 * Retrieves a single experiment based on a set of parameters. In case
+	 * many experiments match the parameters, one is picked
+	 * nondeterministically.
+	 * @param tests The collection of experiments to pick from
 	 * @param parameters The parameters
-	 * @return The test with the corresponding parameters,
+	 * @return The experiment with the corresponding parameters,
 	 *   null if not found
 	 */	
-	public static final Test getTest(Collection<Test> tests, Parameters parameters)
+	public static final Experiment getExperiment(Collection<Experiment> tests, Parameters parameters)
 	{
-		Set<Test> out = getTests(tests, parameters);
+		Set<Experiment> out = getExperiments(tests, parameters);
 		if (out.isEmpty())
 		{
 			return null;
 		}
-		for (Test t : out)
+		for (Experiment t : out)
 		{
 			return t;
 		}
@@ -214,10 +218,10 @@ public class Benchmark
 	 */
 	public void generateAllPrerequisites(boolean override)
 	{
-		Iterator<Test> it = m_tests.iterator();
+		Iterator<Experiment> it = m_tests.iterator();
 		while (it.hasNext())
 		{
-			Test t = it.next();
+			Experiment t = it.next();
 			Parameters input = t.getParameters();
 			if (override || !t.prerequisitesFulilled(input))
 			{
@@ -228,13 +232,13 @@ public class Benchmark
 
 	/**
 	 * Retrieves the set of all parameter names contained in
-	 * at least one test
+	 * at least one experiment
 	 * @return The set of parameter names
 	 */
-	public Set<String> getTestParameterNames()
+	public Set<String> getExperimentParameterNames()
 	{
 		Set<String> out = new HashSet<String>();
-		for (Test t : m_tests)
+		for (Experiment t : m_tests)
 		{
 			out.addAll(t.getParameters().keySet());
 		}
@@ -251,15 +255,15 @@ public class Benchmark
 	}
 
 	/**
-	 * Sequentially runs all the tests in the benchmark
+	 * Sequentially runs all the experiments in the benchmark
 	 */
-	public void runAllTests()
+	public void runAllExperiments()
 	{
-		Iterator<Test> it = m_tests.iterator();
+		Iterator<Experiment> it = m_tests.iterator();
 		while (it.hasNext())
 		{
-			Test t = it.next();
-			if (t.getStatus() == Test.Status.NOT_DONE)
+			Experiment t = it.next();
+			if (t.getStatus() == Experiment.Status.NOT_DONE)
 			{
 				t.run();
 			}
@@ -267,15 +271,15 @@ public class Benchmark
 	}
 
 	/**
-	 * Queues all the tests in the benchmark
+	 * Queues all the experiments in the benchmark
 	 */
-	public void queueAllTests()
+	public void queueAllExperiments()
 	{
-		Iterator<Test> it = m_tests.iterator();
+		Iterator<Experiment> it = m_tests.iterator();
 
 		while (it.hasNext())
 		{
-			Test t = it.next();
+			Experiment t = it.next();
 			if (t.canRun(t.getParameters()))
 			{
 				m_dispatcher.putInQueue(t);
@@ -284,13 +288,13 @@ public class Benchmark
 	}
 
 	/**
-	 * Runs a test in the benchmark
-	 * @param test_id The id of the test to run
-	 * @return true if a test with that ID exists, false otherwise
+	 * Runs an experiment in the benchmark
+	 * @param exp_id The id of the experiment to run
+	 * @return true if an experiment with that ID exists, false otherwise
 	 */
-	public boolean runTest(int test_id)
+	public boolean runExperiment(int exp_id)
 	{
-		Test t = getTest(test_id);
+		Experiment t = getExperiment(exp_id);
 		if (t != null)
 		{
 			if (t.canRun(t.getParameters()))
@@ -303,13 +307,13 @@ public class Benchmark
 	}
 
 	/**
-	 * Places a test in the waiting queue to be executed
-	 * @param test_id The id of the test to run
-	 * @return true if a test with that ID exists, false otherwise
+	 * Places an experiment in the waiting queue to be executed
+	 * @param test_id The id of the experiment to run
+	 * @return true if an experiment with that ID exists, false otherwise
 	 */
-	public boolean queueTest(int test_id)
+	public boolean queueExperiment(int test_id)
 	{
-		Test t = getTest(test_id);
+		Experiment t = getExperiment(test_id);
 		if (t != null)
 		{
 			if (t.canRun(t.getParameters()))
@@ -322,20 +326,20 @@ public class Benchmark
 	}
 
 	/**
-	 * Stops a test
-	 * @param test_id The ID of the test to stop
-	 * @return true if the test exits (whether or not it needed stopping),
-	 *   false otherwise
+	 * Stops an experiment
+	 * @param exp_id The ID of the experiment to stop
+	 * @return true if the experiment exits (whether or not it needed
+	 *   stopping), false otherwise
 	 */
-	public boolean stopTest(int test_id)
+	public boolean stopExperiment(int exp_id)
 	{
-		return m_dispatcher.cancel(test_id);		
+		return m_dispatcher.cancel(exp_id);		
 	}
 
 	/**
-	 * Checks if all the tests in the benchmark are done
+	 * Checks if all the experiments in the benchmark are done
 	 * (either finished or interrupted)
-	 * @return true if all tests are finished, false otherwise
+	 * @return true if all experiments are finished, false otherwise
 	 */
 	public boolean isFinished()
 	{
@@ -343,14 +347,14 @@ public class Benchmark
 	}
 
 	/**
-	 * Sets the dry run status of every test in the benchmark.
-	 * See {@link Test#setDryRun(boolean)}.
+	 * Sets the dry run status of every experiment in the benchmark.
+	 * See {@link Experiment#setDryRun(boolean)}.
 	 * @param b The dry run status
 	 * @return An instance of this benchmark
 	 */
 	public Benchmark setDryRun(boolean b)
 	{
-		for (Test t : m_tests)
+		for (Experiment t : m_tests)
 		{
 			t.setDryRun(b);
 		}
@@ -361,7 +365,7 @@ public class Benchmark
 	 * Sets the number of threads to be used with this benchmark.
 	 * <b>NOTE:</b> this will stop and <b>wipe out</b> the current
 	 * {@link ThreadDispatcher}, leaving dangling any tasks that were running
-	 * in it. It is not recommended to call this method while tests are
+	 * in it. It is not recommended to call this method while experiments are
 	 * running.
 	 * @param num_threads The number of threads this benchmark should use
 	 * @return An instance of this benchmark
@@ -379,7 +383,7 @@ public class Benchmark
 	public String toString()
 	{
 		StringBuilder out = new StringBuilder();
-		for (Test t : m_tests)
+		for (Experiment t : m_tests)
 		{
 			out.append(t);
 		}
@@ -403,32 +407,32 @@ public class Benchmark
 	 */
 	public void deserializeState(JsonMap state, boolean merge)
 	{
-		Set<Test> new_tests = new HashSet<Test>();
+		Set<Experiment> new_tests = new HashSet<Experiment>();
 		m_name = state.getString("name");
 		JsonList test_list = (JsonList) state.get("tests");
 		for (JsonElement el : test_list)
 		{
 			JsonMap el_test = (JsonMap) el;
 			int test_id = el_test.getNumber("id").intValue();
-			Test test_instance = findTestWithState(el_test);
+			Experiment test_instance = findExperimentWithState(el_test);
 			if (test_instance != null)
 			{
-				Test new_test = test_instance.newTest(test_id);
+				Experiment new_test = test_instance.newExperiment(test_id);
 				new_test.deserializeState(el_test);
 				new_tests.add(new_test);
 			}
 		}
-		// Replaces the old set of tests with the ones created from the JSON
+		// Replaces the old set of experiments with the ones created from the JSON
 		// Note that we take care of changing the existing objects, so that
-		// e.g. existing plots don't lose references to these tests
-		for (Test t : new_tests)
+		// e.g. existing plots don't lose references to these experiments
+		for (Experiment t : new_tests)
 		{
-			Test old_t = getTestFromTest(t);
+			Experiment old_t = getExperimentFromExperiment(t);
 			if (old_t != null)
 			{
-				if (!merge || t.getStatus() == Test.Status.DONE)
+				if (!merge || t.getStatus() == Experiment.Status.DONE)
 				{
-					// We take the content of the test in the file only
+					// We take the content of the experiment in the file only
 					// if its status is DONE, or if we overwrite everything
 					old_t.mirror(t);					
 				}
@@ -436,12 +440,12 @@ public class Benchmark
 		}
 		if (!merge)
 		{
-			// We don't merge, so all tests that are not in the input
+			// We don't merge, so all experiments that are not in the input
 			// JSON will be deleted
-			Iterator<Test> t_it = m_tests.iterator();
+			Iterator<Experiment> t_it = m_tests.iterator();
 			while (t_it.hasNext())
 			{
-				Test t = t_it.next();
+				Experiment t = t_it.next();
 				if (!new_tests.contains(t))
 				{
 					t_it.remove();
@@ -451,18 +455,18 @@ public class Benchmark
 	}
 
 	/**
-	 * Retrieves a test with given ID
-	 * @param test_id The test ID to look for
-	 * @return The test instance, null if no test exists with
+	 * Retrieves an experiment with given ID
+	 * @param exp_id The experiment ID to look for
+	 * @return The experiment instance, null if none exists with
 	 *   such ID
 	 */
-	protected Test getTest(int test_id)
+	protected Experiment getExperiment(int exp_id)
 	{
-		Iterator<Test> it = m_tests.iterator();
+		Iterator<Experiment> it = m_tests.iterator();
 		while (it.hasNext())
 		{
-			Test t = it.next();
-			if (t.getId() == test_id)
+			Experiment t = it.next();
+			if (t.getId() == exp_id)
 			{
 				return t;
 			}
@@ -471,13 +475,13 @@ public class Benchmark
 	}
 
 	/**
-	 * Cleans a test
-	 * @param test_id The test ID to clean
-	 * @return true if the test was found, false otherwise
+	 * Cleans an experiment
+	 * @param exp_id The experiment ID to clean
+	 * @return true if the experiment was found, false otherwise
 	 */
-	boolean cleanTest(int test_id)
+	boolean cleanExperiment(int exp_id)
 	{
-		Test t = getTest(test_id);
+		Experiment t = getExperiment(exp_id);
 		if (t != null)
 		{
 			t.clean(t.getParameters());
@@ -487,13 +491,13 @@ public class Benchmark
 	}
 
 	/**
-	 * Resets a test
-	 * @param test_id The test ID to reset
-	 * @return true if the test was found, false otherwise
+	 * Resets an experiment
+	 * @param exp_id The experiment ID to reset
+	 * @return true if the experiment was found, false otherwise
 	 */
-	public boolean resetTest(int test_id)
+	public boolean resetExperiment(int exp_id)
 	{
-		Test t = getTest(test_id);
+		Experiment t = getExperiment(exp_id);
 		if (t != null)
 		{
 			t.reset();
@@ -503,13 +507,13 @@ public class Benchmark
 	}
 	
 	/**
-	 * Resets a test
-	 * @param test_id The test ID to reset
-	 * @return true if the test was found, false otherwise
+	 * Resets an experiment
+	 * @param exp_id The experiment ID to reset
+	 * @return true if the experiment was found, false otherwise
 	 */
-	public boolean resetTestState(int test_id)
+	public boolean resetExperimentState(int exp_id)
 	{
-		Test t = getTest(test_id);
+		Experiment t = getExperiment(exp_id);
 		if (t != null)
 		{
 			t.resetState();
@@ -528,7 +532,7 @@ public class Benchmark
 		out.put("name", m_name);
 		out.put("version", Cli.s_versionString);
 		JsonList list = new JsonList();
-		Set<String> test_params = getTestParameterNames();
+		Set<String> test_params = getExperimentParameterNames();
 		JsonList param_list = new JsonList();
 		for (String param_name : test_params)
 		{
@@ -542,10 +546,10 @@ public class Benchmark
 		}
 		out.put("plots", plot_list);
 		Map<String,Integer> test_status = fillStatusMap();
-		for (Test test : m_tests)
+		for (Experiment test : m_tests)
 		{
 			JsonMap m = test.serializeState();
-			String status = Test.statusToString(test.getStatus());
+			String status = Experiment.statusToString(test.getStatus());
 			m.put("status", status);
 			putInStatusMap(test, test_status);
 			list.add(m);
@@ -561,14 +565,15 @@ public class Benchmark
 	}
 
 	/**
-	 * In the set of current tests, finds a test with the same name as
-	 * the parameter
-	 * @param name The test's name
-	 * @return A test instance with the same name, null if none found
+	 * In the set of current experiments, finds one with the same name as
+	 * the parameter. If there are many experiments with the same name,
+	 * one is picked non-deterministically.
+	 * @param name The experiment's name
+	 * @return An experiment with the same name, null if none found
 	 */
-	protected Test findTestWithName(String name)
+	protected Experiment findExperimentWithName(String name)
 	{
-		for (Test t : m_tests)
+		for (Experiment t : m_tests)
 		{
 			if (name.compareTo(t.getName()) == 0)
 			{
@@ -579,14 +584,14 @@ public class Benchmark
 	}
 	
 	/**
-	 * In the set of current tests, finds a test instance compatible
+	 * In the set of current experiments, finds an instance compatible
 	 * with the parameter values present in the JSON
 	 * @param state The JSON to analyze
-	 * @return A compatible test instance, null if none found
+	 * @return A compatible experiment instance, null if none found
 	 */
-	protected Test findTestWithState(JsonMap state)
+	protected Experiment findExperimentWithState(JsonMap state)
 	{
-		for (Test t : m_classInstances)
+		for (Experiment t : m_classInstances)
 		{
 			if (t.isCompatible(state))
 			{
@@ -606,16 +611,21 @@ public class Benchmark
 	}
 	
 	/**
-	 * Retrieves a set of tests based on a set of parameters
+	 * Retrieves a set of experiments based on a set of parameters
 	 * @param params The parameters
-	 * @return The tests with the corresponding parameters, if
+	 * @return The experiments with the corresponding parameters, if
 	 *   any
 	 */
-	public Collection<Test> getTests(Parameters params)
+	public Collection<Experiment> getExperiments(Parameters params)
 	{
-		return getTests(m_tests, params);
+		return getExperiments(m_tests, params);
 	}
 
+	/**
+	 * Fills a map with dummy values corresponding to the benchmark's
+	 * status.
+	 * @return A map
+	 */
 	static Map<String,Integer> fillStatusMap()
 	{
 		Map<String,Integer> out = new HashMap<String,Integer>();
@@ -633,7 +643,7 @@ public class Benchmark
 	/**
 	 * Adds a plot to the benchmark. Note that this does not associate
 	 * any test to the plot; you have to do it by yourself using
-	 * {@link Plot#addTest(Test)} or {@link Plot#addTests(Collection)}.
+	 * {@link Plot#addExperiment(Experiment)} or {@link Plot#addExperiments(Collection)}.
 	 * @param plot The plot to add
 	 * @return This benchmark
 	 */
@@ -654,12 +664,23 @@ public class Benchmark
 		return m_plots.values();
 	}
 
+	/**
+	 * Retrieves a plot based on its ID. Note that this method does not check
+	 * whether the plot with given ID actually exists in the benchmark.
+	 * @param plot_id The plot ID
+	 * @return The plot
+	 */
 	public Plot getPlot(int plot_id)
 	{
 		return m_plots.get(plot_id);
 	}
 
-	static void putInStatusMap(Test t, Map<String,Integer> map)
+	/**
+	 * Fills a status map with the current state of an experiment
+	 * @param t The experiment
+	 * @param map The map to fill
+	 */
+	static void putInStatusMap(Experiment t, Map<String,Integer> map)
 	{
 		if (!t.canRun(t.getParameters()))
 		{
@@ -699,17 +720,17 @@ public class Benchmark
 	}
 	
 	/**
-	 * Gets the test instance in the benchmark with the same
-	 * input parameters and the same name as the test passed as an
+	 * Gets the experiment instance in the benchmark with the same
+	 * input parameters and the same name as the experiment passed as an
 	 * argument
-	 * @param t The test to look for
-	 * @return A test instance, null if none found
+	 * @param t The experiment to look for
+	 * @return An experiment instance, null if none found
 	 */
-	protected Test getTestFromTest(Test t)
+	protected Experiment getExperimentFromExperiment(Experiment t)
 	{
 		Parameters t_p = t.getParameters();
 		String t_name = t.getName();
-		for (Test in_t : m_tests)
+		for (Experiment in_t : m_tests)
 		{
 			if (in_t.getName().compareTo(t_name) == 0 &&
 					in_t.getParameters().equals(t_p))
@@ -718,28 +739,5 @@ public class Benchmark
 			}
 		}
 		return null;
-	}
-	
-	/**
-	 * Processes the arguments parsed from the command line. This is useful
-	 * only if the benchmark has defined its own arguments in 
-	 * {@link  #setupCommandLineArguments()}. 
-	 * @param arguments The map of arguments values parsed from the
-	 *   command line 
-	 */
-	public void readCommandLine(ArgumentMap arguments)
-	{
-		// Do nothing
-		return;
-	}
-	
-	/**
-	 * Adds command-line parameters specific to this benchmark. These parameters
-	 * will be added to ParkBench's own command-line parameters.
-	 * @return The command line arguments to be added
-	 */
-	public Argument[] setupCommandLineArguments()
-	{
-		return new Argument[0];
 	}
 }

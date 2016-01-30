@@ -22,17 +22,17 @@ import java.util.Random;
 
 import ca.uqac.lif.parkbench.CommandRunner;
 import ca.uqac.lif.parkbench.Parameters;
-import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.Experiment;
 import ca.uqac.lif.util.FileReadWrite;
 
-public abstract class SortTest extends Test
+public abstract class SortExperiment extends Experiment
 {
 	/**
 	 * The folder where the generated data will be put
 	 */
 	protected static final String s_dataDir = "data/";
 	
-	public SortTest(String name)
+	public SortExperiment(String name)
 	{
 		super(name);
 	}
@@ -90,7 +90,7 @@ public abstract class SortTest extends Test
 	}
 	
 	@Override
-	public void runTest(final Parameters input, Parameters results)
+	public void runExperiment(final Parameters input, Parameters results)
 	{
 		int[] array = getArray(input);
 		if (array == null)

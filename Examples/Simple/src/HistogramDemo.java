@@ -16,15 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import ca.uqac.lif.parkbench.Benchmark;
-import ca.uqac.lif.parkbench.Test;
-import ca.uqac.lif.parkbench.TestSuite;
+import ca.uqac.lif.parkbench.Experiment;
+import ca.uqac.lif.parkbench.ExperimentSuite;
 import ca.uqac.lif.parkbench.plot.ClusteredHistogram;
 
-public class HistogramDemo extends TestSuite
+public class HistogramDemo extends ExperimentSuite
 {
 	public static void main(String[] args)
 	{
-		initialize(args, new HistogramDemo());
+		new HistogramDemo().initialize(args);
 	}
 	
 	public void setup(Benchmark b)
@@ -34,14 +34,14 @@ public class HistogramDemo extends TestSuite
 		for (int k = 1; k <= 4; k++)
 		{
 			{
-				Test t = new TestA().setParameter("n", 1).setParameter("k", k);
-				b.addTest(t);
-				histogram.addTest(t);
+				Experiment t = new ExperimentA().setParameter("n", 1).setParameter("k", k);
+				b.addExperiment(t);
+				histogram.addExperiment(t);
 			}
 			{
-				Test t = new TestB().setParameter("n", 1).setParameter("k", k);
-				b.addTest(t);
-				histogram.addTest(t);
+				Experiment t = new ExperimentB().setParameter("n", 1).setParameter("k", k);
+				b.addExperiment(t);
+				histogram.addExperiment(t);
 			}			
 		}
 		b.addPlot(histogram);

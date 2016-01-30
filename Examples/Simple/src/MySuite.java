@@ -15,41 +15,35 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import ca.uqac.lif.parkbench.Benchmark;
+import ca.uqac.lif.parkbench.Experiment;
+import ca.uqac.lif.parkbench.ExperimentSuite;
 
-
-import ca.uqac.lif.parkbench.Test;
-
-/**
- * Shell sort algorithm, as found here:
- * http://stackoverflow.com/a/17543917
- */
-public class ShellSortTest extends SortTest
+public class MySuite extends ExperimentSuite
 {
-	public ShellSortTest()
+	public static void main(String[] args)
 	{
-		super("Shell Sort");
+		new MySuite().initialize(args);
 	}
-
+	
 	@Override
-	public Test newTest()
+	public void setup(Benchmark b)
 	{
-		return new ShellSortTest();
-	}
-
-	@Override
-	public void sort(int[] array)
-	{
-		int j;
-		for( int gap = array.length / 2; gap > 0; gap /= 2 )
+		Experiment[] tests_to_create = {
+				new ExperimentA(),
+				new ExperimentB()
+		};
+		for (int k = 1; k < 3; k++)
 		{
-			for( int i = gap; i < array.length; i++ )
+			for (int n = 1; n < 4; n++)
 			{
-				int tmp = array[ i ];
-				for( j = i; j >= gap && tmp < array[ j - gap ]; j -= gap )
+				for (Experiment t : tests_to_create)
 				{
-					array[ j ] = array[ j - gap ];
+					Experiment new_t = t.newExperiment();
+					new_t.setParameter("n", n);
+					new_t.setParameter("k", k);
+					b.addExperiment(new_t);
 				}
-				array[ j ] = tmp;
 			}
 		}
 	}

@@ -17,23 +17,23 @@
  */
 
 
-import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.Experiment;
 
 /**
  * Bubble sort algorithm, as found here:
  * http://mathbits.com/MathBits/Java/arrays/Bubble.htm
  */
-public class BubbleSortTest extends SortTest
+public class BubbleSort extends SortExperiment
 {
-	public BubbleSortTest()
+	public BubbleSort()
 	{
 		super("Bubble Sort");
 	}
 
 	@Override
-	public Test newTest()
+	public Experiment newExperiment()
 	{
-		return new BubbleSortTest();
+		return new BubbleSort();
 	}
 
 	@Override

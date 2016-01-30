@@ -24,10 +24,10 @@ import ca.uqac.lif.httpserver.RequestCallback;
 
 import com.sun.net.httpserver.HttpExchange;
 
-public class CleanTest extends BenchmarkCallback
+public class CleanExperiment extends BenchmarkCallback
 {
 
-	public CleanTest(Benchmark b)
+	public CleanExperiment(Benchmark b)
 	{
 		super(RequestCallback.Method.GET, "/clean", b);
 	}
@@ -44,7 +44,7 @@ public class CleanTest extends BenchmarkCallback
 			if (!test_id_string.isEmpty())
 			{
 				int test_id = Integer.parseInt(test_id_string);
-				outcome &= m_benchmark.resetTest(test_id);
+				outcome &= m_benchmark.resetExperiment(test_id);
 			}
 		}
 		CallbackResponse response = new CallbackResponse(t);

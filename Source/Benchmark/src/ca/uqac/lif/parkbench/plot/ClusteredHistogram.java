@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import ca.uqac.lif.parkbench.Parameters;
-import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.Experiment;
 
 public class ClusteredHistogram extends PlanarPlot 
 {
@@ -45,7 +45,7 @@ public class ClusteredHistogram extends PlanarPlot
 		// Fill a 2D map with data
 		Map2D<String,Parameters,Number> map = new Map2D<String,Parameters,Number>();
 		map.normalizeRows(m_normalizedRows);
-		for (Test t : m_tests)
+		for (Experiment t : m_tests)
 		{
 			Parameters params = new Parameters(t.getParameters());
 			params.removeAll(m_ignoredParameters);

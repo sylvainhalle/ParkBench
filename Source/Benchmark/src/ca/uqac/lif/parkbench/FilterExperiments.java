@@ -25,10 +25,10 @@ import ca.uqac.lif.httpserver.RequestCallback;
 
 import com.sun.net.httpserver.HttpExchange;
 
-public class FilterTests extends BenchmarkCallback
+public class FilterExperiments extends BenchmarkCallback
 {
 
-	public FilterTests(Benchmark b)
+	public FilterExperiments(Benchmark b)
 	{
 		super(RequestCallback.Method.GET, "/filter", b);
 	}
@@ -69,16 +69,16 @@ public class FilterTests extends BenchmarkCallback
 				p.put(param_name, Float.parseFloat(param_value));
 			}
 		}
-		Collection<Test> tests = m_benchmark.getTests(p);
+		Collection<Experiment> tests = m_benchmark.getExperiments(p);
 		JsonList list = new JsonList();
-		for (Test test : tests)
+		for (Experiment test : tests)
 		{
 			if (name_criterion.isEmpty() 
 					|| name_criterion.compareTo(test.getName()) == 0)
 			{
 				// Test has the correct name
 				if (status_criterion.isEmpty()
-						|| status_criterion.compareToIgnoreCase(Test.statusToString(test.getStatus())) == 0)
+						|| status_criterion.compareToIgnoreCase(Experiment.statusToString(test.getStatus())) == 0)
 				{
 					// Test has the correct status
 					list.add(test.getId());

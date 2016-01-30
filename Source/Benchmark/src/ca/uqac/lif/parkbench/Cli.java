@@ -48,7 +48,7 @@ public class Cli
 	 * information (including this version number) will be overwritten by that
 	 * of the containing jar.
 	 */
-	protected static final String s_versionString = "0.3.3b";
+	protected static final String s_versionString = "0.4";
 
 	/**
 	 * Default server name
@@ -94,7 +94,7 @@ public class Cli
 		this(args, new Argument[0]);
 	}
 
-	public void start(final Benchmark benchmark)
+	public void start(final Benchmark benchmark, ExperimentSuite test_suite)
 	{
 		String server_name = s_defaultServerName;
 		int server_port = s_defaultPort;
@@ -120,7 +120,7 @@ public class Cli
 		}));
 		// Parse command line arguments
 		CliParser c_line = setupOptions();
-		Argument[] arguments = benchmark.setupCommandLineArguments();
+		Argument[] arguments = test_suite.setupCommandLineArguments();
 		for (Argument arg : arguments)
 		{
 			c_line.addArgument(arg);
@@ -172,6 +172,11 @@ public class Cli
 			num_threads = Integer.parseInt(a_map.getOptionValue("threads"));
 		}
 		benchmark.setThreads(num_threads);
+		
+		// Now that the main loop has parsed arguments, send them to the
+		// test suite for further processing
+		test_suite.readCommandLine(a_map);
+		test_suite.setup(benchmark);
 
 		// The remaining arguments are configuration files to read
 		List<String> remaining_args = a_map.getOthers();
@@ -203,10 +208,6 @@ public class Cli
 			}
 		}
 		String save_filename = benchmark.getName() + ".json";
-		
-		// Now that the main loop has parsed arguments, send them to the
-		// benchmark instance for further processing
-		benchmark.readCommandLine(a_map);
 
 		if (interactive_mode)
 		{
@@ -258,7 +259,7 @@ public class Cli
 					+ benchmark.threadCount() + " threads", 1000);
 			println(stdout, "Saving results in " + save_filename, 1000);
 			long start_time = System.currentTimeMillis() / 1000;
-			benchmark.queueAllTests();
+			benchmark.queueAllExperiments();
 			println(stdout, "Queued  Prereq  Running Done   Failed Time", 1000);
 			while (!benchmark.isFinished())
 			{

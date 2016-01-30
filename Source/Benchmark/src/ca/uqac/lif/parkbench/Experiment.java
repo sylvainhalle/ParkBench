@@ -26,13 +26,13 @@ import ca.uqac.lif.cornipickle.json.JsonNumber;
 import ca.uqac.lif.cornipickle.json.JsonString;
 
 /**
- * A test is a set of named parameters
- * @author Sylvain
+ * An experiment is a set of named parameters
+ * @author Sylvain Hallé
  */
-public abstract class Test implements Runnable
+public abstract class Experiment implements Runnable
 {
 	/**
-	 * The status of the test. The meaning of each value is:
+	 * The status of the experiment. The meaning of each value is:
 	 * <ul>
 	 * <li><tt>NOT_DONE</tt>: the test has not started yet</li>
 	 * <li><tt>QUEUED</tt>: the test is in the waiting queue</li>
@@ -50,7 +50,7 @@ public abstract class Test implements Runnable
 		QUEUED, PREREQUISITES, TIMEOUT};
 	
 	/**
-	 * Determines if the test is to be executed for real, or
+	 * Determines if the experiment is to be executed for real, or
 	 * just printed for debugging purposes.
 	 */
 	protected boolean m_dryRun;
@@ -68,7 +68,7 @@ public abstract class Test implements Runnable
 	
 	/**
 	 * A map from parameter names to values, to store the results
-	 * of the execution of the test
+	 * of the execution of the experiment
 	 */
 	private Parameters m_results;
 	
@@ -117,7 +117,11 @@ public abstract class Test implements Runnable
 	 */
 	private String m_host;
 	
-	public Test(String name)
+	/**
+	 * Creates a new empty experiment
+	 * @param name The name of the experiment
+	 */
+	public Experiment(String name)
 	{
 		super();
 		m_name = name;
@@ -133,7 +137,7 @@ public abstract class Test implements Runnable
 		m_killAfter = 0;
 	}
 	
-	Test(String name, int test_id)
+	Experiment(String name, int test_id)
 	{
 		super();
 		m_name = name;
@@ -150,7 +154,14 @@ public abstract class Test implements Runnable
 		m_killAfter = 0;
 	}
 	
-	public abstract void runTest(final Parameters params, Parameters results);
+	/**
+	 * Runs the experiment
+	 * @param params The input parameters for this experiment. The
+	 *  experiment <em>reads</em> data from this object.
+	 * @param results The results of the experiment. The
+	 *  experiment <em>writes</em> data to this object.
+	 */
+	public abstract void runExperiment(final Parameters params, Parameters results);
 	
 	/**
 	 * Gets the test's name
@@ -163,24 +174,24 @@ public abstract class Test implements Runnable
 	
 	/**
 	 * Sets the number of <em>seconds</em> after which the benchmark is allowed to
-	 * interrupt this test. A value of 0 indicates the test should not
+	 * interrupt this experimetn. A value of 0 indicates the experiment should not
 	 * be interrupted.
 	 * @param sec The number of seconds
 	 * @return The test instance
 	 */
-	public final Test setKillTime(long sec)
+	public final Experiment setKillTime(long sec)
 	{
 		m_killAfter = sec;
 		return this;
 	}
 	
 	/**
-	 * Determines if a test can be interrupted by the benchmark
-	 * @return true if test can be interrupted, false otherwise
+	 * Determines if an experiment can be interrupted by the benchmark
+	 * @return true if can be interrupted, false otherwise
 	 */
 	public final boolean canKill()
 	{
-		if (m_status != Test.Status.RUNNING)
+		if (m_status != Experiment.Status.RUNNING)
 		{
 			// Can't kill a test that is not running
 			return false;
@@ -188,14 +199,15 @@ public abstract class Test implements Runnable
 		long cur_time = System.currentTimeMillis() / 1000;
 		if (cur_time - m_startTime > m_killAfter)
 		{
-			// Test has run for long enough: can kill
+			// Exp has run for long enough: can kill
 			return true;
 		}
 		return false;
 	}
 	
 	/**
-	 * Gets the failure message
+	 * Gets the failure message. This method returns a meaningful result
+	 * only of the experiment has actually run and failed.
 	 * @return The message
 	 */
 	public String getFailureMessage()
@@ -204,19 +216,20 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Sets a message explaining the failure of that test, if any
+	 * Sets a message explaining the failure of that experiment, if
+	 * applicable
 	 * @param message The message
 	 * @return This test
 	 */
-	public Test setFailureMessage(String message)
+	public Experiment setFailureMessage(String message)
 	{
 		m_failureMessage = message;
 		return this;
 	}
 	
 	/**
-	 * Gets the host name that ran the test
-	 * @return The host name, empty if the test was not
+	 * Gets the host name that ran the experiment
+	 * @return The host name, empty if the experiment was not
 	 *   run yet
 	 */
 	public String getHost()
@@ -225,7 +238,15 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Gets the start time of the test
+	 * Gets the start time of the experiment
+	 * <p>
+	 * <b>NOTE:</b> {@link #getStartTime()} and {@link #getStopTime()}
+	 * should not be used as precise measurements of a test's duration;
+	 * they are only meant as "good enough" indications of how long an
+	 * experiment has been running for displaying in the control panel.
+	 * If you wish to measure a fine-grained running time for your
+	 * experiment, you should measure it by yourself within the experiment's
+	 * code.
 	 * @return The start time, 0 if test not started
 	 */
 	public long getStartTime()
@@ -235,6 +256,14 @@ public abstract class Test implements Runnable
 	
 	/**
 	 * Gets the end time of the test
+	 * <p>
+	 * <b>NOTE:</b> {@link #getStartTime()} and {@link #getStopTime()}
+	 * should not be used as precise measurements of a test's duration;
+	 * they are only meant as "good enough" indications of how long an
+	 * experiment has been running for displaying in the control panel.
+	 * If you wish to measure a fine-grained running time for your
+	 * experiment, you should measure it by yourself within the experiment's
+	 * code.
 	 * @return The end time, 0 if test not finished
 	 */
 	public long getStopTime()
@@ -243,13 +272,13 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Determines if the test can run, given the set of parameters
+	 * Determines if the experiment can run, given the set of parameters
 	 * it is provided. <b>NOTE:</b> this must not be confused with
-	 * whether a test has prerequisites that need to be fulfilled.
+	 * whether an experiment has prerequisites that need to be fulfilled.
 	 * The present method must return false when it is <em>impossible</em>
-	 * to run the test with such input values.
-	 * @param input The test's input parameters
-	 * @return True if the test can potentially run, false otherwise
+	 * to run the experiment with such input values.
+	 * @param input The experiment,s input parameters
+	 * @return True if the experiment can potentially run, false otherwise
 	 */
 	public boolean canRun(Parameters input)
 	{
@@ -257,7 +286,7 @@ public abstract class Test implements Runnable
 	}
 
 	/**
-	 * Determines if the test is to be executed for real, or
+	 * Determines if the experiment is to be executed for real, or
 	 * just printed for debugging purposes.
 	 * @param b Set to true for a "dry run", false otherwise
 	 */
@@ -266,13 +295,20 @@ public abstract class Test implements Runnable
 		m_dryRun = b;
 	}
 	
+	/**
+	 * Gets the dry run status of this experiment
+	 * @see #setDryRun(boolean)   
+	 * @return true for a "dry run", false otherwise
+	 */
 	public final boolean getDryRun()
 	{
 		return m_dryRun;
 	}
 	
 	/**
-	 * Sets the test's ID
+	 * Sets the experiment's ID. The ID should not contain any meaningful
+	 * information about the experiment itself; it is only used by the
+	 * benchmark to uniquely identify every experiment instance.
 	 * @param test_id The ID
 	 */
 	private void setId(int test_id)
@@ -284,18 +320,18 @@ public abstract class Test implements Runnable
 	 * Sets the value of some parameter
 	 * @param name The parameter name
 	 * @param value The parameter value
-	 * @return A reference to the test itself. This return value can be
+	 * @return A reference to the experiment itself. This return value can be
 	 *   ignored; it is there so that one can chain calls to setParameter in
-	 *   the same line (e.g.: <tt>test.setParameter(...).setParameter(...)</tt>
+	 *   the same line (e.g.: <tt>e.setParameter(...).setParameter(...)</tt>
 	 */
-	public final Test setParameter(String name, Object value)
+	public final Experiment setParameter(String name, Object value)
 	{
 		m_parameters.put(name, value);
 		return this;
 	}
 	
 	/**
-	 * Get the value of some parameter
+	 * Gets the value of some parameter
 	 * @param name The parameter name
 	 * @return The parameter value, or null if that parameter
 	 *   does not exist
@@ -309,13 +345,18 @@ public abstract class Test implements Runnable
 		return m_parameters.get(name);
 	}
 	
+	/**
+	 * Gets the set of all <strong>input</strong> parameters for an
+	 * experiment
+	 * @return The parameters
+	 */
 	public final Parameters getParameters()
 	{
 		return m_parameters;
 	}
 	
 	/**
-	 * Get the integer value of some parameter
+	 * Gets the integer value of some parameter
 	 * @param name The parameter name
 	 * @return The parameter value, cast as a number
 	 */
@@ -330,7 +371,7 @@ public abstract class Test implements Runnable
 	}
 
 	/**
-	 * Get the integer value of some parameter
+	 * Gets the string value of some parameter
 	 * @param name The parameter name
 	 * @return The parameter value, cast as a string, or null
 	 *   if the parameter does not exist
@@ -346,8 +387,8 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Checks if the test is done
-	 * @return True if the test is done, false otherwise
+	 * Checks if the experiment is done
+	 * @return The status of the experiment
 	 */
 	public final Status getStatus()
 	{
@@ -355,7 +396,9 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Sets the tests's status
+	 * Sets the experiment's status. This should be done carefully, as
+	 * the benchmark uses this status to stop, discard, queue, or otherwise
+	 * manage experiments in a suite.
 	 * @param s The status
 	 */
 	public final void setStatus(Status s)
@@ -366,6 +409,7 @@ public abstract class Test implements Runnable
 	/**
 	 * Returns the test's unique ID
 	 * @return The id
+	 * @see #setId(int)
 	 */
 	public final int getId()
 	{
@@ -381,14 +425,21 @@ public abstract class Test implements Runnable
 	@Override
 	public boolean equals(Object o)
 	{
-		if (o == null || !(o instanceof Test))
+		if (o == null || !(o instanceof Experiment))
 		{
 			return false;
 		}
-		return equals((Test) o);
+		return equals((Experiment) o);
 	}
 	
-	protected boolean equals(Test t)
+	/**
+	 * Checks if an experiment is equal to another experiment.
+	 * This is the case when they have the same name, and exactly
+	 * the same input parameters and values.
+	 * @param t The experiment to compare with
+	 * @return true if both experiments are identical, false otherwise
+	 */
+	protected boolean equals(Experiment t)
 	{
 		if (t.getName().compareTo(m_name) != 0)
 		{
@@ -400,13 +451,14 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Checks if a test matches a set of parameters. This happens
+	 * Checks if an experiment matches a set of parameters. This happens
 	 * when all parameters specified in the argument are also defined
-	 * in the test and have the same value. Note that the test may
+	 * in the experiment and have the same value. Note that the experiment may
 	 * have other parameters not specified in the argument; we don't
 	 * care about these.
 	 * @param parameters The map of parameters to look for
-	 * @return true if the test matches these parameters, false otherwise
+	 * @return true if the experiment matches these parameters,
+	 *   false otherwise
 	 */
 	public boolean matches(Parameters parameters)
 	{
@@ -414,11 +466,11 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Checks whether the prerequisites for running this test (required
-	 * files, etc.) are fulfilled. Override this method if your test
-	 * has prerequisites.
-	 * @param input The test's parameters
-	 * @return true if the test is ready to run, false otherwise
+	 * Checks whether the prerequisites for running this experiment
+	 * (required files, etc.) are fulfilled. Override this method if your
+	 * experiment has prerequisites.
+	 * @param input The experiment's parameters
+	 * @return true if the experiment is ready to run, false otherwise
 	 */
 	public boolean prerequisitesFulilled(final Parameters input)
 	{
@@ -426,10 +478,10 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Fulfill the prerequisites for the test. This includes calling
+	 * Fulfill the prerequisites for the experiment. This includes calling
 	 * any additional commands, generating any files, etc. that the
 	 * test will require when run.
-	 * @param input The test's parameters
+	 * @param input The experiment's parameters
 	 * @return true if the prerequisites were correctly generated,
 	 *   false otherwise
 	 */
@@ -440,8 +492,8 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Gets the test's results
-	 * @return The test's results
+	 * Gets the experiment's results
+	 * @return The experiment's results
 	 */
 	public final Parameters getResults()
 	{
@@ -458,7 +510,7 @@ public abstract class Test implements Runnable
 	}
 
 	/**
-	 * Runs the test
+	 * Runs the experiment.
 	 */
 	@Override
 	public final void run()
@@ -484,37 +536,38 @@ public abstract class Test implements Runnable
 		if (prerequisites)
 		{
 			setStatus(Status.RUNNING);
-			runTest(m_parameters, m_results);
+			runExperiment(m_parameters, m_results);
 		}
 		else
 		{
-			setFailureMessage("Test cancelled while generating prerequisites");
+			setFailureMessage(
+					"Experiment cancelled while generating prerequisites");
 			setStatus(Status.FAILED);
 		}
 	}
 
 	/**
-	 * Creates a new empty instance of the test
-	 * @return A new test
+	 * Creates a new empty instance of the experiment
+	 * @return A new experiment
 	 */
-	public abstract Test newTest();
+	public abstract Experiment newExperiment();
 	
 	/**
-	 * Creates a new empty instance of the test
-	 * @param test_id The test ID to give this new test
-	 * @return A new test
+	 * Creates a new empty instance of the experiment
+	 * @param test_id The experiment ID to give this new experiment
+	 * @return A new experiment
 	 */
-	public Test newTest(int test_id)
+	public Experiment newExperiment(int test_id)
 	{
-		Test t = newTest();
+		Experiment t = newExperiment();
 		t.setId(test_id);
 		s_idCounter = Math.max(s_idCounter, test_id + 1);
 		return t;
 	}
 	
 	/**
-	 * Converts a test status into a string
-	 * @param s The test status
+	 * Converts an experiment status into a string
+	 * @param s The experiment status
 	 * @return The string
 	 */
 	public static String statusToString(Status s)
@@ -548,7 +601,7 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Converts a string into a test status
+	 * Converts a string into an experiment status
 	 * @param s The string
 	 * @return The status
 	 */
@@ -587,7 +640,7 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Saves the test's current state into a JSON object
+	 * Saves the experiment's current state into a JSON object
 	 * @return A JSON object with the test's state
 	 */
 	public JsonMap serializeState()
@@ -634,13 +687,13 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Mirrors an existing test. This will make the current test
+	 * Mirrors an existing experiment. This will make the current experiment
 	 * instance copy all parameters, values and state of the test passed
 	 * as parameter, <strong>except the ID and the name</strong>.
-	 * @param t The test to mirror
-	 * @return This test
+	 * @param t The experiment to mirror
+	 * @return This experiment
 	 */
-	Test mirror(Test t)
+	Experiment mirror(Experiment t)
 	{
 		m_parameters = t.m_parameters;
 		m_results = t.m_results;
@@ -652,7 +705,7 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Sets the state of the test to the contents of a JSON structure
+	 * Sets the state of the experiment to the contents of a JSON structure
 	 * @param state The JSON structure
 	 */
 	public void deserializeState(JsonMap state)
@@ -712,13 +765,13 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Checks if the current test is "compatible" with the parameters
-	 * present in the JSON state passed as an argument. By default, a test
-	 * is compatible if it has the same <code>name</code> value as the one 
-	 * given in the JSON; other test classes may override this method to
-	 * provide a finer condition.
+	 * Checks if the current experiment is "compatible" with the parameters
+	 * present in the JSON state passed as an argument. By default, an
+	 * experiment is compatible if it has the same <code>name</code> value as
+	 * the one given in the JSON; other test classes may override this method
+	 * to provide a finer condition.
 	 * @param state The parameters
-	 * @return true if test is compatible, false otherwise
+	 * @return true if experiment is compatible, false otherwise
 	 */
 	protected boolean isCompatible(JsonMap state)
 	{
@@ -726,25 +779,34 @@ public abstract class Test implements Runnable
 		return state_name.compareTo(m_name) == 0;
 	}
 	
-	protected boolean isCompatible(Test t)
+	/**
+	 * Checks if the current experiment is "compatible" with the parameters
+	 * present in the experiment passed as an argument.
+	 * @param t The experiment
+	 * @return true if experiment is compatible, false otherwise
+	 * @see #isCompatible(JsonMap)
+	 */
+	protected boolean isCompatible(Experiment t)
 	{
 		return t.m_name.compareTo(m_name) == 0;
 	}
 	
 	/**
-	 * Cleans a test. This means removing any prerequisites the test may have.
-	 * It is the responsibility of the test writer to make sure tha
+	 * Cleans an experiment. This means removing any prerequisites
+	 * the experiment may have.
+	 * It is the responsibility of the test writer to make sure that
 	 * {@link #clean(Parameters)} undoes the work done in
 	 * {@link #fulfillPrerequisites(Parameters)}.
 	 * <p>
 	 * <b>NOTE:</b> it is probably not well advised to call this method while
-	 * the test is running, but no check is done to that effect. <i>Caveat
-	 * emptor</i>!
+	 * the experiment is running, but no check is done to that effect.
+	 * <i>Caveat emptor</i>!
 	 * <p>
-	 * Other note: if other tests in your test suite have the <em>same</em>
+	 * Other note: if other experiments in your experiment suite have
+	 * the <em>same</em>
 	 * prerequisites, they will be affected by this cleaning too. Again,
 	 * beware!
-	 * @param input The test's input parameters
+	 * @param input The experiment's input parameters
 	 */
 	public void clean(Parameters input)
 	{
@@ -752,11 +814,11 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Completely resets the the test. This means:
+	 * Completely resets the the experiment. This means:
 	 * <ul>
-	 * <li>Putting the test back to the <tt>NOT_DONE</tt> state</li>
+	 * <li>Putting it back to the <tt>NOT_DONE</tt> state</li>
 	 * <li>Cleaning any prerequisites (through {@link #clean(Parameters)})</li>
-	 * <li>Clearing any results the test has generated</li> 
+	 * <li>Clearing any results the experiment has generated</li> 
 	 * </ul>
 	 */
 	public final void reset()
@@ -767,8 +829,8 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Resets the test's state only. This works like {@link #reset()}, but 
-	 * without cleaning the prerequisites.
+	 * Resets the experiment's state only. This works like {@link #reset()},
+	 * but without cleaning the prerequisites.
 	 */
 	public final void resetState()
 	{
@@ -777,8 +839,8 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Stops the tests and gives it a status
-	 * @param s The status of the test (normally <code>FAILED</code> or
+	 * Stops the experiment and gives it a status
+	 * @param s The status of the experiment (normally <code>FAILED</code> or
 	 * <code>DONE</code>)
 	 */
 	public void stopWithStatus(Status s)
@@ -788,7 +850,7 @@ public abstract class Test implements Runnable
 	}
 	
 	/**
-	 * Waits for a number of seconds, doing nothing. If the test
+	 * Waits for a number of seconds, doing nothing. If the experiment
 	 * gets interrupted while waiting, it ends with the status
 	 * <tt>FAILED</tt>.
 	 * @param seconds The number of seconds to wait

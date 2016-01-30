@@ -17,23 +17,23 @@
  */
 
 
-import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.Experiment;
 
 /**
  * Quick sort algorithm, as found here:
  * http://www.java2novice.com/java-sorting-algorithms/quick-sort/
  */
-public class QuickSortTest extends SortTest
+public class QuickSort extends SortExperiment
 {
-	public QuickSortTest()
+	public QuickSort()
 	{
 		super("Quick Sort");
 	}
 	
 	@Override
-	public Test newTest()
+	public Experiment newExperiment()
 	{
-		return new QuickSortTest();
+		return new QuickSort();
 	}
 
 	@Override

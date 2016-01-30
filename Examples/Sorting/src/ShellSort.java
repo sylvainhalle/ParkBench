@@ -17,34 +17,40 @@
  */
 
 
-import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.Experiment;
 
 /**
- * Gnome sort algorithm, as found here:
- * http://dickgrune.com/Programs/gnomesort.html
+ * Shell sort algorithm, as found here:
+ * http://stackoverflow.com/a/17543917
  */
-public class GnomeSortTest extends SortTest
+public class ShellSort extends SortExperiment
 {
-	public GnomeSortTest()
+	public ShellSort()
 	{
-		super("Gnome Sort");
+		super("Shell Sort");
 	}
 
 	@Override
-	public Test newTest()
+	public Experiment newExperiment()
 	{
-		return new GnomeSortTest();
+		return new ShellSort();
 	}
 
 	@Override
 	public void sort(int[] array)
 	{
-		int n = array.length;
-		int i = 0;
-
-		while (i < n) {
-			if (i == 0 || array[i-1] <= array[i]) i++;
-			else {int tmp = array[i]; array[i] = array[i-1]; array[--i] = tmp;}
+		int j;
+		for( int gap = array.length / 2; gap > 0; gap /= 2 )
+		{
+			for( int i = gap; i < array.length; i++ )
+			{
+				int tmp = array[ i ];
+				for( j = i; j >= gap && tmp < array[ j - gap ]; j -= gap )
+				{
+					array[ j ] = array[ j - gap ];
+				}
+				array[ j ] = tmp;
+			}
 		}
 	}
 }

@@ -20,7 +20,7 @@
  import java.util.ArrayList;
  import java.util.List;
 
- public abstract class CommandTest extends Test
+ public abstract class CommandExperiment extends Experiment
  {
 	 public String m_baseFolder;
 
@@ -29,12 +29,12 @@
 	  */
 	 protected static long s_waitInterval = 10;
 
-	 public CommandTest(String test_name)
+	 public CommandExperiment(String test_name)
 	 {
 		 this(test_name, "");
 	 }
 
-	 public CommandTest(String test_name, String base_folder)
+	 public CommandExperiment(String test_name, String base_folder)
 	 {
 		 super(test_name);
 		 m_dryRun = false;
@@ -42,7 +42,7 @@
 	 }
 
 	 @Override
-	 public final void runTest(Parameters params, Parameters results)
+	 public final void runExperiment(Parameters params, Parameters results)
 	 {
 		 List<String> command_list = new ArrayList<String>();
 		 createCommand(params, command_list);

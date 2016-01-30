@@ -35,7 +35,7 @@ import java.util.List;
  * @author Sylvain
  *
  */
-public abstract class CommandTestRegex extends CommandTest
+public abstract class CommandExperimentRegex extends CommandExperiment
 {
 	/**
 	 * The pattern to build a command
@@ -47,7 +47,7 @@ public abstract class CommandTestRegex extends CommandTest
 	 * @param test_name The name of the test to instantiate
 	 * @param command_pattern The pattern to build a command
 	 */
-	public CommandTestRegex(String test_name, String command_pattern)
+	public CommandExperimentRegex(String test_name, String command_pattern)
 	{
 		super(test_name);
 		m_commandPattern = command_pattern;

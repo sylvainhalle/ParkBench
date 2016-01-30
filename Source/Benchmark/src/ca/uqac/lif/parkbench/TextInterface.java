@@ -28,7 +28,7 @@ import java.util.Set;
 import ca.uqac.lif.cornipickle.json.JsonMap;
 import ca.uqac.lif.cornipickle.util.AnsiPrinter;
 import ca.uqac.lif.cornipickle.util.AnsiPrinter.Color;
-import ca.uqac.lif.parkbench.Test.Status;
+import ca.uqac.lif.parkbench.Experiment.Status;
 import ca.uqac.lif.parkbench.plot.Plot;
 import ca.uqac.lif.util.FileReadWrite;
 
@@ -78,7 +78,7 @@ public class TextInterface
 	/**
 	 * The set of tests currently selected
 	 */
-	private final Set<Integer> m_selectedTests;
+	private final Set<Integer> m_selectedExperiments;
 	
 	/**
 	 * The set of plots currently selected
@@ -93,7 +93,7 @@ public class TextInterface
 	public TextInterface(Benchmark b, AnsiPrinter stdout)
 	{
 		super();
-		m_selectedTests = new HashSet<Integer>();
+		m_selectedExperiments = new HashSet<Integer>();
 		m_selectedPlots = new HashSet<Integer>();
 		m_benchmark = b;
 		m_stdout = stdout;
@@ -110,7 +110,7 @@ public class TextInterface
 		{
 			try {
 				m_stdout.resetColors();
-				m_stdout.println("\nTests: (S)tatus  (L)ist  S(e)lect  (A)pply  Sett(i)ngs  Sa(v)e  (G)raphs  (?)Help  (Q)uit ");
+				m_stdout.println("\nExperiments: (S)tatus  (L)ist  S(e)lect  (A)pply  Sett(i)ngs  Sa(v)e  (G)raphs  (?)Help  (Q)uit ");
 				String line = null;
 
 				line = m_console.readLine();
@@ -155,17 +155,17 @@ public class TextInterface
 					}
 					if (choice.compareToIgnoreCase("S") == 0)
 					{
-						for (int test_num : m_selectedTests)
+						for (int test_num : m_selectedExperiments)
 						{
-							m_benchmark.queueTest(test_num);
+							m_benchmark.queueExperiment(test_num);
 						}
 					}
 					else if (choice.compareToIgnoreCase("D") == 0)
 					{
 						long sec_time = System.currentTimeMillis() / 1000;
-						for (int test_num : m_selectedTests)
+						for (int test_num : m_selectedExperiments)
 						{
-							Test t = m_benchmark.getTest(test_num);
+							Experiment t = m_benchmark.getExperiment(test_num);
 							m_stdout.printf("Test %d: %s %s\n", test_num, t.getName(), t.getStatus().toString());
 							Parameters params = t.getParameters();
 							if (t.getStatus() == Status.RUNNING || t.getStatus() == Status.PREREQUISITES)
@@ -194,16 +194,16 @@ public class TextInterface
 					}
 					else if (choice.compareToIgnoreCase("T") == 0)
 					{
-						for (int test_num : m_selectedTests)
+						for (int test_num : m_selectedExperiments)
 						{
-							m_benchmark.stopTest(test_num);
+							m_benchmark.stopExperiment(test_num);
 						}
 					}
 					else if (choice.compareToIgnoreCase("R") == 0)
 					{
-						for (int test_num : m_selectedTests)
+						for (int test_num : m_selectedExperiments)
 						{
-							m_benchmark.resetTest(test_num);
+							m_benchmark.resetExperiment(test_num);
 						}
 					}
 				}
@@ -225,14 +225,14 @@ public class TextInterface
 					String number = m_console.readLine();
 					if (number.compareToIgnoreCase("a") == 0)
 					{
-						for (Test t : m_benchmark.getTests())
+						for (Experiment t : m_benchmark.getExperiments())
 						{
-							m_selectedTests.add(t.getId());
+							m_selectedExperiments.add(t.getId());
 						}
 					}
 					else if (number.compareToIgnoreCase("n") == 0)
 					{
-						m_selectedTests.clear();
+						m_selectedExperiments.clear();
 					}
 					else
 					{
@@ -240,13 +240,13 @@ public class TextInterface
 						for (String t_number : t_nbs)
 						{
 							int t_nb = Integer.parseInt(t_number.trim());
-							if (m_selectedTests.contains(t_nb))
+							if (m_selectedExperiments.contains(t_nb))
 							{
-								m_selectedTests.remove(t_nb);
+								m_selectedExperiments.remove(t_nb);
 							}
 							else
 							{
-								m_selectedTests.add(t_nb);
+								m_selectedExperiments.add(t_nb);
 							}						
 
 						}
@@ -282,9 +282,9 @@ public class TextInterface
 	 */
 	private void printTestList()
 	{
-		Set<Test> tests = m_benchmark.getTests();
+		Set<Experiment> tests = m_benchmark.getExperiments();
 		String[] parameter_names = getParameterNames();
-		m_stdout.print("\nList of tests\n-------------\n");
+		m_stdout.print("\nList of experiments\n-------------\n");
 		int name_length = 16, param_length = 8; 
 		for (int i = 0; i < m_numColumns; i++)
 		{
@@ -297,12 +297,12 @@ public class TextInterface
 		}
 		m_stdout.println("");
 		int total_tests = 0;
-		for (Test t : tests)
+		for (Experiment t : tests)
 		{
 			total_tests++;
 			int id = t.getId();
 			m_stdout.resetColors();
-			if (m_selectedTests.contains(id))
+			if (m_selectedExperiments.contains(id))
 				m_stdout.printf("[X]");
 			else
 				m_stdout.printf("[ ]");
@@ -374,7 +374,7 @@ public class TextInterface
 
 	private String[] getParameterNames()
 	{
-		Set<String> p_names = m_benchmark.getTestParameterNames();
+		Set<String> p_names = m_benchmark.getExperimentParameterNames();
 		String[] param_names = new String[p_names.size()];
 		int i = 0;
 		for (String p_name : p_names)
@@ -418,14 +418,14 @@ public class TextInterface
 			{
 				printPlotList();
 				m_stdout.resetColors()
-				.print("\nGraphs: S(e)lect S(h)ow  Sa(v)e  Back to (t)ests ");
+				.print("\nGraphs: S(e)lect S(h)ow  Sa(v)e  (B)ack to experiments ");
 				String line = null;
 				line = m_console.readLine();
 				if (line == null)
 				{
 					continue;
 				}
-				if (line.compareToIgnoreCase("T") == 0)
+				if (line.compareToIgnoreCase("B") == 0)
 				{
 					run = false;
 				}
@@ -524,14 +524,14 @@ public class TextInterface
 			{
 				m_stdout.printf("\nSettings\n--------\n");
 				m_stdout.printf("(C)olumns:     %d\n", m_numColumns);
-				m_stdout.printf("Back to (t)ests\n");
+				m_stdout.printf("(B)ack to experiments\n");
 				String line = null;
 				line = m_console.readLine();
 				if (line == null)
 				{
 					continue;
 				}
-				if (line.compareToIgnoreCase("T") == 0)
+				if (line.compareToIgnoreCase("B") == 0)
 				{
 					run = false;
 				}

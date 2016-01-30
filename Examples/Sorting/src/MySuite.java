@@ -18,16 +18,16 @@
 
 
 import ca.uqac.lif.parkbench.Benchmark;
-import ca.uqac.lif.parkbench.Test;
-import ca.uqac.lif.parkbench.TestSuite;
+import ca.uqac.lif.parkbench.Experiment;
+import ca.uqac.lif.parkbench.ExperimentSuite;
 import ca.uqac.lif.parkbench.plot.PlanarPlot;
 import ca.uqac.lif.parkbench.plot.ScatterPlot;
 
-public class MyTestSuite extends TestSuite
+public class MySuite extends ExperimentSuite
 {
 	public static void main(String[] args)
 	{
-		initialize(args, new MyTestSuite());
+		new MySuite().initialize(args);
 	}
 
 	public void setup(Benchmark b)
@@ -35,18 +35,18 @@ public class MyTestSuite extends TestSuite
 		// Give a name to the benchmark
 		b.setName("Sorting Algorithms");
 
-		// Initialize tests
-		Test[] tests_to_create = {
-				new QuickSortTest(),
-				new ShellSortTest(),
-				new BubbleSortTest(),
-				new GnomeSortTest()
+		// Initialize experiments
+		Experiment[] experiments_to_create = {
+				new QuickSort(),
+				new ShellSort(),
+				new BubbleSort(),
+				new GnomeSort()
 		};
 		for (int length = 5000; length <= 40000; length += 5000)
 		{
-			for (Test t : tests_to_create)
+			for (Experiment t : experiments_to_create)
 			{
-				b.addTest(t.newTest().setParameter("size", length));
+				b.addExperiment(t.newExperiment().setParameter("size", length));
 			}
 		}
 
@@ -56,7 +56,7 @@ public class MyTestSuite extends TestSuite
 			.setParameterX("size", "List size")
 			.setParameterY("time", "Time (ms)")
 			.setLogscaleY();
-		plot.addTests(b);
+		plot.addExperiments(b);
 		b.addPlot(plot);
 	}
 }

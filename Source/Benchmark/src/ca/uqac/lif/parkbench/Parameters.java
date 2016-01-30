@@ -60,10 +60,10 @@ public class Parameters extends HashMap<String,Object>
 	 * @param to_exclude The set of parameter names to ignore
 	 * @return The set of distinct parameters
 	 */
-	public static Set<Parameters> getSets(Collection<Test> tests, Collection<String> to_exclude)
+	public static Set<Parameters> getSets(Collection<Experiment> tests, Collection<String> to_exclude)
 	{
 		Set<Parameters> out = new HashSet<Parameters>();
-		for (Test t : tests)
+		for (Experiment t : tests)
 		{
 			Parameters params = new Parameters(t.getParameters());
 			params.putAll(t.getParameters());
@@ -82,10 +82,10 @@ public class Parameters extends HashMap<String,Object>
 	 * @return A map from values of parameters in <tt>criteria</tt> to sets of
 	 *   parameters having these values
 	 */
-	public static Map<Parameters,Set<Parameters>> groupBy(Collection<Test> tests, Collection<String> criteria)
+	public static Map<Parameters,Set<Parameters>> groupBy(Collection<Experiment> tests, Collection<String> criteria)
 	{
 		Map<Parameters,Set<Parameters>> out = new HashMap<Parameters,Set<Parameters>>();
-		for (Test t : tests)
+		for (Experiment t : tests)
 		{
 			Parameters params = new Parameters(t.getParameters());
 			params.keepOnly(criteria);

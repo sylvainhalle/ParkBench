@@ -24,12 +24,12 @@ import ca.uqac.lif.httpserver.RequestCallback;
 
 import com.sun.net.httpserver.HttpExchange;
 
-public class RunTest extends BenchmarkCallback
+public class StopExperiment extends BenchmarkCallback
 {
 
-	public RunTest(Benchmark b)
+	public StopExperiment(Benchmark b)
 	{
-		super(RequestCallback.Method.GET, "/run", b);
+		super(RequestCallback.Method.GET, "/stop", b);
 	}
 
 	@Override
@@ -44,12 +44,7 @@ public class RunTest extends BenchmarkCallback
 			if (!test_id_string.isEmpty())
 			{
 				int test_id = Integer.parseInt(test_id_string);
-				boolean test_outcome = m_benchmark.queueTest(test_id);
-				if (!test_outcome)
-				{
-					System.err.println("Test not found " + test_id);
-				}
-				outcome &= test_outcome;
+				outcome &= m_benchmark.stopExperiment(test_id);
 			}
 		}
 		CallbackResponse response = new CallbackResponse(t);
@@ -60,7 +55,4 @@ public class RunTest extends BenchmarkCallback
 		}
 		return response;
 	}
-	
-	
-
 }

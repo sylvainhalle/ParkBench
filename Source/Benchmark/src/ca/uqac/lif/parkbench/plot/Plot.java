@@ -28,7 +28,7 @@ import java.util.Vector;
 import ca.uqac.lif.parkbench.Benchmark;
 import ca.uqac.lif.parkbench.CommandRunner;
 import ca.uqac.lif.parkbench.Parameters;
-import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.Experiment;
 
 public abstract class Plot
 {
@@ -45,7 +45,7 @@ public abstract class Plot
 	/**
 	 * The set of tests associated to that plot
 	 */
-	protected Set<Test> m_tests;
+	protected Set<Experiment> m_tests;
 
 	/**
 	 * The path to launch GnuPlot
@@ -87,7 +87,7 @@ public abstract class Plot
 	{
 		super();
 		m_title = title;
-		m_tests = new HashSet<Test>();
+		m_tests = new HashSet<Experiment>();
 		m_name = "";
 		m_ignoredParameters = new HashSet<String>();
 	}
@@ -149,30 +149,30 @@ public abstract class Plot
 	}
 
 	/**
-	 * Adds a test to the plot
-	 * @param t The test to add
+	 * Adds an experiment to the plot
+	 * @param t The experiment to add
 	 */
-	public void addTest(Test t)
+	public void addExperiment(Experiment t)
 	{
 		m_tests.add(t);
 	}
 
 	/**
-	 * Adds a collection of tests to the plot
+	 * Adds a collection of experiments to the plot
 	 * @param tests The tests
 	 */
-	public void addTests(Collection<Test> tests)
+	public void addExperiments(Collection<Experiment> tests)
 	{
 		m_tests.addAll(tests);
 	}
 
 	/**
-	 * Add all tests from a benchmark to the plot
+	 * Add all experiments from a benchmark to the plot
 	 * @param b The benchmark
 	 */
-	public void addTests(Benchmark b)
+	public void addExperiments(Benchmark b)
 	{
-		addTests(b.getTests());
+		addExperiments(b.getExperiments());
 	}
 
 	/**

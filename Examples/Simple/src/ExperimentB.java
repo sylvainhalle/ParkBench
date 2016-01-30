@@ -18,7 +18,7 @@
 
 
 import ca.uqac.lif.parkbench.Parameters;
-import ca.uqac.lif.parkbench.Test;
+import ca.uqac.lif.parkbench.Experiment;
 
 /**
  * A dummy test that simulates some processing.
@@ -32,17 +32,17 @@ import ca.uqac.lif.parkbench.Test;
  * to generate before starting. It waits <i>n</i> x <i>k</i> seconds
  * before starting the test itself. 
  */
-public class TestB extends Test
+public class ExperimentB extends Experiment
 {
-	public TestB()
+	public ExperimentB()
 	{
 		super("Test B");
 	}
 	
 	@Override
-	public Test newTest()
+	public Experiment newExperiment()
 	{
-		return new TestB();
+		return new ExperimentB();
 	}
 	
 	@Override
@@ -72,7 +72,7 @@ public class TestB extends Test
 	}
 
 	@Override
-	public void runTest(final Parameters params, Parameters results)
+	public void runExperiment(final Parameters params, Parameters results)
 	{
 		// Get the value of test parameters "k" and "n"
 		Number n = params.getNumber("n");

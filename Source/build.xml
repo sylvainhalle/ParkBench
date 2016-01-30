@@ -288,6 +288,7 @@
        administrator to work.
   -->
   <target name="install-deps" depends="init">
+    <mkdir dir="${build.depdir}"/>
     <copy todir="${build.extdir}" includeemptydirs="false">
       <fileset dir="${build.depdir}" includes="*.jar" />
     </copy>

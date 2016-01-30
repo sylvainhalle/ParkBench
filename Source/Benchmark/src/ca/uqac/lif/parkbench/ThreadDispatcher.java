@@ -21,14 +21,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import ca.uqac.lif.parkbench.Test.Status;
+import ca.uqac.lif.parkbench.Experiment.Status;
 
 /**
  * Manages the execution of tests using multiple threads.
  * The dispatcher works as follows.
  * <ol>
  * <li>The benchmark puts tests in the dispatcher's queue using
- *   {@link #putInQueue(Test)}.</li>
+ *   {@link #putInQueue(Experiment)}.</li>
  * <li>The dispatcher periodically checks whether some tests are present
  *   in the queue (the infinite loop of method {@link #run()}, which
  *   calls {@link #check()}.</li>
@@ -49,7 +49,7 @@ public class ThreadDispatcher implements Runnable
 	/**
 	 * The queue of tests waiting to be started
 	 */
-	protected Queue<Test> m_testQueue;
+	protected Queue<Experiment> m_testQueue;
 	
 	/**
 	 * A variable used as a semaphore to signal the dispatcher
@@ -72,17 +72,17 @@ public class ThreadDispatcher implements Runnable
 	{
 		super();
 		m_threads = new TestThread[num_threads];
-		m_testQueue = new LinkedList<Test>();
+		m_testQueue = new LinkedList<Experiment>();
 	}
 	
 	/**
 	 * Puts a new test in the waiting queue
 	 * @param t The test to put in the queue
 	 */
-	synchronized public void putInQueue(Test t)
+	synchronized public void putInQueue(Experiment t)
 	{
 		//System.out.println("Test added with ID " + t.getId());
-		t.setStatus(Test.Status.QUEUED);
+		t.setStatus(Experiment.Status.QUEUED);
 		m_testQueue.add(t);
 	}
 	
@@ -116,13 +116,13 @@ public class ThreadDispatcher implements Runnable
 				{
 					// This test can be interrupted
 					th.interrupt();
-					th.m_test.setStatus(Test.Status.TIMEOUT);
+					th.m_test.setStatus(Experiment.Status.TIMEOUT);
 				}
 				else
 				{
-					Test.Status st = th.m_test.getStatus();
-					if (!(st == Test.Status.FAILED || st == Test.Status.DONE || 
-							st == Test.Status.TIMEOUT))
+					Experiment.Status st = th.m_test.getStatus();
+					if (!(st == Experiment.Status.FAILED || st == Experiment.Status.DONE || 
+							st == Experiment.Status.TIMEOUT))
 					{
 						continue;
 					}
@@ -130,7 +130,7 @@ public class ThreadDispatcher implements Runnable
 			}
 			// This thread has finished its execution, and a test is
 			// waiting to be run
-			Test test = m_testQueue.poll();
+			Experiment test = m_testQueue.poll();
 			if (test != null)
 			{
 				//System.out.println("Test ID " + test.getId() + " assigned to thread #" + i);
@@ -201,10 +201,10 @@ public class ThreadDispatcher implements Runnable
 		}
 		// If we get here, then the test we look for was not in a thread.
 		// Let's look for it in the waiting queue...
-		Iterator<Test> t_it = m_testQueue.iterator();
+		Iterator<Experiment> t_it = m_testQueue.iterator();
 		while (t_it.hasNext())
 		{
-			Test t = t_it.next();
+			Experiment t = t_it.next();
 			if (t.getId() == test_id)
 			{
 				// This is the test we look for: remove it from the
@@ -251,9 +251,9 @@ public class ThreadDispatcher implements Runnable
 		/**
 		 * The test contained by that thread
 		 */
-		protected Test m_test;
+		protected Experiment m_test;
 		
-		public TestThread(Test t)
+		public TestThread(Experiment t)
 		{
 			super(t);
 			m_test = t;
@@ -271,7 +271,7 @@ public class ThreadDispatcher implements Runnable
 		@Override
 		public void interrupt()
 		{
-			m_test.stopWithStatus(Test.Status.FAILED);
+			m_test.stopWithStatus(Experiment.Status.FAILED);
 			super.interrupt();
 		}
 	}

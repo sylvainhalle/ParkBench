@@ -28,10 +28,10 @@
   
   <!-- The project's main class. This is used for the generation of the
        runable JAR file in the "jar" target -->
-  <property name="build.mainclass" value="MyTestSuite"/>
+  <property name="build.mainclass" value="MySuite"/>
   
   <!-- Target jar file -->
-  <property name="build.jar.filename" value="MyTestSuite.jar"/>
+  <property name="build.jar.filename" value="MySuite.jar"/>
   
   <!-- The location of parkbench.jar, relative to the location of
        the build.xml file for this test suite. Note that this is only
