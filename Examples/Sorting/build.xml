@@ -117,8 +117,8 @@
       includeantruntime="false">
       <classpath>
         <pathelement location="${build.bindir}"/>
+        <pathelement location="${build.depdir}"/>
         <pathelement path="${java.class.path}"/>
-        <pathelement location="${build.parkbench}"/>
       </classpath>
     </javac>
     <copy todir="${build.bindir}" includeemptydirs="false">
@@ -161,7 +161,6 @@
 	      <attribute name="Built-Date" value="${TODAY}"/>
 	      <attribute name="Implementation-Version" value="${build.version}"/>
 	  </manifest>
-	  <!-- <zipfileset excludes="META-INF/*.SF" src="${build.parkbench}"/> -->
 	  <zipgroupfileset dir="${build.depdir}">
 	    <include name="*" if="${build.jar.withdeps}"/>
 	  </zipgroupfileset>
@@ -207,6 +206,13 @@
   -->
   <target name="run" description="Invoke the runnable JAR">
     <java jar="${build.jar.filename}" fork="true"/>
+  </target>
+  
+  <!-- Target: build-version
+       Shows the version of this build script
+  -->
+  <target name="build-version" description="Show build script version">
+    <echo message="Version ${build.version}" level="info"/>
   </target>
   
 </project>

@@ -142,7 +142,7 @@ public class Cli
 			stderr.println("under certain conditions. See the file LICENSE for details.\n");
 			System.exit(ERR_OK);
 		}
-		if (a_map.hasOption("h"))
+		if (a_map.hasOption("help"))
 		{
 			c_line.printHelp("ParkBench " + s_versionString + ", a versatile benchmark environment", stderr);
 			System.exit(ERR_OK);
@@ -321,8 +321,7 @@ public class Cli
 		CliParser options = new CliParser();
 		options.addArgument(new CliParser.Argument()
 		.withDescription("Display command line usage")
-		.withLongName("help")
-		.withShortName("h"));
+		.withLongName("help"));
 		options.addArgument(new CliParser.Argument()
 		.withDescription("Use server mode")
 		.withLongName("server"));
