@@ -1,6 +1,5 @@
-ParkBench: a flexible environment for running tests in batch
-============================================================
-
+ParkBench: a flexible environment for running experiments in batch
+==================================================================
 
 To learn how to use ParkBench and look at some tutorials, please refer to
 the following:
@@ -11,8 +10,18 @@ the following:
 Table of Contents                                                    {#toc}
 -----------------
 
+- [Downloading](#download)
 - [Quick start guide](#quickstart)
 - [About the author](#about)
+
+Downloading
+-----------
+
+You can download a stand-alone, precompiled
+[JAR library](https://github.com/sylvainhalle/ParkBench/releases/latest) of
+ParkBench. Note that this version may lag behind the latest source code.
+Otherwise, follow the instructions below to build the latest version by
+yourself.
 
 Quick start guide                                             {#quickstart}
 -----------------
@@ -77,16 +86,18 @@ itself).
 
 ParkBench also requires the following (optional) software to run:
 
-- [GnuPlot](http://gnuplot.info) for generating graphs. Under Windows, please
-  make sure the executable is in `C:\Program Files\gnuplot\bin`. Under other
-  systems, simply ensure that GnuPlot is in the system's path.
+- [GnuPlot](http://gnuplot.info) for generating graphs.
 
-  This is a link to a Windows Gnuplot installer. Choose the 64 bit version.
+  For Windows, here is a link to a Gnuplot installer.
   http://sourceforge.net/projects/gnuplot/files/gnuplot/5.0.1/
 
 - [PDFtk](https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/) for bundling
   multiple graphs into a single PDF document. Install it in the default location
   and it should work for all systems.
+
+*Caveat emptor:* make sure that the executable files of these two programs
+are in the system's path. This is especially true for Windows systems where
+this is not the case by default.
 
 Now what?
 ---------
