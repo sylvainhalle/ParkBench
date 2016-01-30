@@ -50,6 +50,10 @@ tr.impossible td {
   background-color: darkred;
 }
 
+#test-selection {
+	display: inline;
+}
+
 #test-selection > li {
   list-style-type: none;
   display: inline-block;
