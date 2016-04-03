@@ -24,8 +24,6 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Vector;
 
-import ca.uqac.lif.util.FileReadWrite;
-
 public class CommandRunner extends Thread
 {
 	protected String[] m_command;
@@ -189,11 +187,9 @@ public class CommandRunner extends Thread
 		return f.delete();
 	}
 	
-	public static byte[] runAndGet(String command, String inputs)
+	public static byte[] runAndGet(String[] command, String inputs)
 	{
-		String[] s_command = new String[1];
-		s_command[0] = command;
-		CommandRunner runner = new CommandRunner(s_command, inputs);
+		CommandRunner runner = new CommandRunner(command, inputs);
 		runner.run();
 		// Wait until the command is done
 		while (runner.isAlive())
@@ -208,41 +204,18 @@ public class CommandRunner extends Thread
 				// This happens if the user cancels the command manually
 				runner.stopCommand();
 				runner.interrupt();
-				System.err.println("Interrupted");
-				return null;
+				return new byte[0];
 			}
 		}
 		byte[] out = runner.getBytes();
 		return out;
 	}
-
-	public static void main(String[] args) throws IOException
+	
+	public static byte[] runAndGet(String command, String inputs)
 	{
-		//String[] command = {"D:/Workspaces/ParkBench/testA.bat"};
-		//String[] command = {"C:/Program Files/gnuplot/binary/gnuplot.exe"};
-		String[] command = {"gnuplot"};
-		String gpfile = FileReadWrite.readFile("/home/sylvain/test.gp");
-		CommandRunner runner = new CommandRunner(command, gpfile);
-		runner.start();
-		// Wait until the command is done
-		while (runner.isAlive())
-		{
-			// Wait 0.1 s and check again
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e) 
-			{
-				// This happens if the user cancels the command manually
-				runner.stopCommand();
-				runner.interrupt();
-				System.err.println("Interrupted");
-				return;
-			}
-		}
-		byte[] out = runner.getBytes();
-		System.out.println(out.length);
+		String[] s_command = new String[1];
+		s_command[0] = command;
+		return runAndGet(s_command, inputs);
 	}
 
 	@Override
@@ -304,7 +277,15 @@ public class CommandRunner extends Thread
 	 */
 	synchronized public String getString()
 	{
+		if (m_stdoutGobbler == null)
+		{
+			return "";
+		}
 		byte[] out = m_stdoutGobbler.getBytes();
+		if (out == null || out.length == 0)
+		{
+			return "";
+		}
 		return new String(out);
 	}
 	

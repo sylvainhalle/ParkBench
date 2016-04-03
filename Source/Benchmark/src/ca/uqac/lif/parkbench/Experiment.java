@@ -197,7 +197,7 @@ public abstract class Experiment implements Runnable
 			return false;
 		}
 		long cur_time = System.currentTimeMillis() / 1000;
-		if (cur_time - m_startTime > m_killAfter)
+		if (m_killAfter > 0 && cur_time - m_startTime > m_killAfter)
 		{
 			// Exp has run for long enough: can kill
 			return true;

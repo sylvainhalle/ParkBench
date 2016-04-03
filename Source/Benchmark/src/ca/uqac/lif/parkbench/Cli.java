@@ -48,7 +48,7 @@ public class Cli
 	 * information (including this version number) will be overwritten by that
 	 * of the containing jar.
 	 */
-	protected static final String s_versionString = "0.4";
+	protected static final String s_versionString = "0.4.1";
 
 	/**
 	 * Default server name
