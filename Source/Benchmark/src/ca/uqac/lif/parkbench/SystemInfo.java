@@ -20,9 +20,9 @@ package ca.uqac.lif.parkbench;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import ca.uqac.lif.cornipickle.json.JsonMap;
-import ca.uqac.lif.httpserver.CallbackResponse;
-import ca.uqac.lif.httpserver.RequestCallback;
+import ca.uqac.lif.json.JsonMap;
+import ca.uqac.lif.jerrydog.CallbackResponse;
+import ca.uqac.lif.jerrydog.RequestCallback;
 
 import com.sun.net.httpserver.HttpExchange;
 

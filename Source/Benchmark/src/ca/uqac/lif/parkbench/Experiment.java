@@ -20,10 +20,10 @@ package ca.uqac.lif.parkbench;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import ca.uqac.lif.cornipickle.json.JsonElement;
-import ca.uqac.lif.cornipickle.json.JsonMap;
-import ca.uqac.lif.cornipickle.json.JsonNumber;
-import ca.uqac.lif.cornipickle.json.JsonString;
+import ca.uqac.lif.json.JsonElement;
+import ca.uqac.lif.json.JsonMap;
+import ca.uqac.lif.json.JsonNumber;
+import ca.uqac.lif.json.JsonString;
 
 /**
  * An experiment is a set of named parameters
@@ -652,7 +652,7 @@ public abstract class Experiment implements Runnable
 		out.put("starttime", m_startTime);
 		out.put("endtime", m_stopTime);
 		out.put("host", m_host);
-		out.put("failure-message", JsonString.escape(m_failureMessage));
+		out.put("failure-message", m_failureMessage);
 		if (prerequisitesFulilled(m_parameters))
 		{
 			out.put("prerequisites", "true");

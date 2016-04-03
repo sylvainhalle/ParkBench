@@ -19,9 +19,9 @@ package ca.uqac.lif.parkbench;
 
 import java.util.Collection;
 
-import ca.uqac.lif.cornipickle.json.JsonList;
-import ca.uqac.lif.httpserver.CallbackResponse;
-import ca.uqac.lif.httpserver.RequestCallback;
+import ca.uqac.lif.json.JsonList;
+import ca.uqac.lif.jerrydog.CallbackResponse;
+import ca.uqac.lif.jerrydog.RequestCallback;
 
 import com.sun.net.httpserver.HttpExchange;
 

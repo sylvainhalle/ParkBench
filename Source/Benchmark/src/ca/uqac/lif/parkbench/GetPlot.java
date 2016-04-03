@@ -18,10 +18,10 @@
 
 import java.util.Map;
 
-import ca.uqac.lif.httpserver.CallbackResponse;
-import ca.uqac.lif.httpserver.CallbackResponse.ContentType;
-import ca.uqac.lif.httpserver.RequestCallback;
-import ca.uqac.lif.httpserver.Server;
+import ca.uqac.lif.jerrydog.CallbackResponse;
+import ca.uqac.lif.jerrydog.CallbackResponse.ContentType;
+import ca.uqac.lif.jerrydog.RequestCallback;
+import ca.uqac.lif.jerrydog.Server;
 import ca.uqac.lif.parkbench.plot.Plot;
 
 import com.sun.net.httpserver.HttpExchange;

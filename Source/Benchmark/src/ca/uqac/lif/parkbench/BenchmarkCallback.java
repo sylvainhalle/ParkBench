@@ -17,7 +17,7 @@
  */
 package ca.uqac.lif.parkbench;
 
-import ca.uqac.lif.httpserver.RestCallback;
+import ca.uqac.lif.jerrydog.RestCallback;
 
 public abstract class BenchmarkCallback extends RestCallback
 {

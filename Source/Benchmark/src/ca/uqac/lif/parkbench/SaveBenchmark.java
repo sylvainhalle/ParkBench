@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import ca.uqac.lif.cornipickle.json.JsonMap;
-import ca.uqac.lif.httpserver.CallbackResponse;
-import ca.uqac.lif.httpserver.RequestCallback;
-import ca.uqac.lif.httpserver.Server;
+import ca.uqac.lif.json.JsonMap;
+import ca.uqac.lif.jerrydog.CallbackResponse;
+import ca.uqac.lif.jerrydog.RequestCallback;
+import ca.uqac.lif.jerrydog.Server;
 
 import com.sun.net.httpserver.HttpExchange;
 

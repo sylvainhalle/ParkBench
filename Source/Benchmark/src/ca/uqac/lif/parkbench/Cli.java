@@ -21,10 +21,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
-import ca.uqac.lif.cornipickle.json.JsonFastParser;
-import ca.uqac.lif.cornipickle.json.JsonMap;
-import ca.uqac.lif.cornipickle.json.JsonParser;
-import ca.uqac.lif.cornipickle.json.JsonParser.JsonParseException;
+import ca.uqac.lif.json.JsonMap;
+import ca.uqac.lif.json.JsonParser;
+import ca.uqac.lif.json.JsonParser.JsonParseException;
 import ca.uqac.lif.cornipickle.util.AnsiPrinter;
 import ca.uqac.lif.util.CliParser;
 import ca.uqac.lif.util.CliParser.Argument;
@@ -48,7 +47,7 @@ public class Cli
 	 * information (including this version number) will be overwritten by that
 	 * of the containing jar.
 	 */
-	protected static final String s_versionString = "0.4.1";
+	protected static final String s_versionString = "0.5";
 
 	/**
 	 * Default server name
@@ -118,6 +117,7 @@ public class Cli
 				stdout.close();
 			}
 		}));
+		
 		// Parse command line arguments
 		CliParser c_line = setupOptions();
 		Argument[] arguments = test_suite.setupCommandLineArguments();
@@ -180,7 +180,7 @@ public class Cli
 
 		// The remaining arguments are configuration files to read
 		List<String> remaining_args = a_map.getOthers();
-		JsonParser parser = new JsonFastParser();
+		JsonParser parser = new JsonParser();
 		for (String filename : remaining_args)
 		{
 			if (merge)
@@ -208,6 +208,11 @@ public class Cli
 			}
 		}
 		String save_filename = benchmark.getName() + ".json";
+		
+		// Deploy any files
+		String deploy_dir = "deploy";
+		System.out.println("Deploying files to " + deploy_dir);
+		DeployHandler.deployAll(deploy_dir, 1);
 
 		if (interactive_mode)
 		{

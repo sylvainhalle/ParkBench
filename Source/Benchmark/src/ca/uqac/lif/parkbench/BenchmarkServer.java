@@ -17,7 +17,7 @@
  */
 package ca.uqac.lif.parkbench;
 
-import ca.uqac.lif.httpserver.InnerFileServer;
+import ca.uqac.lif.jerrydog.InnerFileServer;
 
 public class BenchmarkServer extends InnerFileServer
 {

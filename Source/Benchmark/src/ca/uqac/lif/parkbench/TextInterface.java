@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import ca.uqac.lif.cornipickle.json.JsonMap;
+import ca.uqac.lif.json.JsonMap;
 import ca.uqac.lif.cornipickle.util.AnsiPrinter;
 import ca.uqac.lif.cornipickle.util.AnsiPrinter.Color;
 import ca.uqac.lif.parkbench.Experiment.Status;

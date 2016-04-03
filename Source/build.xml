@@ -80,13 +80,13 @@
   <property name="build.jar.filename" value="AntRun.jar"/>
   
   <!-- Generate a jar with the documentation -->
-  <property name="build.jar.withdoc" value="true"/>
+  <property name="build.jar.withdoc" value="false"/>
   
   <!-- Generate a jar with the sources -->
-  <property name="build.jar.withsrc" value="true"/>
+  <property name="build.jar.withsrc" value="false"/>
   
   <!-- Generate a jar with the dependencies -->
-  <property name="build.jar.withdeps" value="false"/>
+  <property name="build.jar.withdeps" value="true"/>
   
   <!-- Base name of the jar to produce (used by the "zip" target) -->
   <basename property="build.jar.basename" file="${build.jar.filename}" suffix=".jar"/>
