@@ -1,5 +1,5 @@
-**This repository is deprecated. This project has been renamed
-[LabPal](https://liflab.github.io/labpal).**
+:no_entry_sign: **This repository is deprecated. This project has been renamed
+[LabPal](https://liflab.github.io/labpal).** :no_entry_sign:
 
 ParkBench: a flexible environment for running experiments in batch
 ==================================================================
